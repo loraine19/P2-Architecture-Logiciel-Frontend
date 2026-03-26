@@ -1,63 +1,64 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../../shared/material.module';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { UserService } from '../../core/service/user.service';
-import { Register } from '../../core/models/Register';
-import { InfoMessage } from '../../core/models/InfoMessage';
+import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MaterialModule } from '../../shared/material.module';
+import { UserService } from '../../core/service/user.service';
+import { Login } from '../../core/models/Login';
+import { InfoMessage } from '../../core/models/InfoMessage';
 
 @Component({
-  selector: 'app-register',
-  imports: [CommonModule, MaterialModule],
-  templateUrl: './register.component.html',
+  selector: 'app-login',
   standalone: true,
-  styleUrl: './register.component.css'
+  imports: [CommonModule, MaterialModule, ReactiveFormsModule],
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.css'
 })
-export class RegisterComponent implements OnInit {
+export class LoginComponent implements OnInit {
   private userService = inject(UserService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
-  registerForm: FormGroup = new FormGroup({});
+  private router = inject(Router);
+
+  loginForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
   infoMessage: InfoMessage = { message: '', error: false };
 
-  ngOnInit() {
-    this.registerForm = this.formBuilder.group(
-      {
-        firstName: ['', Validators.required],
-        lastName: ['', Validators.required],
-        login: ['', Validators.required],
-        password: ['', Validators.required]
-      },
-    );
+  ngOnInit(): void {
+    this.loginForm = this.formBuilder.group({
+      login: ['', Validators.required],
+      password: ['', Validators.required]
+    });
   }
 
   get form() {
-    return this.registerForm.controls;
+    return this.loginForm.controls;
   }
 
   onSubmit(): void {
     this.submitted = true;
-    if (this.registerForm.invalid) {
+    this.infoMessage = { message: '', error: false };
+
+    if (this.loginForm.invalid) {
       return;
     }
-    const registerUser: Register = {
-      firstName: this.registerForm.get('firstName')?.value,
-      lastName: this.registerForm.get('lastName')?.value,
-      login: this.registerForm.get('login')?.value,
-      password: this.registerForm.get('password')?.value
-    };
-    this.userService.register(registerUser)
+
+    const credentials: Login = this.loginForm.value;
+
+    this.userService.login(credentials)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.infoMessage = { message: 'Hi, ' + registerUser.login + '! you are now registered , you can now log in! ', error: false };
+          this.infoMessage = { message: 'Hi, ' + credentials.login + '! you are now logged in !', error: false };
+          this.router.navigate(['/']);
         },
         error: (err: HttpErrorResponse) => this.handleError(err)
       });
   }
+
+  // Handle errors from the login attempt and set an appropriate message for the user
   private handleError(err: HttpErrorResponse): void {
     let message = 'An unexpected error occurred. Please try again.';
 
@@ -85,8 +86,10 @@ export class RegisterComponent implements OnInit {
 
     this.infoMessage = { message, error: true };
   }
+
   onReset(): void {
     this.submitted = false;
-    this.registerForm.reset();
+    this.infoMessage = { message: '', error: false };
+    this.loginForm.reset();
   }
 }

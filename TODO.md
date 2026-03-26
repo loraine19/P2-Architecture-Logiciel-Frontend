@@ -11,20 +11,20 @@
 
 ## Étape 2 - Corrigez l'API d'authentification (Back-end) 🛠️
 
-- [ ] Identifier l'endpoint d'authentification `/api/login`.
-- [ ] Déboguer la méthode `login` dans `UserService.java` via des points d'arrêt.
-- [ ] Implémenter le service `JWTService.java` pour la délivrance du token.
-- [ ] Garantir que l'API retourne un token JWT valide en cas de succès.
-- [ ] Valider le fonctionnement de la route avec **Postman**.
-- [ ] Respecter le découpage en couches et l'usage exclusif de **DTO** dans les controllers.
+- [x] Identifier l'endpoint d'authentification `/api/login`.
+- [x] Déboguer la méthode `login` dans `UserService.java` via des points d'arrêt.
+- [x] Implémenter le service `JWTService.java` pour la délivrance du token.
+- [x] Garantir que l'API retourne un token JWT valide en cas de succès.
+- [x] Valider le fonctionnement de la route avec **Postman**.
+- [x] Respecter le découpage en couches et l'usage exclusif de **DTO** dans les controllers.
 
 ## Étape 3 - Implémentez l'interface d'authentification (Front-end) 🖥️
 
-- [ ] Créer le composant `login` et sa route dédiée.
-- [ ] Développer le formulaire (champs login et mot de passe).
-- [ ] Créer le service Angular pour consommer l'API `/api/login`.
-- [ ] Assurer la réception et la gestion du token d'authentification.
-- [ ] Gérer les états de l'interface : chargement, erreurs serveur et succès.
+- [x] Créer le composant `login` et sa route dédiée.
+- [x] Développer le formulaire (champs login et mot de passe).
+- [x] Créer le service Angular pour consommer l'API `/api/login`.
+- [x] Assurer la réception et la gestion du token d'authentification.
+- [x] Gérer les états de l'interface : chargement, erreurs serveur et succès.
 
 ## Étape 4 - Ajoutez de nouvelles fonctionnalités (Back-end) 🏗️
 
