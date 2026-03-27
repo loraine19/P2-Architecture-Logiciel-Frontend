@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Register, UserDTO } from '../models/Register';
+import { UserDTO } from '../models/Register';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Login } from '../models/Login';

@@ -21,6 +21,7 @@ export class ErrorService {
                     break;
                 case 401:
                     message = 'Invalid credentials. Please check your login and password.';
+                    this.router.navigate(['/login'], { queryParams: { msg: message, error: true } });
                     break;
                 case 403:
                     message = 'Access denied.';

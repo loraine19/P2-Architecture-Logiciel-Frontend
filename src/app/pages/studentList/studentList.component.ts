@@ -20,9 +20,11 @@ export class StudentListComponent implements OnInit {
   private errorService = inject(ErrorService);
   private router = inject(Router);
 
+
   students: Student[] = [];
   infoMessage: InfoMessage = { message: '', error: false };
   isLoading: boolean = true;
+  pendingDeleteId: number | null = null;
 
   ngOnInit(): void {
     this.loadStudents();
@@ -43,15 +45,29 @@ export class StudentListComponent implements OnInit {
   }
 
   deleteStudent(id: number): void {
-    if (confirm('Are you sure you want to delete this student?')) {
-      this.studentService.deleteStudent(id).subscribe({
+    this.pendingDeleteId = id;
+    this.infoMessage = { message: '', error: false };
+  }
+
+  confirmDelete(): void {
+    if (this.pendingDeleteId) {
+      this.studentService.deleteStudent(this.pendingDeleteId).subscribe({
         next: () => {
-          this.students = this.students.filter(s => s.id !== id);
+          this.students = this.students.filter(s => s.id !== this.pendingDeleteId);
           this.infoMessage = { message: 'Student deleted successfully', error: false };
+          this.pendingDeleteId = null;
         },
-        error: (err) => this.errorService.handleError(err, this.infoMessage)
+        error: (err) => {
+          this.errorService.handleError(err, this.infoMessage);
+          this.pendingDeleteId = null;
+        }
       });
     }
+  }
+
+  cancelDelete(): void {
+    this.pendingDeleteId = null;
+    this.infoMessage = { message: '', error: false };
   }
 
   viewStudent(id: number): void {

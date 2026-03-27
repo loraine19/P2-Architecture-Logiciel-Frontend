@@ -8,7 +8,7 @@ import { MaterialModule } from '../shared/material.module';
   selector: 'app-navigation',
   imports: [RouterLink, RouterLinkActive, CommonModule, MaterialModule],
   templateUrl: './navigation.component.html',
-  styleUrls: ['../pages/pages.css']
+  styleUrls: ['../pages/pages.css', './navigation.css']
 })
 export class NavigationComponent {
   isMenuOpen = false;
