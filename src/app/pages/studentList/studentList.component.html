@@ -1,0 +1,139 @@
+<div class="card m-3">
+  <h5 class="card-header">
+    <mat-icon class="header-icon">people</mat-icon>
+    Student List
+  </h5>
+  <div class="card-body">
+    <!-- Alert Messages -->
+    @if (infoMessage.message && infoMessage.error) {
+      <div class="alert alert-danger" role="alert">
+        <mat-icon>error</mat-icon>
+        {{ infoMessage.message }}
+      </div>
+    }
+    @if (infoMessage.message && !infoMessage.error) {
+      <div class="alert alert-success" role="alert">
+        <mat-icon>check_circle</mat-icon>
+        {{ infoMessage.message }}
+      </div>
+    }
+
+    <!-- Loading State -->
+    @if (isLoading) {
+      <div class="d-flex justify-content-center p-4">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    }
+
+    <!-- Student Table with Horizontal Scroll -->
+    @if (!isLoading && students.length > 0) {
+      <div class="student-table-container">
+        <div class="student-table-wrapper">
+          <table class="student-table">
+            <thead>
+              <tr>
+                <th class="student-header id-col">ID</th>
+                <th class="student-header">First Name</th>
+                <th class="student-header">Last Name</th>
+                <th class="student-header">Email</th>
+                <th class="student-header">Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (student of students; track student.id) {
+                <tr class="student-row">
+                  <td class="student-cell id-col">{{ student.id }}</td>
+                  <td class="student-cell">{{ student.firstName }}</td>
+                  <td class="student-cell">{{ student.lastName }}</td>
+                  <td class="student-cell">{{ student.email }}</td>
+                  <td class="student-cell">{{ student.phoneNumber }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="actions-column">
+          <div class="actions-header">
+            <span class="actions-title">Actions</span>
+          </div>
+          <div class="actions-body">
+            @for (student of students; track student.id) {
+              <div class="action-row">
+                <div
+                  class="btn-group-action"
+                  role="group"
+                  aria-label="Student actions"
+                >
+                  <button
+                    mat-mini-fab
+                    color="primary"
+                    class="action-btn"
+                    title="View Details"
+                    (click)="viewStudent(student.id)"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button
+                    mat-mini-fab
+                    color="warn"
+                    class="action-btn"
+                    title="Edit Student"
+                    (click)="editStudent(student.id)"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-mini-fab
+                    class="action-btn"
+                    title="Delete Student"
+                    (click)="deleteStudent(student.id)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- No Students State -->
+    @if (!isLoading && students.length === 0) {
+      <div class="text-center p-5">
+        <div class="empty-state-container">
+          <mat-icon class="empty-state-icon">people_outline</mat-icon>
+          <h5 class="empty-state-title">No Students Found</h5>
+          <p class="empty-state-text">
+            There are no students to display yet. Start by adding your first
+            student!
+          </p>
+          <button
+            mat-raised-button
+            color="primary"
+            class="empty-state-btn"
+            routerLink="/studentCreate"
+          >
+            <mat-icon>person_add</mat-icon>
+            Add First Student
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Add Student Button -->
+    @if (!isLoading && students.length > 0) {
+      <div class="d-flex justify-content-center mt-4">
+        <button
+          mat-raised-button
+          color="primary"
+          class="add-student-btn"
+          routerLink="/studentCreate"
+        >
+          <mat-icon>add_circle</mat-icon>
+          Add New Student
+        </button>
+      </div>
+    }
+  </div>
+</div>

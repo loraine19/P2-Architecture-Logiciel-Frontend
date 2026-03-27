@@ -1,4 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
+html,
+body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  align-items: center;
+  justify-content: center;
+  background-color: #e5eaee;
+}
+body {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+}
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* THE VISUAL FIX  */
+mat-form-field {
+  --mdc-outlined-text-field-outline-width: 1.5px !important;
+  --mdc-outlined-text-field-focus-outline-width: 2.5px !important;
+  --mdc-outlined-text-field-outline-color: #9f9f9f !important;
+  --mdc-outlined-text-field-error-outline-width: 1.5px !important;
+  --mdc-outlined-text-field-error-focus-outline-width: 2.5px !important;
+  --mdc-notched-outline: border-radius: 92px !important;
+}

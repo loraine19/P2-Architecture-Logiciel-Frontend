@@ -1,26 +1,29 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MaterialModule } from '../../shared/material.module';
 import { UserService } from '../../core/service/user.service';
 import { Login } from '../../core/models/Login';
 import { InfoMessage } from '../../core/models/InfoMessage';
+import { ErrorService } from '../../core/service/error.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, MaterialModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: '../pages.css'
 })
 export class LoginComponent implements OnInit {
   private userService = inject(UserService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private errorService = inject(ErrorService);
 
   loginForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
@@ -28,14 +31,34 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.loginForm = this.formBuilder.group({
-      login: ['', Validators.required],
-      password: ['', Validators.required]
+      login: ['', [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(100),
+      ]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(128),
+        Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.-_])[A-Za-z\\d@$!%*?&.-_]+$")
+      ]]
+    });
+    // Check for query params to display messages
+    this.route.queryParams.subscribe(params => {
+      const msg = params['msg'];
+      const error = params['error'];
+      if (msg) {
+        this.infoMessage.message = msg;
+        this.infoMessage.error = error === 'true';
+      }
     });
   }
 
   get form() {
     return this.loginForm.controls;
   }
+
+
 
   onSubmit(): void {
     this.submitted = true;
@@ -52,40 +75,15 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: () => {
           this.infoMessage = { message: 'Hi, ' + credentials.login + '! you are now logged in !', error: false };
-          this.router.navigate(['/']);
+          setTimeout(() => {
+            this.router.navigate(['/studentList']);
+          }, 2000);
         },
-        error: (err: HttpErrorResponse) => this.handleError(err)
+        error: (err: HttpErrorResponse) => this.errorService.handleError(err, this.infoMessage)
       });
   }
 
-  // Handle errors from the login attempt and set an appropriate message for the user
-  private handleError(err: HttpErrorResponse): void {
-    let message = 'An unexpected error occurred. Please try again.';
 
-    if (err.error?.message) {
-      message = err.error.message;
-    } else {
-      switch (err.status) {
-        case 0:
-          message = 'Unable to connect to the server. Please check your network.';
-          break;
-        case 401:
-          message = 'Invalid credentials. Please check your login and password.';
-          break;
-        case 403:
-          message = 'Access denied.';
-          break;
-        case 404:
-          message = 'Service not found.';
-          break;
-        case 500:
-          message = 'Internal server error.';
-          break;
-      }
-    }
-
-    this.infoMessage = { message, error: true };
-  }
 
   onReset(): void {
     this.submitted = false;

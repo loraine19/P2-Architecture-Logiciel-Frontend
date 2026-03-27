@@ -2,88 +2,169 @@
   <h5 class="card-header">Registration Form</h5>
   <div class="card-body">
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <div class="form-row">
-        <div class="form-group col-5">
-          @if (infoMessage.message && infoMessage.error) {
-            <div class="alert alert-danger" role="alert">
-              {{ infoMessage.message }}
-            </div>
-          }
-          @if (infoMessage.message && !infoMessage.error) {
-            <div class="alert alert-success" role="alert">
-              {{ infoMessage.message }}
-            </div>
-          }
-          <label>First Name</label>
-          <input
-            type="text"
-            formControlName="firstName"
-            class="form-control"
-            [ngClass]="{ 'is-invalid': submitted && form['firstName'].errors }"
-          />
-          @if (submitted && form["firstName"].errors) {
-            <div class="invalid-feedback">
-              @if (form["firstName"].errors?.["required"]) {
-                <div>First Name is required</div>
-              }
-            </div>
-          }
+      <!-- Alert Messages -->
+      @if (infoMessage.message && infoMessage.error) {
+        <div class="alert alert-danger" role="alert">
+          {{ infoMessage.message }}
         </div>
-        <div class="form-group col-5">
-          <label>Last Name</label>
-          <input
-            type="text"
-            formControlName="lastName"
-            class="form-control"
-            [ngClass]="{ 'is-invalid': submitted && form['lastName'].errors }"
-          />
-          @if (submitted && form["lastName"].errors) {
-            <div class="invalid-feedback">
-              @if (form["lastName"].errors?.["required"]) {
-                <div>Last Name is required</div>
-              }
-            </div>
-          }
+      }
+      @if (infoMessage.message && !infoMessage.error) {
+        <div class="alert alert-success" role="alert">
+          {{ infoMessage.message }}
         </div>
-      </div>
-      <div class="form-group">
-        <label>Login</label>
-        <input
-          type="text"
-          formControlName="login"
-          class="form-control"
-          [ngClass]="{ 'is-invalid': submitted && form['login'].errors }"
-        />
-        @if (submitted && form["login"].errors) {
-          <div class="invalid-feedback">
-            @if (form["login"].errors?.["required"]) {
-              <div>Login is required</div>
+      }
+
+      <!-- Personal Information Row -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>First Name</mat-label>
+            <input
+              type="text"
+              matInput
+              formControlName="firstName"
+              placeholder="Enter your first name"
+            />
+            <mat-icon matPrefix>person</mat-icon>
+            @if (form["firstName"].touched && form["firstName"].errors) {
+              <mat-error>
+                @if (form["firstName"].errors?.["required"]) {
+                  First name is required
+                }
+                @if (form["firstName"].errors?.["minlength"]) {
+                  First name must be at least 2 characters long
+                }
+                @if (form["firstName"].errors?.["maxlength"]) {
+                  First name cannot exceed 50 characters
+                }
+                @if (form["firstName"].errors?.["pattern"]) {
+                  First name can only contain letters, spaces, hyphens, and
+                  apostrophes
+                }
+              </mat-error>
             }
-          </div>
-        }
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Last Name</mat-label>
+            <input
+              matInput
+              [type]="'text'"
+              formControlName="lastName"
+              placeholder="Enter your last name"
+            />
+            <mat-icon matPrefix>person</mat-icon>
+            @if (form["lastName"].touched && form["lastName"].errors) {
+              <mat-error>
+                @if (form["lastName"].errors?.["required"]) {
+                  Last name is required
+                }
+                @if (form["lastName"].errors?.["minlength"]) {
+                  Last name must be at least 2 characters long
+                }
+                @if (form["lastName"].errors?.["maxlength"]) {
+                  Last name cannot exceed 50 characters
+                }
+                @if (form["lastName"].errors?.["pattern"]) {
+                  Last name can only contain letters, spaces, hyphens, and
+                  apostrophes
+                }
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Password</label>
-        <input
-          type="text"
-          formControlName="password"
-          class="form-control"
-          [ngClass]="{ 'is-invalid': submitted && form['password'].errors }"
-        />
-        @if (submitted && form["password"].errors) {
-          <div class="invalid-feedback">
-            @if (form["password"].errors?.["required"]) {
-              <div>password is required</div>
-            }
-          </div>
-        }
+      <!-- Login Field -->
+      <div class="mb-3">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Login</mat-label>
+          <input
+            matInput
+            formControlName="login"
+            placeholder="Choose a login name"
+            autocomplete="username"
+          />
+          <mat-icon matPrefix>account_circle</mat-icon>
+          @if (form["login"].touched && form["login"].errors) {
+            <mat-error>
+              @if (form["login"].errors?.["required"]) {
+                Login is required
+              }
+              @if (form["login"].errors?.["email"]) {
+                Please enter a valid email address
+              }
+              @if (form["login"].errors?.["maxlength"]) {
+                Login cannot exceed 100 characters
+              }
+            </mat-error>
+          }
+        </mat-form-field>
       </div>
-      <div class="d-flex justify-content-center gap-4 p-4">
-        <button class="btn btn-primary mr-1">Register</button>
-        <button class="btn btn-secondary" type="reset" (click)="onReset()">
-          Cancel
+
+      <!-- Password Field -->
+      <div class="mb-3">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            [type]="passwordVisible ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Create a secure password"
+            autocomplete="new-password"
+          />
+          <mat-icon
+            matSuffix
+            (click)="togglePasswordVisibility()"
+            class="cursor-pointer"
+          >
+            {{ passwordVisible ? "visibility_off" : "visibility" }}
+          </mat-icon>
+          @if (form["password"].touched && form["password"].errors) {
+            <mat-error>
+              @if (form["password"].errors?.["required"]) {
+                Password is required
+              }
+              @if (form["password"].errors?.["minlength"]) {
+                Password must be at least 8 characters long
+              }
+              @if (form["password"].errors?.["maxlength"]) {
+                Password cannot exceed 128 characters
+              }
+              @if (form["password"].errors?.["pattern"]) {
+                Password must contain 1 lowercase, 1 uppercase, 1 digit, and 1
+                special character
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          class="rounded-pill px-4"
+          [disabled]="registerForm.invalid"
+        >
+          <mat-icon>person_add</mat-icon>
+          Register
         </button>
+        @if (registerForm.dirty) {
+          <button
+            type="button"
+            mat-button
+            color="warn"
+            class="rounded-pill cancel-btn px-4"
+            (click)="onReset()"
+          >
+            <mat-icon>cancel</mat-icon>
+            Cancel
+          </button>
+        }
       </div>
     </form>
   </div>

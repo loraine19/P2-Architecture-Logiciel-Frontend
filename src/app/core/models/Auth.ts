@@ -1,5 +1,11 @@
-export interface Auth {
-    token?: string,
-    isAuthenticated: boolean
-    partialToken: string
+export class Auth {
+    token?: string;
+    isAuthenticated: boolean;
+    partialToken: string;
+
+
+    constructor(isAuthenticated: boolean, partialToken: string) {
+        this.isAuthenticated = isAuthenticated;
+        this.partialToken = partialToken;
+    }
 }

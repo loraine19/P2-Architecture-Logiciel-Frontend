@@ -1,35 +1,59 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../shared/material.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserService } from '../../core/service/user.service';
-import { Register } from '../../core/models/Register';
+import { UserDTO } from '../../core/models/Register';
 import { InfoMessage } from '../../core/models/InfoMessage';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ErrorService } from '../../core/service/error.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
-  imports: [CommonModule, MaterialModule],
+  imports: [CommonModule, MaterialModule, ReactiveFormsModule],
   templateUrl: './register.component.html',
   standalone: true,
-  styleUrl: './register.component.css'
+  styleUrl: '../pages.css'
 })
 export class RegisterComponent implements OnInit {
   private userService = inject(UserService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
+  private errorService = inject(ErrorService);
+  private router = inject(Router);
   registerForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
   infoMessage: InfoMessage = { message: '', error: false };
+  passwordVisible: boolean = false;
 
   ngOnInit() {
     this.registerForm = this.formBuilder.group(
       {
-        firstName: ['', Validators.required],
-        lastName: ['', Validators.required],
-        login: ['', Validators.required],
-        password: ['', Validators.required]
+        firstName: ['', [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(50),
+          Validators.pattern("^[a-zA-ZÀ-ÿ\\s'-]+$")
+        ]],
+        lastName: ['', [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(50),
+          Validators.pattern("^[a-zA-ZÀ-ÿ\\s'-]+$")
+        ]],
+        login: ['', [
+          Validators.required,
+          Validators.email,
+          Validators.maxLength(100)
+        ]],
+        password: ['', [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.maxLength(128),
+          Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.-_])[A-Za-z\\d@@$!%*?&.-_]+$")
+        ]]
       },
     );
   }
@@ -43,7 +67,7 @@ export class RegisterComponent implements OnInit {
     if (this.registerForm.invalid) {
       return;
     }
-    const registerUser: Register = {
+    const registerUser: UserDTO = {
       firstName: this.registerForm.get('firstName')?.value,
       lastName: this.registerForm.get('lastName')?.value,
       login: this.registerForm.get('login')?.value,
@@ -54,39 +78,19 @@ export class RegisterComponent implements OnInit {
       .subscribe({
         next: () => {
           this.infoMessage = { message: 'Hi, ' + registerUser.login + '! you are now registered , you can now log in! ', error: false };
+          setTimeout(() => {
+            this.router.navigate(['/login?msg=Registration successful! Please log in.&error=false']);
+          }, 2000);
         },
-        error: (err: HttpErrorResponse) => this.handleError(err)
+        error: (err: HttpErrorResponse) => this.errorService.handleError(err, this.infoMessage)
       });
-  }
-  private handleError(err: HttpErrorResponse): void {
-    let message = 'An unexpected error occurred. Please try again.';
-
-    if (err.error?.message) {
-      message = err.error.message;
-    } else {
-      switch (err.status) {
-        case 0:
-          message = 'Unable to connect to the server. Please check your network.';
-          break;
-        case 401:
-          message = 'Invalid credentials. Please check your login and password.';
-          break;
-        case 403:
-          message = 'Access denied.';
-          break;
-        case 404:
-          message = 'Service not found.';
-          break;
-        case 500:
-          message = 'Internal server error.';
-          break;
-      }
-    }
-
-    this.infoMessage = { message, error: true };
   }
   onReset(): void {
     this.submitted = false;
     this.registerForm.reset();
+  }
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
   }
 }
