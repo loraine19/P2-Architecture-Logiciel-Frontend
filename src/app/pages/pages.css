@@ -97,6 +97,7 @@ mat-icon {
   justify-content: center;
   border: none;
   cursor: pointer;
+  box-shadow: none;
   transition: background-color 0.2s ease;
 }
 
@@ -105,27 +106,35 @@ mat-icon {
   width: 20px;
   height: 20px;
 }
-
-.btn-group-action .view {
-  background-color: #e8def8;
-  color: #6750a4;
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.btn-group-action .edit {
+
+.action-btn.view {
+  background-color: #dedef8;
+  color: #505fa4;
+}
+.action-btn.edit {
   background-color: #fef0d8;
   color: #8c4a00;
 }
-.btn-group-action .delete {
+.action-btn.delete {
   background-color: #ffdad6;
   color: #ba1a1a;
 }
 
-.btn-group-action .view:hover {
+.btn-group-action .view:hover,
+.action-btn.view:hover {
   background-color: #d0bcff;
 }
-.btn-group-action .edit:hover {
+.btn-group-action .edit:hover,
+.action-btn.edit:hover {
   background-color: #fde2b4;
 }
-.btn-group-action .delete:hover {
+.btn-group-action .delete:hover,
+.action-btn.delete:hover {
   background-color: #ffb4ab;
 }
 
@@ -326,19 +335,6 @@ button[mat-raised-button]:hover,
     justify-content: center;
     font-weight: 500;
     border: none;
-  }
-
-  .action-btn-mobile.view {
-    background-color: #e8def8;
-    color: #6750a4;
-  }
-  .action-btn-mobile.edit {
-    background-color: #fef0d8;
-    color: #8c4a00;
-  }
-  .action-btn-mobile.delete {
-    background-color: #ffdad6;
-    color: #ba1a1a;
   }
 }
 

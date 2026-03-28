@@ -1,4 +1,4 @@
-# Utilisation d'une image Nginx légère
+# npm run build --configuration=production BEFORE BUILDING THE DOCKER IMAGE
 FROM nginx:alpine
 
 COPY dist/etudiant-frontend/browser /usr/share/nginx/html

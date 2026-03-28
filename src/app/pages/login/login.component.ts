@@ -28,6 +28,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
   infoMessage: InfoMessage = { message: '', error: false };
+  passwordVisible: boolean = false;
 
   ngOnInit(): void {
     this.loginForm = this.formBuilder.group({
@@ -98,5 +99,9 @@ export class LoginComponent implements OnInit {
     this.submitted = false;
     this.infoMessage = { message: '', error: false };
     this.loginForm.reset();
+  }
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
   }
 }
