@@ -1,0 +1,271 @@
+<div class="card m-0 border-0 main-container">
+  <h5 class="card-header d-flex align-items-center border-0 pt-4 pb-2 px-4">
+    <mat-icon class="text-primary me-2">domain</mat-icon>
+    Système de Gestion des Étudiants
+  </h5>
+
+  <div class="card-body px-4 pb-4">
+    <div
+      class="card h-100 bg-secondary bg-opacity-10 p-4 d-flex flex-column border-0"
+      role="alert"
+    >
+      <h6
+        class="d-flex align-items-center fw-bold mb-3 gap-3 text-secondary text-opacity-75"
+      >
+        <div
+          class="rounded-circle d-flex w-8 h-8 align-items-center justify-content-center feature-icon-container bg-secondary bg-opacity-25 p-2 me-3"
+        >
+          <mat-icon class="feature-icon text-secondary">devices</mat-icon>
+        </div>
+
+        Exercice d'Architecture Logicielle
+      </h6>
+      <p class="mb-0">
+        Application complète de gestion des étudiants développée dans le cadre
+        d'un projet d'apprentissage de l'architecture logicielle moderne. Cette
+        solution démontre l'implémentation d'une architecture client-serveur
+        avec Angular et Spring Boot.
+      </p>
+    </div>
+
+    <div class="row mt-4 gap-4">
+      <div class="flex-column">
+        <h6 class="d-flex align-items-center text-secondary">
+          Repositories Section
+        </h6>
+      </div>
+      <div class="d-flex flex-column flex-lg-row gap-4">
+        <div class="mb-3">
+          <div class="card h-100">
+            <div class="card-body p-4 bg-primary bg-opacity-25">
+              <h6
+                class="d-flex align-items-center fw-bold mb-3 gap-3 text-primary text-opacity-75"
+              >
+                <div
+                  class="rounded-circle d-flex w-8 h-8 align-items-center justify-content-center feature-icon-container bg-primary bg-opacity-25 p-2"
+                >
+                  <mat-icon class="feature-icon text-primary">web</mat-icon>
+                </div>
+                Frontend - Angular
+              </h6>
+              <p class="card-text small mb-3 text-secondary">Tech stacks</p>
+              <div class="d-flex flex-wrap gap-2 mb-4">
+                @for (tech of techStackFrontend; track tech) {
+                  <span
+                    class="badge text-opacity-75 bg-primary bg-opacity-25 text-dark rounded-pill border-0 shadow-sm px-3 py-2"
+                    >{{ tech }}</span
+                  >
+                }
+              </div>
+              <button
+                mat-raised-button
+                class="add-student-btn w-100 d-flex justify-content-center align-items-center"
+                (click)="
+                  openRepository(
+                    'https://github.com/loraine19/P2-Architecture-Logiciel-Frontend'
+                  )
+                "
+              >
+                Voir le Dépôt
+                <mat-icon class="ms-2 bg">arrow_outward</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="card h-100">
+            <div class="card-body p-4 bg-success bg-opacity-25">
+              <h6
+                class="d-flex align-items-center fw-bold mb-3 gap-3 text-success"
+              >
+                <div
+                  class="rounded-circle d-flex w-8 h-8 align-items-center justify-content-center feature-icon-container bg-success bg-opacity-25 p-2"
+                >
+                  <mat-icon class="feature-icon text-success">code</mat-icon>
+                </div>
+                Backend - Spring Boot
+              </h6>
+              <p class="card-text small mb-3 text-secondary">Tech stacks</p>
+              <div class="d-flex flex-wrap gap-2 mb-4">
+                @for (tech of techStackBackend; track tech) {
+                  <span
+                    class="badge text-opacity-75 bg-success bg-opacity-25 text-dark rounded-pill border-0 shadow-sm px-3 py-2"
+                    >{{ tech }}</span
+                  >
+                }
+              </div>
+              <button
+                mat-raised-button
+                class="add-student-btn bg-success w-100 d-flex justify-content-center align-items-center"
+                (click)="
+                  openRepository(
+                    'https://github.com/loraine19/P2-Architecture-Logiciel-Backend'
+                  )
+                "
+              >
+                Voir le Dépôt
+                <mat-icon class="ms-2">arrow_outward</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-12">
+        <h6 class="d-flex align-items-center text-secondary mb-3">
+          Features Section
+        </h6>
+      </div>
+
+      @for (feature of features; track feature.title) {
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div
+            class="card student-card bg-{{
+              feature.color
+            }} bg-opacity-25 h-100 border-0"
+          >
+            <div class="card-body d-flex flex-column align-items-start p-4">
+              <div
+                class="mb-3 rounded-circle d-flex align-items-center justify-content-center feature-icon-container bg-{{
+                  feature.color
+                }} bg-opacity-25 p-2"
+              >
+                <mat-icon class="feature-icon text-{{ feature.color }}">
+                  {{ feature.icon }}
+                </mat-icon>
+              </div>
+              <h6 class="card-title fw-bold text-{{ feature.color }}">
+                {{ feature.title }}
+              </h6>
+              <p class="card-text small text-secondary">
+                {{ feature.description }}
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-12">
+        <h6 class="d-flex align-items-center text-secondary mb-3">
+          Architecture Section
+        </h6>
+        <div class="card w-100 border-0 bg-secondary bg-opacity-10">
+          <div class="card-body p-4">
+            <h6 class="card-title mb-3 d-flex align-items-center text-dark">
+              <mat-icon class="me-2 text-secondary">account_tree</mat-icon>
+              Architecture du Projet
+            </h6>
+            <ul class="list-unstyled ms-4">
+              <li class="mb-2 d-flex align-items-center">
+                <mat-icon
+                  class="text-light bg-secondary rounded-circle me-2 list-icon"
+                  >check_circle</mat-icon
+                >
+                <span class="small text-secondary"
+                  >Objectif d'une architecture du Projet</span
+                >
+              </li>
+              <li class="mb-2 d-flex align-items-center">
+                <mat-icon
+                  class="text-light bg-secondary rounded-circle me-2 list-icon"
+                  >check_circle</mat-icon
+                >
+                <span class="small text-secondary"
+                  >Objectif du système de gestion des Étudiants</span
+                >
+              </li>
+            </ul>
+
+            <div
+              class="alert alert-info mt-4 p-3 d-flex align-items-center border-0"
+              role="alert"
+            >
+              <mat-icon class="me-3 text-primary">info</mat-icon>
+              <span class="small text-primary-dark"
+                >Contexte académique : Système de Gestion des Étudiants</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-12">
+        <h6 class="d-flex align-items-center text-secondary mb-3">
+          Call to Action
+        </h6>
+
+        @if (userService.isLoggedIn$ | async) {
+          <div
+            class="card w-100 border-0 empty-state-container bg-primary bg-opacity-10"
+          >
+            <div
+              class="card-body d-flex flex-column align-items-center justify-content-center p-5"
+            >
+              <h5 class="fw-bold mb-2 text-dark">
+                Bienvenue dans l'Application !
+              </h5>
+              <p class="small mb-4 text-secondary">
+                Vous êtes connecté. Gérez vos étudiants ci-dessous.
+              </p>
+              <div class="d-flex gap-3">
+                <button
+                  mat-raised-button
+                  class="add-student-btn px-4"
+                  routerLink="/studentList"
+                >
+                  <mat-icon class="me-2">list</mat-icon> Liste
+                </button>
+                <button
+                  mat-raised-button
+                  class="cancel-btn px-4"
+                  routerLink="/studentCreate"
+                >
+                  <mat-icon class="me-2">person_add</mat-icon> Créer
+                </button>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div
+            class="card w-100 border-0 empty-state-container bg-primary bg-opacity-10"
+          >
+            <div
+              class="card-body d-flex flex-column align-items-center justify-content-center p-5"
+            >
+              <h5 class="fw-bold mb-2 text-dark">
+                Prêt à Explorer l'Application ?
+              </h5>
+              <p class="small mb-4 text-secondary">
+                Connectez-vous pour découvrir toutes les fonctionnalités.
+              </p>
+              <div class="d-flex gap-3">
+                <button
+                  mat-raised-button
+                  class="add-student-btn px-4"
+                  routerLink="/login"
+                >
+                  Se Connecter <mat-icon class="ms-2">how_to_reg</mat-icon>
+                </button>
+                <button
+                  mat-raised-button
+                  class="cancel-btn px-4"
+                  routerLink="/register"
+                >
+                  S'Inscrire
+                  <mat-icon class="ms-2 border-none">person_add_alt</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

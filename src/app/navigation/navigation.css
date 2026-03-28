@@ -149,3 +149,16 @@
   font-weight: 500;
   padding: 12px !important;
 }
+
+/* Menu Text Styles */
+.menu-text {
+  margin-left: 12px;
+  font-weight: 500;
+}
+
+/* Close Button Styles */
+.close-btn {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+}

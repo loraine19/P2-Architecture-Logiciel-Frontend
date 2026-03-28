@@ -11,10 +11,18 @@ import { UserServiceInterface } from './servicesInterfaces/userServicesInterface
   providedIn: 'root'
 })
 export class UserService implements UserServiceInterface {
-  private isLoggedInSubject = new BehaviorSubject<boolean>(this.isLoggedIn());
+  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) {
+    // Initialize authentication state on service creation
+    this.initializeAuthState();
+  }
+
+  private initializeAuthState(): void {
+    const isAuth = this.isLoggedIn();
+    this.isLoggedInSubject.next(isAuth);
+  }
 
   register(userDTO: UserDTO): Observable<Object> {
     return this.httpClient.post('/api/register', userDTO);
@@ -22,25 +30,65 @@ export class UserService implements UserServiceInterface {
 
   login(login: Login): Observable<Auth> {
     return this.httpClient.post<Auth>('/api/login', login).pipe(
-      tap((auth: Auth) => {
-        localStorage.setItem('partialToken', auth.partialToken);
-        localStorage.setItem('isAuthenticated', String(auth.isAuthenticated));
-        this.isLoggedInSubject.next(auth.isAuthenticated);
+      tap((response: any) => {
+        console.log('Login response:', response); // Debug log
+
+        // Handle different response formats from backend
+        let isAuthenticated = false;
+        let partialToken = '';
+
+        if (response.message === 'Login successful' || response.success === true) {
+          // Backend returns success message - assume authenticated
+          isAuthenticated = true;
+          partialToken = response.partialToken || response.token || 'authenticated';
+        } else if (response.isAuthenticated !== undefined) {
+          // Backend returns isAuthenticated field
+          isAuthenticated = response.isAuthenticated;
+          partialToken = response.partialToken || '';
+        }
+
+        localStorage.setItem('partialToken', partialToken);
+        localStorage.setItem('isAuthenticated', String(isAuthenticated));
+        this.isLoggedInSubject.next(isAuthenticated);
+        console.log('Updated auth state to:', isAuthenticated); // Debug log
       })
     );
   }
 
   logout(): void {
-    this.httpClient.get('/api/logout').subscribe(() => {
-      localStorage.removeItem('partialToken');
-      localStorage.removeItem('isAuthenticated');
-      this.isLoggedInSubject.next(false);
-      location.replace('/login');
+    this.httpClient.get('/api/logout').subscribe({
+      next: () => {
+        this.clearAuthState();
+      },
+      error: () => {
+        // Clear auth state even if server request fails
+        this.clearAuthState();
+      }
     });
   }
 
+  private clearAuthState(): void {
+    localStorage.removeItem('partialToken');
+    localStorage.removeItem('isAuthenticated');
+    this.isLoggedInSubject.next(false);
+    // Use router navigation instead of location.replace
+    window.location.href = '/login';
+  }
+
   isLoggedIn(): boolean {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    const authValue = localStorage.getItem('isAuthenticated');
+    const isAuth = authValue === 'true';
+    console.log('Checking localStorage auth:', { authValue, isAuth }); // Debug log
+    return isAuth;
+  }
+
+  /**
+   * Observable version for guards (2026 style)
+   * Returns current authentication state as Observable
+   */
+  isAuthenticated(): Observable<boolean> {
+    console.log('Current auth state from BehaviorSubject:', this.isLoggedInSubject.value); // Debug log
+    return this.isLoggedIn$;
   }
 
 

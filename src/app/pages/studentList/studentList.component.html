@@ -56,79 +56,157 @@
       </div>
     }
 
-    <!-- Student Table with Horizontal Scroll -->
+    <!-- Responsive Student Cards -->
     @if (!isLoading && students.length > 0) {
-      <div class="student-table-container">
-        <div class="student-table-wrapper">
-          <table class="student-table">
-            <thead>
-              <tr>
-                <th class="student-header id-col">ID</th>
-                <th class="student-header">First Name</th>
-                <th class="student-header">Last Name</th>
-                <th class="student-header">Email</th>
-                <th class="student-header">Phone</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (student of students; track student.id) {
-                <tr class="student-row">
-                  <td class="student-cell id-col">{{ student.id }}</td>
-                  <td class="student-cell">{{ student.firstName }}</td>
-                  <td class="student-cell">{{ student.lastName }}</td>
-                  <td class="student-cell">{{ student.email }}</td>
-                  <td class="student-cell">{{ student.phoneNumber }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-        <div class="actions-column">
-          <div class="actions-header">
-            <span class="actions-title">Actions</span>
+      <div class="students-container">
+        <!-- Desktop Header (hidden on mobile) -->
+        <div class="d-none d-md-block">
+          <div class="student-header-row">
+            <div class="student-header-grid">
+              <div class="header-item id-header">
+                <mat-icon class="header-icon">tag</mat-icon>
+                <span>ID</span>
+              </div>
+              <div class="header-item">
+                <mat-icon class="header-icon">person</mat-icon>
+                <span>First Name</span>
+              </div>
+              <div class="header-item">
+                <mat-icon class="header-icon">person_outline</mat-icon>
+                <span>Last Name</span>
+              </div>
+              <div class="header-item">
+                <mat-icon class="header-icon">email</mat-icon>
+                <span>Email</span>
+              </div>
+              <div class="header-item">
+                <mat-icon class="header-icon">phone</mat-icon>
+                <span>Phone</span>
+              </div>
+              <div class="header-item actions-header">
+                <mat-icon class="header-icon">settings</mat-icon>
+                <span>Actions</span>
+              </div>
+            </div>
           </div>
-          <div class="actions-body">
-            @for (student of students; track student.id) {
-              <div class="action-row">
-                <div
-                  class="btn-group-action"
-                  role="group"
-                  aria-label="Student actions"
-                >
-                  <button
-                    mat-mini-fab
-                    class="action-btn"
-                    title="View Details"
-                    (click)="viewStudent(student.id)"
-                  >
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                  <button
-                    mat-mini-fab
-                    class="action-btn edit"
-                    title="Edit Student"
-                    (click)="editStudent(student.id)"
-                  >
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button
-                    mat-mini-fab
-                    class="action-btn delete"
-                    title="Delete Student"
-                    (click)="deleteStudent(student.id)"
-                  >
-                    <mat-icon>delete</mat-icon>
-                  </button>
+        </div>
+
+        <!-- Student Cards/Rows -->
+        <div class="students-list">
+          @for (student of students; track student.id) {
+            <div class="student-card">
+              <!-- Mobile Card Layout -->
+              <div class="d-block d-md-none">
+                <div class="student-card-header">
+                  <div class="student-name">
+                    <mat-icon class="name-icon">person</mat-icon>
+                    <span class="fw-bold"
+                      >{{ student.firstName }} {{ student.lastName }}</span
+                    >
+                  </div>
+                  <div class="student-id-badge">
+                    <span class="badge bg-primary">ID: {{ student.id }}</span>
+                  </div>
+                </div>
+                <div class="student-card-body">
+                  <div class="student-info-row">
+                    <mat-icon class="info-icon">email</mat-icon>
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ student.email }}</span>
+                  </div>
+                  <div class="student-info-row">
+                    <mat-icon class="info-icon">phone</mat-icon>
+                    <span class="info-label">Phone:</span>
+                    <span class="info-value">{{ student.phoneNumber }}</span>
+                  </div>
+                </div>
+                <div class="student-card-actions">
+                  <div class="btn-group w-100" role="group">
+                    <button
+                      mat-stroked-button
+                      class="flex-fill action-btn-mobile view"
+                      (click)="viewStudent(student.id)"
+                    >
+                      <mat-icon>visibility</mat-icon>
+                      <span class="d-none d-sm-inline ms-1">View</span>
+                    </button>
+                    <button
+                      mat-stroked-button
+                      class="flex-fill action-btn-mobile edit"
+                      (click)="editStudent(student.id)"
+                    >
+                      <mat-icon>edit</mat-icon>
+                      <span class="d-none d-sm-inline ms-1">Edit</span>
+                    </button>
+                    <button
+                      mat-stroked-button
+                      color="warn"
+                      class="flex-fill action-btn-mobile delete"
+                      (click)="deleteStudent(student.id)"
+                    >
+                      <mat-icon>delete</mat-icon>
+                      <span class="d-none d-sm-inline ms-1">Delete</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            }
-          </div>
+
+              <!-- Desktop Row Layout -->
+              <div class="d-none d-md-block">
+                <div class="student-row-grid">
+                  <div class="student-cell id-cell">
+                    <span class="student-id">{{ student.id }}</span>
+                  </div>
+                  <div class="student-cell">
+                    <span class="student-data">{{ student.firstName }}</span>
+                  </div>
+                  <div class="student-cell">
+                    <span class="student-data">{{ student.lastName }}</span>
+                  </div>
+                  <div class="student-cell">
+                    <span class="student-data">{{ student.email }}</span>
+                  </div>
+                  <div class="student-cell">
+                    <span class="student-data">{{ student.phoneNumber }}</span>
+                  </div>
+                  <div class="student-cell actions-cell">
+                    <div class="btn-group-action" role="group">
+                      <button
+                        mat-mini-fab
+                        class="action-btn me-1"
+                        title="View Details"
+                        (click)="viewStudent(student.id)"
+                      >
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                      <button
+                        mat-mini-fab
+                        class="action-btn edit me-1"
+                        title="Edit Student"
+                        (click)="editStudent(student.id)"
+                      >
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button
+                        mat-mini-fab
+                        class="action-btn delete"
+                        title="Delete Student"
+                        (click)="deleteStudent(student.id)"
+                      >
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
         </div>
       </div>
     }
 
     <!-- No Students State -->
-    @if (!isLoading && students.length === 0) {
+    @if (!isLoading && students.length === 0 && !infoMessage.error) {
       <div class="text-center p-5">
         <div class="empty-state-container">
           <mat-icon class="empty-state-icon">people_outline</mat-icon>
@@ -151,7 +229,7 @@
     }
 
     <!-- Add Student Button -->
-    @if (!isLoading && students.length > 0) {
+    @if (!isLoading && students.length > 0 && infoMessage.error === false) {
       <div class="d-flex justify-content-center mt-4">
         <button
           mat-raised-button

@@ -1,299 +1,386 @@
 /* ==========================================================================
-   STRUCTURE
+   STRUCTURE GÉNÉRALE & GESTION DU SCROLL
    ========================================================================== */
 
+/* Ancrage en haut de la page, sous la barre de navigation */
 main,
 .container {
-  padding-top: 80px;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 24px 16px;
+  height: calc(100vh - 64px); /* Ajuster '64px' selon la hauteur de ta navbar */
+  display: flex;
+  align-items: flex-start; /* Empêche le centrage vertical de la carte */
+  justify-content: center;
+  background-color: #f8fafd;
 }
 
-.btn-group {
+/* Carte principale (conteneur de la page) */
+.card {
+  border-radius: 24px;
+  border: 1px solid #e1e3e1;
+  background: white;
+  box-shadow: none;
   display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 !important; /* Annule le m-3 de Bootstrap s'il est présent */
+  max-height: calc(
+    100vh - 6rem
+  ); /* S'adapte à la hauteur du conteneur parent */
+  overflow: hidden; /* Empêche la carte elle-même de déborder */
 }
+
+/* En-tête fixe de la carte */
+.card-header {
+  background: white;
+  color: #1f1f1f !important;
+  padding: 24px 24px 16px 24px;
+  font-weight: 500;
+  border-bottom: 1px solid #e1e3e1;
+  flex-shrink: 0; /* Empêche l'en-tête de rétrécir lors du défilement */
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+
+/* Zone de contenu défilante */
+.card-body {
+  padding: 24px;
+  overflow-y: auto; /* Active le scroll uniquement à l'intérieur de la carte */
+  flex: 1 1 auto;
+}
+
+/* ==========================================================================
+   ICÔNES - COULEURS MATERIAL 3 STRICTES
+   ========================================================================== */
+mat-icon {
+  font-family: "Material Icons", "Material Symbols Outlined", fallback;
+}
+
+.text-primary,
+.header-icon,
+.name-icon {
+  color: #0b57d0 !important;
+}
+.text-success {
+  color: #146c2e !important;
+}
+.text-danger,
+.error {
+  color: #b3261e !important;
+}
+.text-warning {
+  color: #8c4a00 !important;
+}
+.text-secondary,
+.info-icon {
+  color: #444746 !important;
+}
+
+/* ==========================================================================
+   BOUTONS (STYLE PILULE)
+   ========================================================================== */
+.btn-group,
 .btn-group-action {
   display: flex;
   gap: 8px;
   align-items: center;
-  justify-content: center;
 }
 
-.btn-group button {
-  min-width: 48px;
-  height: 40px;
-  border-radius: 20px;
-  margin: 0 8px;
-}
-
+/* Boutons d'actions du tableau (View, Edit, Delete) */
 .btn-group-action button {
-  min-width: 40px;
+  width: 40px;
   height: 40px;
-  border-radius: 20px;
-  margin: 0 2px;
-  font-size: 10rem !important;
+  border-radius: 100px;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.btn-group-action mat-icon {
-  font-size: 22px !important;
-  margin-top: 4px;
-}
-.btn-group-action .edit,
-.btn-group .edit {
-  background-color: #f3ae3f50;
-  color: #c87107;
-}
-.btn-group-action .delete,
-.btn-group .delete {
-  background-color: #f33f3f50;
-  color: #ad0707;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-/* Boutons */
+.btn-group-action mat-icon {
+  font-size: 20px !important;
+  width: 20px;
+  height: 20px;
+}
+
+.btn-group-action .view {
+  background-color: #e8def8;
+  color: #6750a4;
+}
+.btn-group-action .edit {
+  background-color: #fef0d8;
+  color: #8c4a00;
+}
+.btn-group-action .delete {
+  background-color: #ffdad6;
+  color: #ba1a1a;
+}
+
+.btn-group-action .view:hover {
+  background-color: #d0bcff;
+}
+.btn-group-action .edit:hover {
+  background-color: #fde2b4;
+}
+.btn-group-action .delete:hover {
+  background-color: #ffb4ab;
+}
+
+/* Boutons principaux (Ajout, Connexion, etc.) */
 button[mat-raised-button],
-.add-student-btn,
-.empty-state-btn {
-  border-radius: 24px;
+.add-student-btn {
+  border-radius: 100px;
   padding: 10px 24px;
-  background-color: #1d6dae;
+  background-color: #0b57d0;
   color: white;
   font-weight: 500;
   border: none;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-button[mat-raised-button]:disabled,
-.add-student-btn:disabled {
-  background-color: #e0e0e0;
-  color: #9e9e9e;
-  cursor: not-allowed;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 button[mat-raised-button]:hover,
 .add-student-btn:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3) !important;
+  background-color: #0842a0;
 }
 
-button[mat-button]:hover {
-  background: rgba(26, 115, 232, 0.08);
+.cancel-btn {
+  background-color: white !important;
+  color: #0b57d0 !important;
+  border: 1px solid #74777520;
+}
+
+.cancel-btn:hover {
+  background-color: #f8fafd !important;
 }
 
 /* ==========================================================================
-   TABLEAU ÉTUDIANTS 
+   TABLEAU ÉTUDIANTS - LAYOUT DESKTOP (GRID RESTAURÉ)
    ========================================================================== */
-.student-table-container {
-  display: flex;
-  max-width: 100%;
-  border-radius: 16px;
+.students-container {
+  border-radius: 24px;
+  background: white;
+  border: 1px solid #e1e3e1;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  background: white;
   margin-bottom: 24px;
-  border: 1px solid #dadce0;
 }
 
-.student-table-wrapper {
-  flex: 1;
-  overflow-x: auto;
-  border-right: 1px solid #dadce0;
+.student-header-row {
+  background: #f8fafd;
+  border-bottom: 1px solid #e1e3e1;
 }
 
-.student-table {
-  width: 100%;
-  min-width: 800px;
-  border-collapse: collapse;
-  background: white;
+.student-header-grid {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 2fr 1.5fr 160px;
+  align-items: center;
+  min-height: 56px;
 }
 
-.student-header {
-  background: #f8f9fa;
-  color: #0d6bc4;
+.header-item {
   padding: 12px 16px;
-  text-align: left;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
   font-size: 0.875rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  height: 56px;
-  border-bottom: 1px solid #dadce0;
+  color: #444746;
 }
 
-.student-header.id-col {
-  min-width: 80px;
-  width: 80px;
+.header-item.actions-header,
+.header-item.id-header {
+  justify-content: center;
 }
 
-.student-row:hover {
-  background: #f1f3f4;
+.student-row-grid {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 2fr 1.5fr 160px;
+  align-items: center;
+  min-height: 64px;
+  border-bottom: 1px solid #f0f4f8;
+  transition: background-color 0.2s ease;
+}
+
+.student-row-grid:last-child {
+  border-bottom: none;
+}
+
+.student-row-grid:hover {
+  background-color: #f8fafd;
 }
 
 .student-cell {
   padding: 12px 16px;
   font-size: 0.875rem;
-  color: #3c4043;
-  white-space: nowrap;
-  height: 64px;
-  border-bottom: 1px solid #f1f3f4;
-}
-
-.student-cell.id-col {
-  font-weight: 600;
-  color: #0d6bc4;
-  text-align: center;
-}
-
-/* --- Colonne Actions  --- */
-.actions-column {
-  flex-shrink: 0;
-  width: max-content;
-  background: #f8f9fa;
-  border-left: 1px solid #dadce0;
-}
-
-.actions-header {
-  background: #f8f9fa;
-  padding: 12px 16px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 1rem;
-  height: 56px;
+  color: #1f1f1f;
   display: flex;
   align-items: center;
+  word-break: break-word;
+}
+
+.student-cell.actions-cell,
+.student-cell.id-cell {
   justify-content: center;
-  border-bottom: 1px solid #dadce0;
 }
 
-.actions-body {
-  max-height: 500px;
-  overflow-y: auto;
-}
-
-.action-row {
-  padding: 4px 8px;
-  border-bottom: 1px solid #ebebeb;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 64px;
-}
-
-.action-btn {
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: none;
-}
-
-.action-btn:hover {
-  background: #c2d7f7;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+.student-id {
+  font-weight: 500;
+  color: #0b57d0;
+  background: #d3e3fd;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.75rem;
 }
 
 /* ==========================================================================
-   FORMULAIRES & CARDS
+   MOBILE LAYOUT - CARTES INDIVIDUELLES RESTAURÉES
    ========================================================================== */
-.card {
-  border-radius: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #dadce0;
-  max-width: 700px;
-  margin: 2rem auto;
-  background: white;
+@media (max-width: 768px) {
+  .card {
+    border-radius: 16px; /* Angles légèrement réduits sur mobile */
+  }
+
+  .student-header-row {
+    display: none; /* Masque l'en-tête de tableau sur mobile */
+  }
+
+  .students-container {
+    border: none;
+    background: transparent;
+  }
+
+  /* Rendu sous forme de cartes pour chaque étudiant */
+  .student-card {
+    border: 1px solid #e1e3e1;
+    border-radius: 24px;
+    background: white;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .student-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #f8fafd;
+    border-bottom: 1px solid #e1e3e1;
+  }
+
+  .student-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: #1f1f1f;
+  }
+
+  .student-card-body {
+    padding: 16px;
+  }
+
+  .student-info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .student-info-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .info-label {
+    font-weight: 500;
+    color: #444746;
+    min-width: 60px;
+    font-size: 0.875rem;
+  }
+
+  .info-value {
+    color: #1f1f1f;
+    flex: 1;
+    word-break: break-word;
+    font-size: 0.875rem;
+  }
+
+  .student-card-actions {
+    padding: 16px;
+    border-top: 1px solid #e1e3e1;
+    display: flex;
+    gap: 8px;
+  }
+
+  .student-card-actions button {
+    flex: 1;
+    border-radius: 100px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    border: none;
+  }
+
+  .action-btn-mobile.view {
+    background-color: #e8def8;
+    color: #6750a4;
+  }
+  .action-btn-mobile.edit {
+    background-color: #fef0d8;
+    color: #8c4a00;
+  }
+  .action-btn-mobile.delete {
+    background-color: #ffdad6;
+    color: #ba1a1a;
+  }
 }
 
-.card-header {
-  background: #f8f9fa;
-  color: #041e49 !important;
-  padding: 18px 24px;
-  font-weight: 500;
-  border-bottom: 1px solid #dadce0;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-}
-
-.card-body {
-  padding: 24px;
-}
-
-mat-form-field {
-  position: relative !important;
-  width: 100%;
-  margin-top: px;
-  margin-bottom: 6px;
-  z-index: 0;
-}
-mat-error {
-  max-width: 100%;
-  overflow: auto;
-}
-
-/* Form field  */
-
-.mat-mdc-form-field-error-wrapper {
-  margin-bottom: 19px;
-  position: relative;
-  overflow: auto;
-}
-
-/* Alertes */
+/* ==========================================================================
+   ALERTES ET EMPTY STATE
+   ========================================================================== */
 .alert {
-  border-radius: 12px;
-  padding: 12px 16px;
+  border-radius: 24px;
+  padding: 16px 20px;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
+  border: none;
 }
 
+.alert-info {
+  background-color: #d3e3fd;
+  color: #041e49;
+}
 .alert-success {
-  background: #e6f4ea;
-  color: #137333;
+  background: #c4eed0;
+  color: #072711;
 }
 .alert-danger {
-  background: #fce8e6;
-  color: #d93025;
+  background: #ffdad6;
+  color: #410002;
+}
+/* Teal foncé pour correspondre au design des commandes du screenshot */
+.alert-warning {
+  background-color: #004d40;
+  color: #ffffff;
+}
+.alert-warning mat-icon {
+  color: #ffffff !important;
 }
 
-/* ==========================================================================
-   RESPONSIVE 
-   ========================================================================== */
-@media (max-width: 768px) {
-  .student-table-container {
-    flex-direction: column;
-  }
-  .actions-column {
-    width: 100%;
-    order: -1;
-    border-left: none;
-    border-bottom: 1px solid #dadce0;
-  }
-  .actions-body {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 16px;
-    gap: 8px;
-  }
-  .action-row {
-    flex: 1;
-    min-width: calc(100% / 3 - 16px);
-    border-bottom: none;
-    background: #f1f3f4;
-    border-radius: 8px;
-  }
-  .student-table-wrapper {
-    border-right: none;
-    border-top: 1px solid #dadce0;
-  }
-  .side-menu {
-    width: 300px;
-  }
+.empty-state-container {
+  padding: 3rem 2rem;
+  text-align: center;
+  background-color: #f8fafd;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

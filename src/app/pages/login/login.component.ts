@@ -76,7 +76,16 @@ export class LoginComponent implements OnInit {
         next: () => {
           this.infoMessage = { message: 'Hi, ' + credentials.login + '! you are now logged in !', error: false };
           setTimeout(() => {
-            this.router.navigate(['/studentList']);
+            // Get return URL from query params or default to studentList
+            const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/studentList';
+            console.log('Login successful, redirecting to:', returnUrl);
+
+            // Parse the URL to remove any nested returnUrl parameters to prevent loops
+            const urlObj = new URL(returnUrl, window.location.origin);
+            urlObj.searchParams.delete('returnUrl');
+            const cleanUrl = urlObj.pathname + (urlObj.search ? urlObj.search : '');
+
+            this.router.navigateByUrl(cleanUrl);
           }, 2000);
         },
         error: (err: HttpErrorResponse) => this.errorService.handleError(err, this.infoMessage)

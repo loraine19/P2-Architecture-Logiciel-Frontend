@@ -44,7 +44,7 @@
     <li class="menu-item" *ngIf="userService.isLoggedIn$ | async">
       <a
         class="menu-link"
-        [routerLink]="['/']"
+        [routerLink]="['/home']"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
         (click)="closeMenu()"
