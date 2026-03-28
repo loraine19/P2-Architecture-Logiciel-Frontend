@@ -59,13 +59,13 @@ export class HomeComponent {
       icon: 'list',
       color: 'warning',
       title: 'Interface Utilisateur',
-      description: 'Interface moderne et responsive avec Angular Material'
+      description: 'Interface moderne et responsive avec Angular Material et CSS personnalisé Material Design (Style MD3 inspiré de Google)'
     },
     {
       icon: 'security',
       color: 'danger',
       title: 'Authentification & Sécurité',
-      description: 'Système de connexion sécurisé avec gestion des rôles'
+      description: 'Système de connexion sécurisé avec Cookies HTTP Only et JWT(mobile)'
     },
     {
       icon: 'api',

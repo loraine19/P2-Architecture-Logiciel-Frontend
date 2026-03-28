@@ -261,28 +261,28 @@
           } @else {
             <button
               type="button"
-              mat-button
-              color="primary"
+              mat-raised-button
+              color="info"
               class="rounded-pill px-4"
-              (click)="toggleEditMode()"
+              (click)="goBackToList()"
             >
-              <mat-icon>edit</mat-icon>
-              Edit Student
+              <mat-icon>arrow_back</mat-icon>
+              Back to Student List
             </button>
           }
         </div>
       </form>
 
-      <!-- Floating Action Button - Back to List -->
+      <!-- Floating Action Button - Toggle Edit/View -->
       <div class="fab-container">
         <button
           mat-fab
-          color="accent"
-          class="fab-secondary"
-          (click)="goBackToList()"
-          title="Back to Student List"
+          [color]="isEditMode ? 'warn' : 'primary'"
+          class="fab-primary"
+          (click)="toggleEditMode()"
+          [title]="isEditMode ? 'Switch to View Mode' : 'Switch to Edit Mode'"
         >
-          <mat-icon>arrow_back</mat-icon>
+          <mat-icon>{{ isEditMode ? "visibility" : "edit" }}</mat-icon>
         </button>
       </div>
     }

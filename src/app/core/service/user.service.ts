@@ -1,16 +1,19 @@
 import { Injectable } from '@angular/core';
 import { UserDTO } from '../models/Register';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, BehaviorSubject, from, of } from 'rxjs';
+import { tap, catchError, switchMap, map } from 'rxjs/operators';
 import { Login } from '../models/Login';
 import { Auth } from '../models/Auth';
 import { UserServiceInterface } from './servicesInterfaces/userServicesInterface';
+import { PlatformDetectionService } from './platform-detection.service';
+import { AdaptiveStorageService } from './adaptive-storage.service';
 
 /**
- * User authentication service implementation
+ * User authentication service implementation with hybrid authentication
+ * Supports HTTP-only cookies for web browsers and JWT secure storage for mobile
  * Handles user registration, login/logout, and session management
- * Provides secure authentication state management
+ * Provides secure authentication state management across platforms
  */
 @Injectable({
   providedIn: 'root'
@@ -20,18 +23,32 @@ export class UserService implements UserServiceInterface {
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
-  constructor(private httpClient: HttpClient) {
-    console.log('UserService initialized, checking existing auth state');
+  constructor(
+    private httpClient: HttpClient,
+    private platformDetection: PlatformDetectionService,
+    private adaptiveStorage: AdaptiveStorageService
+  ) {
+    console.log('UserService initialized for hybrid auth on platform:', this.platformDetection.getPlatform());
     this.initializeAuthState();
   }
 
   /**
-   * Initializes authentication state from localStorage
+   * Initializes authentication state using platform-appropriate storage
+   * Uses cookies for web, secure storage for mobile
    */
   private initializeAuthState(): void {
-    const isAuth = this.isLoggedIn();
-    console.log('Initializing auth state:', isAuth);
-    this.isLoggedInSubject.next(isAuth);
+    this.platformDetection.logPlatformInfo();
+
+    from(this.adaptiveStorage.getAuthState()).subscribe({
+      next: (isAuth) => {
+        console.log('Initializing hybrid auth state:', isAuth);
+        this.isLoggedInSubject.next(isAuth);
+      },
+      error: (error) => {
+        console.error('Error initializing auth state:', error);
+        this.isLoggedInSubject.next(false);
+      }
+    });
   }
 
   /**
@@ -55,20 +72,28 @@ export class UserService implements UserServiceInterface {
   }
 
   /**
-   * Authenticates user with login credentials
+   * Authenticates user with login credentials using hybrid authentication
+   * Web: Uses HTTP-only cookies, Mobile: Uses JWT with secure storage
    */
   login(login: Login): Observable<Auth> {
-    console.log('Login attempt for user:', login.login);
+    console.log('Hybrid login attempt for user:', login.login, 'Platform:', this.platformDetection.getPlatform());
 
     if (!login || !login.login || !login.password) {
       console.error('Invalid login credentials provided');
       throw new Error('Login credentials are required');
     }
 
-    return this.httpClient.post<Auth>(`${this.apiUrl}/login`, login).pipe(
-      tap((response: any) => {
+    // Build headers to indicate platform preference
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-Platform': this.platformDetection.getPlatform(),
+      'X-Auth-Type': this.platformDetection.isMobile() ? 'jwt' : 'cookie'
+    });
+
+    return this.httpClient.post<Auth>(`${this.apiUrl}/login`, login, { headers }).pipe(
+      switchMap((response: any) => {
         console.log('Login response received for user:', login.login);
-        this.processLoginResponse(response);
+        return from(this.processHybridLoginResponse(response));
       }),
       catchError(error => {
         console.error('Login failed for user:', login.login, error);
@@ -78,73 +103,125 @@ export class UserService implements UserServiceInterface {
   }
 
   /**
-   * Processes login response and updates authentication state
+   * Processes hybrid login response and updates authentication state
+   * Handles both JWT (mobile) and cookie (web) authentication
    */
-  private processLoginResponse(response: any): void {
+  private async processHybridLoginResponse(response: any): Promise<Auth> {
     let isAuthenticated = false;
-    let partialToken = '';
+    let token = '';
 
+    // Parse response based on success patterns
     if (response.message === 'Login successful' || response.success === true) {
       isAuthenticated = true;
-      partialToken = response.partialToken || response.token || 'authenticated';
-      console.log('Authentication successful, token received');
+      token = response.token || response.jwt || response.partialToken || '';
+      console.log('Authentication successful, platform:', this.platformDetection.getPlatform());
     } else if (response.isAuthenticated !== undefined) {
       isAuthenticated = response.isAuthenticated;
-      partialToken = response.partialToken || '';
+      token = response.token || response.jwt || response.partialToken || '';
       console.log('Authentication state from response:', isAuthenticated);
     }
 
-    this.updateAuthenticationState(isAuthenticated, partialToken);
+    // Store authentication data using platform-appropriate method
+    if (isAuthenticated) {
+      await this.adaptiveStorage.storeAuthToken(token, isAuthenticated);
+      this.isLoggedInSubject.next(true);
+      console.log('Hybrid authentication state updated successfully');
+    } else {
+      await this.adaptiveStorage.clearAuthData();
+      this.isLoggedInSubject.next(false);
+      console.log('Authentication failed, cleared state');
+    }
+
+    return response;
   }
 
   /**
-   * Updates local authentication state and storage
-   */
-  private updateAuthenticationState(isAuthenticated: boolean, partialToken: string): void {
-    localStorage.setItem('partialToken', partialToken);
-    localStorage.setItem('isAuthenticated', String(isAuthenticated));
-    this.isLoggedInSubject.next(isAuthenticated);
-    console.log('Authentication state updated:', isAuthenticated);
-  }
-
-  /**
-   * Logs out current user and clears session data
+   * Logs out current user using hybrid authentication
+   * Clears cookies (web) or secure storage (mobile)
    */
   logout(): void {
-    console.log('Logout initiated');
+    console.log('Hybrid logout initiated, platform:', this.platformDetection.getPlatform());
 
-    this.httpClient.get(`${this.apiUrl}/logout`).subscribe({
+    // Build headers to indicate platform and logout type
+    const headers = new HttpHeaders({
+      'X-Platform': this.platformDetection.getPlatform(),
+      'X-Auth-Type': this.platformDetection.isMobile() ? 'jwt' : 'cookie'
+    });
+
+    this.httpClient.post(`${this.apiUrl}/logout`, {}, { headers }).subscribe({
       next: () => {
         console.log('Server logout successful');
-        this.clearAuthState();
+        this.clearHybridAuthState();
       },
       error: (error) => {
         console.warn('Server logout failed, clearing local auth state anyway:', error);
-        this.clearAuthState();
+        this.clearHybridAuthState();
       }
     });
   }
 
   /**
-   * Clears authentication state and redirects to login
+   * Clears authentication state using platform-appropriate method
    */
-  private clearAuthState(): void {
-    console.log('Clearing authentication state');
-    localStorage.removeItem('partialToken');
-    localStorage.removeItem('isAuthenticated');
-    this.isLoggedInSubject.next(false);
-    window.location.href = '/home';
+  private clearHybridAuthState(): void {
+    console.log('Clearing hybrid authentication state');
+
+    from(this.adaptiveStorage.clearAuthData()).subscribe({
+      next: () => {
+        this.isLoggedInSubject.next(false);
+        console.log('Hybrid auth state cleared successfully');
+        window.location.href = '/home';
+      },
+      error: (error) => {
+        console.error('Error clearing auth state:', error);
+        this.isLoggedInSubject.next(false);
+        window.location.href = '/home';
+      }
+    });
   }
 
   /**
-   * Checks if user is currently logged in using localStorage
+   * Checks if user is currently logged in using hybrid storage
+   * @returns {Observable<boolean>} Authentication state observable
    */
   isLoggedIn(): boolean {
-    const authValue = localStorage.getItem('isAuthenticated');
-    const isAuth = authValue === 'true';
-    console.log('Checking localStorage auth state:', { authValue, isAuth });
-    return isAuth;
+    // For synchronous calls, return current subject value
+    // For proper async handling, components should use isLoggedIn$ observable
+    const currentState = this.isLoggedInSubject.value;
+    console.log('Checking current auth state (sync):', currentState);
+    return currentState;
   }
+
+  /**
+   * Asynchronously checks authentication state using hybrid storage
+   * @returns {Observable<boolean>} Authentication state observable
+   */
+  checkAuthState(): Observable<boolean> {
+    return from(this.adaptiveStorage.getAuthState()).pipe(
+      tap(isAuth => {
+        console.log('Hybrid auth state check result:', isAuth);
+        this.isLoggedInSubject.next(isAuth);
+      }),
+      catchError(error => {
+        console.error('Error checking auth state:', error);
+        this.isLoggedInSubject.next(false);
+        return of(false);
+      })
+    );
+  }
+
+  /**
+   * Gets authentication token for API requests (mobile only)
+   * @returns {Promise<string | null>} Token for mobile, null for web
+   */
+  async getAuthToken(): Promise<string | null> {
+    if (this.platformDetection.isMobile()) {
+      return await this.adaptiveStorage.getAuthToken();
+    }
+    return null; // Web uses HTTP-only cookies
+  }
+
+
 
   /**
    * Returns authentication state as Observable for reactive components

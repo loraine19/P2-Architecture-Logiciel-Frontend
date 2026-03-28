@@ -33,8 +33,8 @@ mat-form-field {
   --google-orange-light: #fff3e0;
   --google-yellow: #fbbc05;
   --google-yellow-light: #fffbf0;
-  --google-green: #34a853;
-  --google-green-light: #e8f5e8;
+  --google-green: #309e5e;
+  --google-green-light: #dbf8db;
   --google-cyan: #00acc1;
   --google-cyan-light: #e0f7fa;
   --google-gray: #5f6368;
@@ -198,7 +198,7 @@ mat-form-field {
 .fab-primary {
   width: 64px;
   height: 64px;
-  border-radius: 50%;
+  border-radius: 100% !important;
   background-color: var(--google-blue);
   color: white;
   border: none;
@@ -225,7 +225,7 @@ mat-form-field {
 .fab-secondary {
   width: 58px;
   height: 58px;
-  border-radius: 50%;
+  border-radius: 100% !important;
   background-color: var(--google-blue-light);
   color: var(--google-blue);
   cursor: pointer;
@@ -251,6 +251,7 @@ mat-form-field {
 /* Icônes dans les FAB */
 .fab-primary mat-icon,
 .fab-secondary mat-icon {
+  margin-top: 5%;
   font-size: inherit;
 }
 /* FAB responsive - mobile */
