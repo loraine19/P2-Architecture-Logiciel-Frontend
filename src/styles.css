@@ -41,3 +41,232 @@ mat-form-field {
   --google-gray-light: #f8f9fa;
   --google-gray-dark: #202124;
 }
+
+/* ==========================================================================
+   ALERTES ET EMPTY STATE
+   ========================================================================== */
+.alert {
+  border-radius: 24px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  border: none;
+}
+
+.alert-info {
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
+}
+.alert-success {
+  background: var(--google-green-light);
+  color: var(--google-green);
+}
+.alert-danger {
+  background: var(--google-red-light);
+  color: var(--google-red);
+}
+/* Teal foncé pour correspondre au design des commandes du screenshot */
+.alert-warning {
+  background-color: var(--google-cyan);
+  color: #ffffff;
+}
+.alert-warning mat-icon {
+  color: #ffffff !important;
+}
+
+.empty-state-container {
+  padding: 3rem 2rem;
+  text-align: center;
+  background-color: #f8fafd;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ==========================================================================
+   ÉTATS VIDES ET ÉLÉMENTS UTILITAIRES
+   ========================================================================== */
+.empty-state-container {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--google-gray);
+}
+
+.empty-state-icon {
+  font-size: 64px !important;
+  width: 64px !important;
+  height: 64px !important;
+  color: var(--google-gray) !important;
+  margin-bottom: 16px;
+}
+
+.empty-state-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--google-gray-dark);
+}
+
+.empty-state-text {
+  color: var(--google-gray);
+  margin-bottom: 24px;
+}
+
+.empty-state-btn {
+  background-color: var(--google-blue);
+  color: white;
+  border-radius: 100px;
+  padding: 12px 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Conteneur d'icône de fonctionnalité */
+.feature-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.feature-icon {
+  font-size: 1.5rem !important;
+}
+
+/* Bouton d'édition toggle */
+.edit-toggle-btn {
+  border-radius: 50% !important;
+}
+
+.info-value {
+  color: var(--google-gray-dark);
+  flex: 1;
+  word-break: break-word;
+  font-size: 0.875rem;
+}
+
+/* ==========================================================================
+   MESSAGES D'ALERTE - STYLE MATERIAL DESIGN 3
+   ========================================================================== */
+.alert {
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+}
+
+.alert-info {
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
+}
+.alert-success {
+  background-color: var(--google-green-light);
+  color: var(--google-green);
+}
+.alert-danger {
+  background-color: var(--google-red-light);
+  color: var(--google-red);
+}
+.alert-warning {
+  background-color: var(--google-orange-light);
+  color: var(--google-orange);
+}
+.alert-warning mat-icon {
+  color: var(--google-orange);
+}
+
+/* ==========================================================================
+   FLOATING ACTION BUTTONS (FAB) - BOUTONS DE BAS DE PAGE
+   ========================================================================== */
+.fab-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.fab-primary {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--google-blue);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 12px 0 rgb(4 30 73 / 30%),
+    0 2px 6px 0 rgb(0 0 0 / 15%);
+  transition: all 0.2s ease;
+  font-size: 24px;
+}
+
+.fab-primary:hover {
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
+  box-shadow:
+    0 6px 16px 0 rgb(4 30 73 / 35%),
+    0 3px 8px 0 rgb(0 0 0 / 20%);
+  transform: scale(1.05) translateY(-2px);
+}
+
+.fab-secondary {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 2px 8px 0 rgb(4 30 73 / 20%),
+    0 1px 4px 0 rgb(0 0 0 / 10%);
+  transition: all 0.2s ease;
+  font-size: 20px;
+}
+
+.fab-secondary:hover {
+  background-color: var(--google-blue);
+  color: white;
+  border-color: var(--google-blue);
+  box-shadow:
+    0 4px 12px 0 rgb(4 30 73 / 30%),
+    0 2px 6px 0 rgb(0 0 0 / 15%);
+  transform: scale(1.05) translateY(-2px);
+}
+/* Icônes dans les FAB */
+.fab-primary mat-icon,
+.fab-secondary mat-icon {
+  font-size: inherit;
+}
+/* FAB responsive - mobile */
+@media (max-width: 768px) {
+  .fab-container {
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .fab-primary {
+    width: 48px;
+    height: 48px;
+  }
+
+  .fab-secondary {
+    width: 40px;
+    height: 40px;
+  }
+}
