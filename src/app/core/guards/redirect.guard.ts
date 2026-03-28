@@ -5,7 +5,8 @@ import { map, take } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 /**
- * Smart redirect guard - redirects based on authentication state
+ * Smart redirect guard for root route navigation
+ * Redirects authenticated users to student list, unauthenticated users to home
  */
 export const redirectGuard = (): Observable<boolean> => {
     const userService = inject(UserService);
@@ -14,14 +15,16 @@ export const redirectGuard = (): Observable<boolean> => {
     return userService.isAuthenticated().pipe(
         take(1),
         map(isAuthenticated => {
+            console.log('Redirect Guard - Authentication state:', isAuthenticated); // Debug log
+
             if (isAuthenticated) {
-                // User is authenticated, redirect to student list
+                console.log('Redirect Guard - Authenticated user, redirecting to student list');
                 router.navigate(['/studentList']);
             } else {
-                // User is not authenticated, redirect to home
+                console.log('Redirect Guard - Unauthenticated user, redirecting to home');
                 router.navigate(['/home']);
             }
-            return false; // Always return false to prevent navigation to the empty route
+            return false; // Always block navigation to empty route
         })
     );
 };

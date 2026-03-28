@@ -4,17 +4,24 @@ import { LoginComponent } from './pages/login/login.component';
 import { StudentCreateComponent } from './pages/studentCreate/studentCreate.component';
 import { StudentListComponent } from './pages/studentList/studentList.component';
 import { StudentDetailsComponent } from './pages/studentDetails/studentDetails.component';
+import { HomeComponent } from './pages/home/home.component';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
 import { redirectGuard } from './core/guards/redirect.guard';
-import { HomeComponent } from './pages/home/home.component';
 
+/**
+ * Application routing configuration
+ * Defines all routes with appropriate guards and titles for SEO
+ * Separates public routes from protected authentication-required routes
+ */
 export const routes: Routes = [
+  // Root redirect route
   {
     path: '',
     canActivate: [redirectGuard],
     children: []
   },
-  // Public routes accessible to all users
+
+  // Public routes - accessible to all users
   {
     path: 'home',
     component: HomeComponent,
@@ -32,7 +39,8 @@ export const routes: Routes = [
     canActivate: [guestGuard],
     title: 'Login - Student Management'
   },
-  // Protected routes (authentication required)
+
+  // Protected routes - authentication required
   {
     path: 'studentCreate',
     component: StudentCreateComponent,
@@ -58,6 +66,7 @@ export const routes: Routes = [
     title: 'Student Details - Student Management'
   },
 
+  // Catch-all route - redirects unknown paths
   {
     path: '**',
     redirectTo: 'login'

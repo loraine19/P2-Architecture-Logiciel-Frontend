@@ -8,6 +8,10 @@ import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../core/service/user.service';
 
+/**
+ * Home page component displaying application overview and features
+ * Shows different content based on user authentication state
+ */
 @Component({
   selector: 'app-home',
   imports: [
@@ -23,7 +27,8 @@ import { UserService } from '../../core/service/user.service';
   styleUrl: '../pages.css'
 })
 export class HomeComponent {
-  userService = inject(UserService);
+  public userService = inject(UserService);
+  // Technology stacks for repository section display
   techStackFrontend = [
     'Angular 18',
     'TypeScript',
@@ -42,6 +47,7 @@ export class HomeComponent {
     'Docker'
   ];
 
+  // Features for home page display
   features = [
     {
       icon: 'person_add',
@@ -61,7 +67,6 @@ export class HomeComponent {
       title: 'Authentification & Sécurité',
       description: 'Système de connexion sécurisé avec gestion des rôles'
     },
-
     {
       icon: 'api',
       color: 'success',
@@ -70,7 +75,15 @@ export class HomeComponent {
     }
   ];
 
-  openRepository(url: string) {
+  constructor() {
+    console.log('HomeComponent initialized');
+  }
+
+  /**
+   * Opens external repository URL in new tab
+   */
+  openRepository(url: string): void {
+    console.log('Opening repository:', url);
     window.open(url, '_blank');
   }
 }

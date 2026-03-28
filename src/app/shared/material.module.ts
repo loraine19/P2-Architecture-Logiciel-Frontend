@@ -1,7 +1,12 @@
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+
+// Angular CDK imports
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CdkTreeModule } from '@angular/cdk/tree';
 import { PortalModule } from '@angular/cdk/portal';
+
+// Angular Material imports (alphabetical order)
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -26,25 +31,38 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTreeModule } from '@angular/material/tree';
-import { ReactiveFormsModule } from '@angular/forms';
 
+/**
+ * Centralized Angular Material components module
+ * Imports and exports all necessary Material Design components and Angular CDK modules
+ * for consistent UI throughout the application
+ */
 
-const materialModules = [
+// Core modules (Forms and CDK)
+const coreModules = [
   ReactiveFormsModule,
+  OverlayModule,
   CdkTreeModule,
+  PortalModule
+];
+
+// Material Design components (alphabetical order)
+const materialComponents = [
   MatAutocompleteModule,
   MatButtonModule,
+  MatButtonToggleModule,
   MatCardModule,
   MatCheckboxModule,
   MatChipsModule,
   MatDividerModule,
   MatExpansionModule,
+  MatFormFieldModule,
   MatIconModule,
   MatInputModule,
   MatListModule,
   MatMenuModule,
-  MatProgressSpinnerModule,
   MatPaginatorModule,
+  MatProgressSpinnerModule,
   MatRippleModule,
   MatSelectModule,
   MatSidenavModule,
@@ -53,19 +71,26 @@ const materialModules = [
   MatTableModule,
   MatTabsModule,
   MatToolbarModule,
-  MatFormFieldModule,
-  MatButtonToggleModule,
-  MatTreeModule,
-  OverlayModule,
-  PortalModule
+  MatTreeModule
 ];
 
+// Combined modules for export
+const allMaterialModules = [
+  ...coreModules,
+  ...materialComponents
+];
+
+/**
+ * Material Design module providing all necessary Angular Material components
+ * Centralizes material imports to avoid duplication across components
+ */
 @NgModule({
-  imports: [
-    ...materialModules
-  ],
-  exports: [
-    ...materialModules
-  ],
+  imports: allMaterialModules,
+  exports: allMaterialModules
 })
-export class MaterialModule { }
+export class MaterialModule {
+
+  constructor() {
+    console.log('MaterialModule initialized - All Angular Material components loaded');
+  }
+}

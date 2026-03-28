@@ -1,3 +1,7 @@
+/**
+ * Student entity model with complete information
+ * Represents a student record in the system
+ */
 export class Student {
     id: number;
     firstName: string;
@@ -27,6 +31,27 @@ export class Student {
         this.city = city;
         this.zipCode = zipCode;
     }
+
+    /**
+     * Factory method to create student from API response
+     */
+    static fromApiResponse(data: any): Student {
+        return new Student(
+            data.id,
+            data.firstName,
+            data.lastName,
+            data.email,
+            data.phoneNumber,
+            data.address,
+            data.city,
+            data.zipCode
+        );
+    }
+
 }
 
+/**
+ * Student DTO for creation without ID
+ * Used when creating new student records
+ */
 export type StudentDto = Omit<Student, 'id'>;

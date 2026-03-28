@@ -1,4 +1,4 @@
-<div class="card m-3">
+<div class="page-card">
   <h5 class="card-header">
     <mat-icon class="header-icon">people</mat-icon>
     Student List
@@ -37,7 +37,7 @@
 
     <!-- Alert Messages -->
     @if (infoMessage.message && infoMessage.error) {
-      <div class="alert alert-danger" role="alert">
+      <div class="alert alert-danger gap-2" role="alert">
         <mat-icon>error</mat-icon>
         {{ infoMessage.message }}
       </div>
@@ -226,19 +226,32 @@
           </button>
         </div>
       </div>
+
+      <!-- FAB pour empty state aussi -->
+      <div class="fab-container">
+        <button
+          mat-fab
+          color="primary"
+          class="fab-primary"
+          routerLink="/studentCreate"
+          title="Add First Student"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
     }
 
     <!-- Add Student Button -->
     @if (!isLoading && students.length > 0 && infoMessage.error === false) {
-      <div class="d-flex justify-content-center mt-4">
+      <div class="fab-container">
         <button
-          mat-raised-button
+          mat-fab
           color="primary"
-          class="add-student-btn"
+          class="fab-primary"
           routerLink="/studentCreate"
+          title="Add New Student"
         >
-          <mat-icon>add_circle</mat-icon>
-          Add New Student
+          <mat-icon>add</mat-icon>
         </button>
       </div>
     }

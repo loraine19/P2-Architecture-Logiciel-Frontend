@@ -1,18 +1,21 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Student, StudentDto } from '../../core/models/Student';
 import { StudentService } from '../../core/service/student.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { InfoMessage } from '../../core/models/InfoMessage';
+import { InfoMessage, InfoMessageFactory } from '../../core/models/InfoMessage';
 import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
+import { HttpErrorResponse } from '@angular/common/http';
 
+/**
+ * Student details component for viewing and editing student information
+ * Supports both view and edit modes with comprehensive validation
+ */
 @Component({
-  selector: 'app-studentDetails',
+  selector: 'app-student-details',
   imports: [CommonModule, ReactiveFormsModule, MaterialModule],
   templateUrl: './studentDetails.component.html',
   styleUrl: '../pages.css'
@@ -27,11 +30,17 @@ export class StudentDetailsComponent implements OnInit {
 
   studentForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
-  infoMessage: InfoMessage = { message: '', error: false };
-  studentId: number | null = null;
-  student: Student | null = null;
-  isEditMode: boolean = false;
+  infoMessage: InfoMessage = InfoMessageFactory.empty();
   isLoading: boolean = true;
+  isEditMode: boolean = false;
+  student: Student | null = null;
+
+
+  studentId: number | null = null;
+
+  constructor() {
+    console.log('StudentDetailsComponent initialized');
+  }
 
   ngOnInit(): void {
     this.initializeForm();

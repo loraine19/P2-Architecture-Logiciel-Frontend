@@ -1,19 +1,20 @@
 /* ==========================================================================
-   STRUCTURE GÉNÉRALE & GESTION DU SCROLL
+   STRUCTURE GÉNÉRALE & GESTION DU SCROLL - NOMS COHÉRENTS
    ========================================================================== */
 
-/* Ancrage en haut de la page, sous la barre de navigation */
+/* Conteneur principal et ancrage sous la navigation */
 main,
-.container {
+.page-container {
   padding: 24px 16px;
-  height: calc(100vh - 64px); /* Ajuster '64px' selon la hauteur de ta navbar */
+  height: calc(100vh - 64px); /* Hauteur navbar */
   display: flex;
-  align-items: flex-start; /* Empêche le centrage vertical de la carte */
+  align-items: flex-start;
   justify-content: center;
   background-color: #f8fafd;
 }
 
-/* Carte principale (conteneur de la page) */
+/* Carte principale - CORRIGÉ: suppression du conflit margin */
+.page-card,
 .card {
   border-radius: 24px;
   border: 1px solid #e1e3e1;
@@ -22,11 +23,10 @@ main,
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin: 0 !important; /* Annule le m-3 de Bootstrap s'il est présent */
-  max-height: calc(
-    100vh - 6rem
-  ); /* S'adapte à la hauteur du conteneur parent */
-  overflow: hidden; /* Empêche la carte elle-même de déborder */
+  /* CORRECTION: margin cohérente sans !important */
+  margin: 0;
+  max-height: calc(100vh - 6rem);
+  overflow: hidden;
 }
 
 /* En-tête fixe de la carte */
@@ -50,8 +50,10 @@ main,
 }
 
 /* ==========================================================================
-   ICÔNES - COULEURS MATERIAL 3 STRICTES
+   COULEURS MATERIAL DESIGN 3 - VARIABLES DÉFINIES DANS STYLES.CSS
    ========================================================================== */
+
+/* ICÔNES - COULEURS MATERIAL 3 STRICTES */
 mat-icon {
   font-family: "Material Icons", "Material Symbols Outlined", fallback;
 }
@@ -59,26 +61,28 @@ mat-icon {
 .text-primary,
 .header-icon,
 .name-icon {
-  color: #0b57d0 !important;
+  color: var(--google-blue) !important;
 }
 .text-success {
-  color: #146c2e !important;
+  color: var(--google-green) !important;
 }
 .text-danger,
 .error {
-  color: #b3261e !important;
+  color: var(--google-red) !important;
 }
 .text-warning {
-  color: #8c4a00 !important;
+  color: var(--google-orange) !important;
 }
 .text-secondary,
 .info-icon {
-  color: #444746 !important;
+  color: var(--google-gray) !important;
 }
 
 /* ==========================================================================
-   BOUTONS (STYLE PILULE)
+   BOUTONS SYSTÈME - STYLE MATERIAL DESIGN 3 
    ========================================================================== */
+
+/* Groupes de boutons */
 .btn-group,
 .btn-group-action {
   display: flex;
@@ -87,7 +91,8 @@ mat-icon {
 }
 
 /* Boutons d'actions du tableau (View, Edit, Delete) */
-.btn-group-action button {
+.btn-group-action button,
+.action-btn {
   width: 40px;
   height: 40px;
   border-radius: 100px;
@@ -106,67 +111,226 @@ mat-icon {
   width: 20px;
   height: 20px;
 }
-.action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+.action-btn.view,
+.btn-group-action .view {
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
+}
+.action-btn.edit,
+.btn-group-action .edit {
+  background-color: var(--google-orange-light);
+  color: var(--google-orange);
+}
+.action-btn.delete,
+.btn-group-action .delete {
+  background-color: var(--google-red-light);
+  color: var(--google-red);
 }
 
-.action-btn.view {
-  background-color: #dedef8;
-  color: #505fa4;
-}
-.action-btn.edit {
-  background-color: #fef0d8;
-  color: #8c4a00;
-}
-.action-btn.delete {
-  background-color: #ffdad6;
-  color: #ba1a1a;
-}
-
-.btn-group-action .view:hover,
-.action-btn.view:hover {
-  background-color: #d0bcff;
-}
-.btn-group-action .edit:hover,
-.action-btn.edit:hover {
-  background-color: #fde2b4;
-}
-.btn-group-action .delete:hover,
-.action-btn.delete:hover {
-  background-color: #ffb4ab;
-}
-
-/* Boutons principaux (Ajout, Connexion, etc.) */
-button[mat-raised-button],
-.add-student-btn {
-  border-radius: 100px;
-  padding: 10px 24px;
-  background-color: #0b57d0;
+.action-btn.view:hover,
+.btn-group-action .view:hover {
+  background-color: var(--google-blue);
   color: white;
+}
+.action-btn.edit:hover,
+.btn-group-action .edit:hover {
+  background-color: var(--google-orange);
+  color: white;
+}
+.action-btn.delete:hover,
+.btn-group-action .delete:hover {
+  background-color: var(--google-red);
+  color: white;
+}
+
+/* Boutons principaux CTA - Couleurs navigation (brand-icon style) */
+button[mat-raised-button],
+button[mat-button][color="primary"],
+button[mat-button].delete,
+button[mat-button].confirm,
+.btn-cta {
+  border-radius: 100px;
+  padding: 12px 24px;
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
   font-weight: 500;
   border: none;
   cursor: pointer;
-  box-shadow: none;
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 12%),
+    0 1px 2px 0 rgb(0 0 0 / 8%);
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
 }
 
 button[mat-raised-button]:hover,
-.add-student-btn:hover {
-  background-color: #0842a0;
+button[mat-button][color="primary"]:hover,
+button[mat-button].delete:hover,
+button[mat-button].confirm:hover,
+.btn-cta:hover {
+  background-color: var(--google-blue) !important;
+  color: white !important;
+  border-color: var(--google-blue);
+  box-shadow:
+    0 2px 6px 0 rgb(4 30 73 / 25%),
+    0 1px 3px 0 rgb(0 0 0 / 15%);
+  transform: translateY(-1px);
 }
 
-.cancel-btn {
-  background-color: white !important;
-  color: #0b57d0 !important;
-  border: 1px solid #74777520;
+.cancel-btn,
+button[mat-button]:not(.delete):not(.confirm):not([color="primary"]) {
+  background-color: var(--google-red-light) !important;
+  color: var(--google-red) !important;
+  border-radius: 100px !important;
+  padding: 12px 24px !important;
+  font-weight: 500 !important;
 }
 
-.cancel-btn:hover {
-  background-color: #f8fafd !important;
+.cancel-btn:hover,
+button[mat-button]:not(.delete):not(.confirm):not([color="primary"]):hover {
+  background-color: var(--google-red) !important;
+  color: var(--google-red-light) !important;
+  transform: translateY(-1px);
+}
+
+/* Boutons avec couleurs Material Angular spéciales */
+button[mat-button][color="warn"],
+button[mat-raised-button][color="warn"] {
+  background-color: var(--google-red-light) !important;
+  color: var(--google-red) !important;
+}
+
+button[mat-button][color="warn"]:hover,
+button[mat-raised-button][color="warn"]:hover {
+  background-color: var(--google-red) !important;
+  color: white !important;
+  border-color: var(--google-red) !important;
+}
+button[mat-button][color="success"],
+button[mat-raised-button][color="success"] {
+  background-color: var(--google-green-light) !important;
+  color: var(--google-green) !important;
+}
+
+button[mat-button][color="success"]:hover,
+button[mat-raised-button][color="success"]:hover {
+  background-color: var(--google-green) !important;
+  color: white !important;
+  border-color: var(--google-green) !important;
+}
+
+button[mat-button][color="accent"],
+button[mat-raised-button][color="accent"] {
+  background-color: var(--google-blue-light) !important;
+  color: var(--google-blue) !important;
+  border: 1px solid rgba(4, 30, 73, 0.2) !important;
+}
+
+button[mat-button][color="accent"]:hover,
+button[mat-raised-button][color="accent"]:hover {
+  background-color: var(--google-blue) !important;
+  color: white !important;
+  border-color: var(--google-blue) !important;
+}
+button[mat-raised-button]:disabled {
+  background-color: var(--google-gray-light) !important;
+  color: var(--google-gray) !important;
+  border: none !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+/* ==========================================================================
+   FLOATING ACTION BUTTONS (FAB) - BOUTONS DE BAS DE PAGE
+   ========================================================================== */
+.fab-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.fab-primary {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--google-blue);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 12px 0 rgb(4 30 73 / 30%),
+    0 2px 6px 0 rgb(0 0 0 / 15%);
+  transition: all 0.2s ease;
+  font-size: 24px;
+}
+
+.fab-primary:hover {
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
+  box-shadow:
+    0 6px 16px 0 rgb(4 30 73 / 35%),
+    0 3px 8px 0 rgb(0 0 0 / 20%);
+  transform: scale(1.05) translateY(-2px);
+}
+
+.fab-secondary {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 2px 8px 0 rgb(4 30 73 / 20%),
+    0 1px 4px 0 rgb(0 0 0 / 10%);
+  transition: all 0.2s ease;
+  font-size: 20px;
+}
+
+.fab-secondary:hover {
+  background-color: var(--google-blue);
+  color: white;
+  border-color: var(--google-blue);
+  box-shadow:
+    0 4px 12px 0 rgb(4 30 73 / 30%),
+    0 2px 6px 0 rgb(0 0 0 / 15%);
+  transform: scale(1.05) translateY(-2px);
+}
+/* Icônes dans les FAB */
+.fab-primary mat-icon,
+.fab-secondary mat-icon {
+  font-size: inherit;
+}
+/* FAB responsive - mobile */
+@media (max-width: 768px) {
+  .fab-container {
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .fab-primary {
+    width: 48px;
+    height: 48px;
+  }
+
+  .fab-secondary {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 /* ==========================================================================
@@ -199,7 +363,7 @@ button[mat-raised-button]:hover,
   gap: 8px;
   font-weight: 500;
   font-size: 0.875rem;
-  color: #444746;
+  color: var(--google-gray);
 }
 
 .header-item.actions-header,
@@ -227,7 +391,7 @@ button[mat-raised-button]:hover,
 .student-cell {
   padding: 12px 16px;
   font-size: 0.875rem;
-  color: #1f1f1f;
+  color: var(--google-gray-dark);
   display: flex;
   align-items: center;
   word-break: break-word;
@@ -240,15 +404,15 @@ button[mat-raised-button]:hover,
 
 .student-id {
   font-weight: 500;
-  color: #0b57d0;
-  background: #d3e3fd;
+  color: var(--google-blue);
+  background: var(--google-blue-light);
   padding: 4px 12px;
   border-radius: 100px;
   font-size: 0.75rem;
 }
 
 /* ==========================================================================
-   MOBILE LAYOUT - CARTES INDIVIDUELLES RESTAURÉES
+   MOBILE LAYOUT - CARTES RESPONSIVES
    ========================================================================== */
 @media (max-width: 768px) {
   .card {
@@ -287,7 +451,16 @@ button[mat-raised-button]:hover,
     align-items: center;
     gap: 8px;
     font-weight: 500;
-    color: #1f1f1f;
+    color: var(--google-gray-dark);
+  }
+
+  .student-id-badge {
+    background: var(--google-blue-light);
+    color: var(--google-blue);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
   }
 
   .student-card-body {
@@ -305,37 +478,131 @@ button[mat-raised-button]:hover,
     margin-bottom: 0;
   }
 
-  .info-label {
-    font-weight: 500;
-    color: #444746;
-    min-width: 60px;
-    font-size: 0.875rem;
-  }
-
-  .info-value {
-    color: #1f1f1f;
-    flex: 1;
-    word-break: break-word;
-    font-size: 0.875rem;
-  }
-
   .student-card-actions {
     padding: 16px;
     border-top: 1px solid #e1e3e1;
-    display: flex;
-    gap: 8px;
   }
 
-  .student-card-actions button {
-    flex: 1;
-    border-radius: 100px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .info-label {
     font-weight: 500;
-    border: none;
+    color: var(--google-gray);
+    min-width: 60px;
+    font-size: 0.875rem;
   }
+}
+
+/* ==========================================================================
+   MESSAGES D'ALERTE - STYLE MATERIAL DESIGN 3
+   ========================================================================== */
+.alert {
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+}
+
+.alert-info {
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
+}
+.alert-success {
+  background-color: var(--google-green-light);
+  color: var(--google-green);
+}
+.alert-danger {
+  background-color: var(--google-red-light);
+  color: var(--google-red);
+}
+.alert-warning {
+  background-color: var(--google-orange-light);
+  color: var(--google-orange);
+}
+.alert-warning mat-icon {
+  color: var(--google-orange);
+}
+
+/* ==========================================================================
+   ÉTATS VIDES ET ÉLÉMENTS UTILITAIRES
+   ========================================================================== */
+.empty-state-container {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--google-gray);
+}
+
+.empty-state-icon {
+  font-size: 64px !important;
+  width: 64px !important;
+  height: 64px !important;
+  color: var(--google-gray) !important;
+  margin-bottom: 16px;
+}
+
+.empty-state-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--google-gray-dark);
+}
+
+.empty-state-text {
+  color: var(--google-gray);
+  margin-bottom: 24px;
+}
+
+.empty-state-btn {
+  background-color: var(--google-blue);
+  color: white;
+  border-radius: 100px;
+  padding: 12px 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Conteneur d'icône de fonctionnalité */
+.feature-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.feature-icon {
+  font-size: 1.5rem !important;
+}
+
+/* Bouton d'édition toggle */
+.edit-toggle-btn {
+  border-radius: 50% !important;
+}
+
+.info-value {
+  color: var(--google-gray-dark);
+  flex: 1;
+  word-break: break-word;
+  font-size: 0.875rem;
+}
+
+.student-card-actions {
+  padding: 16px;
+  border-top: 1px solid #e1e3e1;
+  display: flex;
+  gap: 8px;
+}
+
+.student-card-actions button {
+  flex: 1;
+  border-radius: 100px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  border: none;
 }
 
 /* ==========================================================================
@@ -351,20 +618,20 @@ button[mat-raised-button]:hover,
 }
 
 .alert-info {
-  background-color: #d3e3fd;
-  color: #041e49;
+  background-color: var(--google-blue-light);
+  color: var(--google-blue);
 }
 .alert-success {
-  background: #c4eed0;
-  color: #072711;
+  background: var(--google-green-light);
+  color: var(--google-green);
 }
 .alert-danger {
-  background: #ffdad6;
-  color: #410002;
+  background: var(--google-red-light);
+  color: var(--google-red);
 }
 /* Teal foncé pour correspondre au design des commandes du screenshot */
 .alert-warning {
-  background-color: #004d40;
+  background-color: var(--google-cyan);
   color: #ffffff;
 }
 .alert-warning mat-icon {

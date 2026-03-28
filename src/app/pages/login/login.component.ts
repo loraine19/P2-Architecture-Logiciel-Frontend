@@ -2,14 +2,18 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MaterialModule } from '../../shared/material.module';
 import { UserService } from '../../core/service/user.service';
 import { Login } from '../../core/models/Login';
-import { InfoMessage } from '../../core/models/InfoMessage';
+import { InfoMessage, InfoMessageFactory } from '../../core/models/InfoMessage';
 import { ErrorService } from '../../core/service/error.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
+/**
+ * Login page component for user authentication
+ * Provides secure login form with validation and error handling
+ */
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -27,10 +31,22 @@ export class LoginComponent implements OnInit {
 
   loginForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
-  infoMessage: InfoMessage = { message: '', error: false };
+  infoMessage: InfoMessage = InfoMessageFactory.empty();
   passwordVisible: boolean = false;
 
+  constructor() {
+    console.log('LoginComponent initialized');
+  }
+
   ngOnInit(): void {
+    this.initializeForm();
+    this.checkQueryParams();
+  }
+
+  /**
+   * Initializes the login form with validation rules
+   */
+  private initializeForm(): void {
     this.loginForm = this.formBuilder.group({
       login: ['', [
         Validators.required,
@@ -44,13 +60,22 @@ export class LoginComponent implements OnInit {
         Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.-_])[A-Za-z\\d@$!%*?&.-_]+$")
       ]]
     });
-    // Check for query params to display messages
+    console.log('Login form initialized');
+  }
+
+  /**
+   * Checks for query parameters to display messages
+   */
+  private checkQueryParams(): void {
     this.route.queryParams.subscribe(params => {
       const msg = params['msg'];
       const error = params['error'];
       if (msg) {
-        this.infoMessage.message = msg;
-        this.infoMessage.error = error === 'true';
+        this.infoMessage = {
+          message: msg,
+          error: error === 'true'
+        };
+        console.log('Query param message displayed:', msg);
       }
     });
   }

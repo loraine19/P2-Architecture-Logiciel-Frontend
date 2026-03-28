@@ -5,7 +5,7 @@ import { map, take } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 /**
- * Modern functional auth guard (2026 style)
+ * Modern functional auth guard 
  * Protects routes from unauthorized access
  */
 export const authGuard = (): Observable<boolean> => {
@@ -19,18 +19,9 @@ export const authGuard = (): Observable<boolean> => {
             if (isAuthenticated) {
                 return true;
             } else {
-                // Redirect to login with return URL (prevent nested parameters)
-                const currentUrl = router.url;
-                console.log('Auth Guard - Redirecting to login, return URL:', currentUrl); // Debug log
-
-                // Only add returnUrl if we're not already on login page
-                if (!currentUrl.startsWith('/login')) {
-                    router.navigate(['/login'], {
-                        queryParams: { returnUrl: currentUrl }
-                    });
-                } else {
-                    router.navigate(['/home']); // Clean redirect without params
-                }
+                // Redirect to home if not authenticated
+                console.log('Auth Guard - User not authenticated, redirecting to home');
+                router.navigate(['/home']);
                 return false;
             }
         })

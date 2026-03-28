@@ -1,4 +1,4 @@
-<div class="card m-0 border-0 main-container">
+<div class="page-card">
   <h5 class="card-header d-flex align-items-center border-0 pt-4 pb-2 px-4">
     <mat-icon class="text-primary me-2">domain</mat-icon>
     Système de Gestion des Étudiants
@@ -59,7 +59,7 @@
               </div>
               <button
                 mat-raised-button
-                class="add-student-btn w-100 d-flex justify-content-center align-items-center"
+                class="btn-cta d-flex justify-content-center align-items-center"
                 (click)="
                   openRepository(
                     'https://github.com/loraine19/P2-Architecture-Logiciel-Frontend'
@@ -96,8 +96,9 @@
                 }
               </div>
               <button
+                color="success"
                 mat-raised-button
-                class="add-student-btn bg-success w-100 d-flex justify-content-center align-items-center"
+                class="btn-cta d-flex justify-content-center align-items-center"
                 (click)="
                   openRepository(
                     'https://github.com/loraine19/P2-Architecture-Logiciel-Backend'
@@ -217,7 +218,7 @@
               <div class="d-flex gap-3">
                 <button
                   mat-raised-button
-                  class="add-student-btn px-4"
+                  class="btn-cta px-4"
                   routerLink="/studentList"
                 >
                   <mat-icon class="me-2">list</mat-icon> Liste
@@ -248,7 +249,7 @@
               <div class="d-flex gap-3">
                 <button
                   mat-raised-button
-                  class="add-student-btn px-4"
+                  class="btn-cta px-4"
                   routerLink="/login"
                 >
                   Se Connecter <mat-icon class="ms-2">how_to_reg</mat-icon>

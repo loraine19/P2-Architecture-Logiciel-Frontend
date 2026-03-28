@@ -5,11 +5,15 @@ import { MaterialModule } from '../../shared/material.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserService } from '../../core/service/user.service';
 import { UserDTO } from '../../core/models/Register';
-import { InfoMessage } from '../../core/models/InfoMessage';
-import { HttpErrorResponse } from '@angular/common/http';
+import { InfoMessage, InfoMessageFactory } from '../../core/models/InfoMessage';
 import { ErrorService } from '../../core/service/error.service';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
+/**
+ * Registration page component for new user account creation
+ * Provides secure registration form with validation and password visibility toggle
+ */
 @Component({
   selector: 'app-register',
   imports: [CommonModule, MaterialModule, ReactiveFormsModule],
@@ -23,10 +27,15 @@ export class RegisterComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private errorService = inject(ErrorService);
   private router = inject(Router);
+
   registerForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
-  infoMessage: InfoMessage = { message: '', error: false };
+  infoMessage: InfoMessage = InfoMessageFactory.empty();
   passwordVisible: boolean = false;
+
+  constructor() {
+    console.log('RegisterComponent initialized');
+  }
 
   ngOnInit() {
     this.registerForm = this.formBuilder.group(

@@ -22,3 +22,22 @@ mat-form-field {
   --mdc-outlined-text-field-error-focus-outline-width: 2.5px !important;
   --mdc-notched-outline: border-radius: 92px !important;
 }
+
+:root {
+  --google-blue: #041e49;
+  --google-blue-hover: #032b5c;
+  --google-blue-light: #d3e3fd;
+  --google-red: #ea4335;
+  --google-red-light: #fce8e6;
+  --google-orange: #ff9800;
+  --google-orange-light: #fff3e0;
+  --google-yellow: #fbbc05;
+  --google-yellow-light: #fffbf0;
+  --google-green: #34a853;
+  --google-green-light: #e8f5e8;
+  --google-cyan: #00acc1;
+  --google-cyan-light: #e0f7fa;
+  --google-gray: #5f6368;
+  --google-gray-light: #f8f9fa;
+  --google-gray-dark: #202124;
+}

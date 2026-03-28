@@ -1,4 +1,4 @@
-<div class="card m-3">
+<div class="page-card">
   <h5 class="card-header">Create Student</h5>
 
   <div class="card-body">
@@ -204,17 +204,20 @@
           <mat-icon>cancel</mat-icon>
           Cancel
         </button>
-        <button
-          type="button"
-          mat-button
-          color="accent"
-          class="rounded-pill px-4"
-          (click)="goBackToList()"
-        >
-          <mat-icon>arrow_back</mat-icon>
-          Back to List
-        </button>
       </div>
     </form>
+
+    <!-- Floating Action Button - Back to List -->
+    <div class="fab-container">
+      <button
+        mat-fab
+        color="accent"
+        class="fab-secondary"
+        (click)="goBackToList()"
+        title="Back to List"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
   </div>
 </div>

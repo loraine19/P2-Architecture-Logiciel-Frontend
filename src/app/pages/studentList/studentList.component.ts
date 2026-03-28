@@ -1,13 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { StudentService } from '../../core/service/student.service';
 import { Student } from '../../core/models/Student';
 import { MaterialModule } from '../../shared/material.module';
 import { ErrorService } from '../../core/service/error.service';
-import { InfoMessage } from '../../core/models/InfoMessage';
+import { InfoMessage, InfoMessageFactory } from '../../core/models/InfoMessage';
 
+/**
+ * Student list component displaying all students with CRUD operations
+ * Provides responsive table/card layout and confirmation dialogs
+ */
 @Component({
   selector: 'app-student-list',
   standalone: true,
@@ -20,11 +23,14 @@ export class StudentListComponent implements OnInit {
   private errorService = inject(ErrorService);
   private router = inject(Router);
 
-
   students: Student[] = [];
-  infoMessage: InfoMessage = { message: '', error: false };
   isLoading: boolean = true;
+  infoMessage: InfoMessage = InfoMessageFactory.empty();
   pendingDeleteId: number | null = null;
+
+  constructor() {
+    console.log('StudentListComponent initialized');
+  }
 
   ngOnInit(): void {
     this.loadStudents();

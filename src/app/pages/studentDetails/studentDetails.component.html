@@ -1,4 +1,4 @@
-<div class="card m-3">
+<div class="page-card">
   <h5 class="card-header d-flex justify-content-between align-items-center">
     <span>
       @if (isLoading) {
@@ -41,14 +41,18 @@
         >
         <h5 class="text-muted">Student Not Found</h5>
         <p class="text-muted">The student with this ID does not exist.</p>
+      </div>
+
+      <!-- FAB for student not found -->
+      <div class="fab-container">
         <button
-          mat-raised-button
-          color="primary"
-          class="rounded-pill"
+          mat-fab
+          color="accent"
+          class="fab-secondary"
           (click)="goBackToList()"
+          title="Back to Student List"
         >
           <mat-icon>arrow_back</mat-icon>
-          Back to List
         </button>
       </div>
     }
@@ -265,18 +269,22 @@
               <mat-icon>edit</mat-icon>
               Edit Student
             </button>
-            <button
-              type="button"
-              mat-button
-              class="rounded-pill px-4"
-              (click)="goBackToList()"
-            >
-              <mat-icon>arrow_back</mat-icon>
-              Back to List
-            </button>
           }
         </div>
       </form>
+
+      <!-- Floating Action Button - Back to List -->
+      <div class="fab-container">
+        <button
+          mat-fab
+          color="accent"
+          class="fab-secondary"
+          (click)="goBackToList()"
+          title="Back to Student List"
+        >
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
     }
   </div>
 </div>
