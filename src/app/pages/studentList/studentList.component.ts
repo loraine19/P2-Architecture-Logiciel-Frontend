@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterLink } from '@angular/router';
 import { StudentService } from '../../core/service/student.service';
 import { Student } from '../../core/models/Student';
@@ -14,7 +14,7 @@ import { InfoMessage, InfoMessageFactory } from '../../core/models/InfoMessage';
 @Component({
   selector: 'app-student-list',
   standalone: true,
-  imports: [CommonModule, MaterialModule, RouterLink],
+  imports: [MaterialModule, RouterLink],
   templateUrl: './studentList.component.html',
   styleUrl: '../pages.css'
 })

@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { MaterialModule } from '../../shared/material.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserService } from '../../core/service/user.service';
@@ -16,7 +16,7 @@ import { HttpErrorResponse } from '@angular/common/http';
  */
 @Component({
   selector: 'app-register',
-  imports: [CommonModule, MaterialModule, ReactiveFormsModule],
+  imports: [MaterialModule, ReactiveFormsModule],
   templateUrl: './register.component.html',
   standalone: true,
   styleUrl: '../pages.css'

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserService } from '../../core/service/user.service';
-import { CommonModule } from '@angular/common';
+
 import { MaterialModule } from '../material.module';
 
 /**
@@ -10,7 +10,7 @@ import { MaterialModule } from '../material.module';
  */
 @Component({
   selector: 'app-navigation',
-  imports: [RouterLink, RouterLinkActive, CommonModule, MaterialModule],
+  imports: [RouterLink, RouterLinkActive, MaterialModule],
   templateUrl: './navigation.component.html',
   styleUrls: ['../../pages/pages.css', './navigation.css']
 })

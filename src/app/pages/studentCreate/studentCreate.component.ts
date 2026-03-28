@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { StudentDto } from '../../core/models/Student';
 import { StudentService } from '../../core/service/student.service';
@@ -16,7 +16,7 @@ import { HttpErrorResponse } from '@angular/common/http';
  */
 @Component({
   selector: 'app-student-create',
-  imports: [CommonModule, ReactiveFormsModule, MaterialModule],
+  imports: [ReactiveFormsModule, MaterialModule],
   templateUrl: './studentCreate.component.html',
   styleUrl: '../pages.css'
 })

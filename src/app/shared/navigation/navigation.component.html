@@ -12,7 +12,7 @@
     (click)="toggleMenu()"
     [attr.aria-expanded]="isMenuOpen"
     aria-label="Toggle navigation"
-  >
+    >
     <mat-icon [class.open]="isMenuOpen">
       {{ isMenuOpen ? "close" : "menu" }}
     </mat-icon>
@@ -35,7 +35,7 @@
       class="close-btn"
       (click)="closeMenu()"
       aria-label="Close menu"
-    >
+      >
       <mat-icon>close</mat-icon>
     </button>
   </div>
@@ -48,66 +48,76 @@
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
         (click)="closeMenu()"
-      >
+        >
         <mat-icon class="menu-icon">home</mat-icon>
         <span class="menu-text">Home</span>
       </a>
     </li>
-    <li class="menu-item" *ngIf="!isAuthenticated()">
-      <a
-        class="menu-link"
-        [routerLink]="['/register']"
-        routerLinkActive="active"
-        (click)="closeMenu()"
-      >
-        <mat-icon class="menu-icon">person_add</mat-icon>
-        <span class="menu-text">Register</span>
-      </a>
-    </li>
-    <li class="menu-item" *ngIf="isAuthenticated()">
-      <a
-        class="menu-link"
-        [routerLink]="['/studentCreate']"
-        routerLinkActive="active"
-        (click)="closeMenu()"
-      >
-        <mat-icon class="menu-icon">add_circle</mat-icon>
-        <span class="menu-text">Create Student</span>
-      </a>
-    </li>
-    <li class="menu-item" *ngIf="isAuthenticated()">
-      <a
-        class="menu-link"
-        [routerLink]="['/studentList']"
-        routerLinkActive="active"
-        (click)="closeMenu()"
-      >
-        <mat-icon class="menu-icon">list</mat-icon>
-        <span class="menu-text">Student List</span>
-      </a>
-    </li>
-    <li class="menu-item" *ngIf="!isAuthenticated()">
-      <a
-        class="menu-link"
-        [routerLink]="['/login']"
-        routerLinkActive="active"
-        (click)="closeMenu()"
-      >
-        <mat-icon class="menu-icon">login</mat-icon>
-        <span class="menu-text">Login</span>
-      </a>
-    </li>
+    @if (!isAuthenticated()) {
+      <li class="menu-item">
+        <a
+          class="menu-link"
+          [routerLink]="['/register']"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+          >
+          <mat-icon class="menu-icon">person_add</mat-icon>
+          <span class="menu-text">Register</span>
+        </a>
+      </li>
+    }
+    @if (isAuthenticated()) {
+      <li class="menu-item">
+        <a
+          class="menu-link"
+          [routerLink]="['/studentCreate']"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+          >
+          <mat-icon class="menu-icon">add_circle</mat-icon>
+          <span class="menu-text">Create Student</span>
+        </a>
+      </li>
+    }
+    @if (isAuthenticated()) {
+      <li class="menu-item">
+        <a
+          class="menu-link"
+          [routerLink]="['/studentList']"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+          >
+          <mat-icon class="menu-icon">list</mat-icon>
+          <span class="menu-text">Student List</span>
+        </a>
+      </li>
+    }
+    @if (!isAuthenticated()) {
+      <li class="menu-item">
+        <a
+          class="menu-link"
+          [routerLink]="['/login']"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+          >
+          <mat-icon class="menu-icon">login</mat-icon>
+          <span class="menu-text">Login</span>
+        </a>
+      </li>
+    }
   </ul>
 
-  <div class="menu-footer" *ngIf="isAuthenticated()">
-    <button
-      mat-raised-button
-      color="warn"
-      class="logout-btn"
-      (click)="userService.logout(); closeMenu()"
-    >
-      <mat-icon>logout</mat-icon>
-      <span>Logout</span>
-    </button>
-  </div>
+  @if (isAuthenticated()) {
+    <div class="menu-footer">
+      <button
+        mat-raised-button
+        color="warn"
+        class="logout-btn"
+        (click)="userService.logout(); closeMenu()"
+        >
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </div>
+  }
 </nav>
