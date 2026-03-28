@@ -15,12 +15,12 @@ body {
 
 /* THE VISUAL FIX  */
 mat-form-field {
-  --mdc-outlined-text-field-outline-width: 1.5px !important;
-  --mdc-outlined-text-field-focus-outline-width: 2.5px !important;
-  --mdc-outlined-text-field-outline-color: #9f9f9f !important;
-  --mdc-outlined-text-field-error-outline-width: 1.5px !important;
-  --mdc-outlined-text-field-error-focus-outline-width: 2.5px !important;
-  --mdc-notched-outline: border-radius: 92px !important;
+  --mat-form-field-outlined-outline-width: 1.5px !important;
+  --mat-form-field-outlined-focus-outline-width: 2.5px !important;
+  --mat-form-field-outlined-outline-color: #9f9f9f !important;
+  --mat-form-field-outlined-error-outline-width: 1.5px !important;
+  --mat-form-field-outlined-error-focus-outline-width: 2.5px !important;
+  --mat-notched-outline: border-radius: 92px !important;
 }
 
 :root {
