@@ -1,11 +1,3 @@
-# ==========================================================================
-# STUDENT MANAGEMENT FRONTEND - DOCKER CONFIGURATION
-# Modern Angular 18+ application containerized with Nginx
-# ==========================================================================
-
-# IMPORTANT: Build the production bundle before creating the Docker image
-# Command: npm run build --configuration=production
-
 # Use official Nginx Alpine image for lightweight production deployment
 FROM nginx:alpine
 
@@ -27,5 +19,3 @@ EXPOSE 80
 # Add health check for container monitoring
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost/ || exit 1
-
-# Nginx runs in foreground by default (no need for explicit CMD)
