@@ -2,14 +2,14 @@
  * User entity model with complete user information
  * Includes timestamps for audit tracking
  */
-export interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  login: string;
-  password: string;
-  createdAt: Date;
-  updatedAt: Date;
+export class User {
+  id?: number;
+  firstName: string = '';
+  lastName: string = '';
+  login: string = '';
+  password: string = '';
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 /**

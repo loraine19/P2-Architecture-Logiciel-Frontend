@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserService } from '../../core/service/user.service';
+import { UserDTO } from '../../core/models/User';
+import { Observable, map } from 'rxjs';
 
 import { MaterialModule } from '../material.module';
 
@@ -17,8 +19,11 @@ import { MaterialModule } from '../material.module';
 export class NavigationComponent {
   isMenuOpen = false;
 
-  constructor(public userService: UserService) {
-    console.log('NavigationComponent initialized');
+  constructor(public userService: UserService) { }
+
+  public userFirstName(): string {
+    const user: UserDTO | null = this.userService.getCurrentUser();
+    return user ? user.firstName : 'Student Management';
   }
 
   /**
@@ -26,7 +31,6 @@ export class NavigationComponent {
    */
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
-    console.log('Menu toggled:', this.isMenuOpen);
   }
 
   /**
@@ -34,15 +38,12 @@ export class NavigationComponent {
    */
   closeMenu(): void {
     this.isMenuOpen = false;
-    console.log('Menu closed');
   }
 
   /**
    * Checks if user is authenticated
    */
   isAuthenticated(): boolean {
-    const isAuth = this.userService.isLoggedIn();
-    console.log('Navigation auth check:', isAuth);
-    return isAuth;
+    return this.userService.isLoggedIn();
   }
 }

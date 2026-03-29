@@ -13,7 +13,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { RegisterComponent } from './register.component';
 import { UserService } from '../../core/service/user.service';
 import { UserMockService } from '../../core/service/user-mock.service';
-import { Register } from '../../core/models/Register';
+import { Register } from '../../core/models/User';
 
 /**
  * Unit tests for RegisterComponent

@@ -1,4 +1,4 @@
-<div class="page-card">
+<div class="page-card w-80 overflow-hidden">
   <h5 class="card-header d-flex align-items-center border-0 pt-4 pb-2 px-4">
     <mat-icon class="text-primary me-2">domain</mat-icon>
     Système de Gestion des Étudiants
@@ -13,7 +13,7 @@
         class="d-flex align-items-center fw-bold mb-3 gap-3 text-secondary text-opacity-75"
       >
         <div
-          class="rounded-circle d-flex w-8 h-8 align-items-center justify-content-center feature-icon-container bg-secondary bg-opacity-25 p-2 me-3"
+          class="rounded-circle d-flex w-8 h-8 align-items-center justify-content-center feature-icon-container bg-secondary bg-opacity-25 p-2 me-3 whitespace-wrap"
         >
           <mat-icon class="feature-icon text-secondary">devices</mat-icon>
         </div>
@@ -202,7 +202,7 @@
           Call to Action
         </h6>
 
-        @if (userService.isLoggedIn$ | async) {
+        @if (userService.isLoggedIn()) {
           <div
             class="card w-100 border-0 empty-state-container bg-secondary bg-opacity-10"
           >

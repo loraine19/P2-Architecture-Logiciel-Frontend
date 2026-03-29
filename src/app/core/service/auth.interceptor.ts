@@ -1,83 +1,73 @@
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Observable, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { Observable, from, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { PlatformDetectionService } from './platform-detection.service';
+import { AdaptiveStorageService } from './adaptiveStorage.service';
 import { UserService } from './user.service';
+import { Router } from '@angular/router';
 
 /**
  * HTTP Interceptor for hybrid authentication
- * Automatically adds JWT Authorization header for mobile requests
- * Allows cookies to be sent automatically for web requests
+ * Mobile: JWT in Bearer header, Web: HTTP-only cookies
  */
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
     constructor(
         private platformDetection: PlatformDetectionService,
-        private userService: UserService
+        private adaptiveStorage: AdaptiveStorageService,
+        private userService: UserService,
+        private router: Router
     ) { }
 
-    /**
-     * Intercepts HTTP requests to add authentication headers
-     * @param {HttpRequest<any>} request - Original HTTP request
-     * @param {HttpHandler} next - Next handler in the chain
-     * @returns {Observable<HttpEvent<any>>} Modified request observable
-     */
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-        // Skip auth for public endpoints
-        if (this.isPublicEndpoint(request.url)) {
-            console.log('Skipping auth for public endpoint:', request.url);
-            return next.handle(request);
-        }
+        // Exclude public endpoints from interception
+        if (this.isPublicEndpoint(request.url)) return next.handle(request);
 
+        // 1. Mobile platform - retrieve token from adaptive storage and add Authorization header
         if (this.platformDetection.isMobile()) {
-            // Mobile: Add JWT token in Authorization header
-            return from(this.userService.getAuthToken()).pipe(
-                switchMap(token => {
-                    if (token) {
-                        const authRequest = request.clone({
-                            setHeaders: {
-                                'Authorization': `Bearer ${token}`,
-                                'X-Platform': 'mobile'
-                            }
-                        });
-                        console.log('Adding JWT Authorization header for mobile request');
-                        return next.handle(authRequest);
-                    } else {
-                        console.log('No JWT token available for mobile request');
-                        return next.handle(request);
-                    }
+            return from(this.adaptiveStorage.getAuthToken()).pipe(
+                // If no token, proceed without modifying the request
+                switchMap((token: string | null) => {
+                    if (!token) return next.handle(request);
+                    // Cloned request with Authorization header
+                    const authRequest = request.clone({
+                        setHeaders: { 'Authorization': `Bearer ${token}` }
+                    });
+                    return next.handle(authRequest);
                 })
             );
-        } else {
-            // Web: Allow cookies to be sent automatically, add platform header
-            const cookieRequest = request.clone({
-                setHeaders: {
-                    'X-Platform': 'web'
-                },
-                withCredentials: true // Ensure cookies are sent
-            });
-            console.log('Sending web request with credentials (cookies)');
-            return next.handle(cookieRequest);
         }
+
+        // Web platform - rely on browser's cookie handling (withCredentials)
+        return next.handle(request.clone({ withCredentials: true })).pipe(
+            // Optionally, handle 401 responses to trigger logout or token refresh
+            catchError((error: HttpErrorResponse) => {
+                if (error.status === 401 && this.platformDetection.isMobile()) {
+                    this.userService.refreshAccessToken().subscribe(
+                        (response) => {
+                            if (!response.success) {
+                                this.userService.logout();
+                                this.router.navigate(['/login'], { queryParams: { msg: 'Your session has expired. Please log in again.', error: true } });
+                            }
+                            else {
+                                alert('Token refreshed successfully. Please retry your request.');
+                                location.reload();
+                            }
+                        }
+                    )
+
+
+                }
+                return throwError(() => error);
+            })
+        );
     }
 
-    /**
-     * Checks if the endpoint is public (no auth required)
-     * @private
-     * @param {string} url - Request URL
-     * @returns {boolean} True if public endpoint
-     */
     private isPublicEndpoint(url: string): boolean {
-        const publicEndpoints = [
-            '/api/register',
-            '/api/login',
-            '/api/public',
-            '/assets/'
-        ];
-
+        const publicEndpoints = ['/api/register', '/api/login', '/api/public', '/assets/'];
         return publicEndpoints.some(endpoint => url.includes(endpoint));
     }
 }

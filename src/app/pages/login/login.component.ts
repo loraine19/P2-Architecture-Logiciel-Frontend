@@ -58,7 +58,9 @@ export class LoginComponent implements OnInit {
         Validators.minLength(8),
         Validators.maxLength(128),
         Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.-_])[A-Za-z\\d@$!%*?&.-_]+$")
-      ]]
+      ]],
+      rememberMe: [true,
+      ]
     });
     console.log('Login form initialized');
   }

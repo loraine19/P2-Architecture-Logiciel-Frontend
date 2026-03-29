@@ -5,7 +5,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { UserService } from './user.service';
 import { User } from '../models/User';
 import { Login } from '../models/Login';
-import { Register } from '../models/Register';
+import { Register } from '../models/User';
 
 /**
  * Unit tests for UserService

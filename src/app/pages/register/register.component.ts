@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { MaterialModule } from '../../shared/material.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserService } from '../../core/service/user.service';
-import { UserDTO } from '../../core/models/Register';
+import { UserDTO } from '../../core/models/User';
 import { InfoMessage, InfoMessageFactory } from '../../core/models/InfoMessage';
 import { ErrorService } from '../../core/service/error.service';
 import { Router } from '@angular/router';

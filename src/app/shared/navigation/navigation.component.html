@@ -3,7 +3,7 @@
   <div class="brand-section">
     <a class="brand-link" [routerLink]="['/']">
       <mat-icon class="brand-icon">school</mat-icon>
-      Etudiant Frontend
+      {{ userFirstName() }}
     </a>
   </div>
   <button
@@ -12,7 +12,7 @@
     (click)="toggleMenu()"
     [attr.aria-expanded]="isMenuOpen"
     aria-label="Toggle navigation"
-    >
+  >
     <mat-icon [class.open]="isMenuOpen">
       {{ isMenuOpen ? "close" : "menu" }}
     </mat-icon>
@@ -35,7 +35,7 @@
       class="close-btn"
       (click)="closeMenu()"
       aria-label="Close menu"
-      >
+    >
       <mat-icon>close</mat-icon>
     </button>
   </div>
@@ -48,7 +48,7 @@
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
         (click)="closeMenu()"
-        >
+      >
         <mat-icon class="menu-icon">home</mat-icon>
         <span class="menu-text">Home</span>
       </a>
@@ -60,7 +60,7 @@
           [routerLink]="['/register']"
           routerLinkActive="active"
           (click)="closeMenu()"
-          >
+        >
           <mat-icon class="menu-icon">person_add</mat-icon>
           <span class="menu-text">Register</span>
         </a>
@@ -73,7 +73,7 @@
           [routerLink]="['/studentCreate']"
           routerLinkActive="active"
           (click)="closeMenu()"
-          >
+        >
           <mat-icon class="menu-icon">add_circle</mat-icon>
           <span class="menu-text">Create Student</span>
         </a>
@@ -86,7 +86,7 @@
           [routerLink]="['/studentList']"
           routerLinkActive="active"
           (click)="closeMenu()"
-          >
+        >
           <mat-icon class="menu-icon">list</mat-icon>
           <span class="menu-text">Student List</span>
         </a>
@@ -99,7 +99,7 @@
           [routerLink]="['/login']"
           routerLinkActive="active"
           (click)="closeMenu()"
-          >
+        >
           <mat-icon class="menu-icon">login</mat-icon>
           <span class="menu-text">Login</span>
         </a>
@@ -114,7 +114,7 @@
         color="warn"
         class="logout-btn"
         (click)="userService.logout(); closeMenu()"
-        >
+      >
         <mat-icon>logout</mat-icon>
         <span>Logout</span>
       </button>

@@ -23,7 +23,7 @@ main,
   display: flex;
   flex-direction: column;
   width: 100%;
-  /* CORRECTION: margin cohérente sans !important */
+  max-width: 90vw;
   margin: 0;
   max-height: calc(100vh - 6rem);
   overflow: hidden;
