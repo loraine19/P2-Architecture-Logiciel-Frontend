@@ -32,7 +32,6 @@ export class UserService implements UserServiceInterface {
     if (!userDTO?.login || !userDTO?.password) {
       throw new Error('User data is required for registration');
     }
-
     return this.httpClient.post(`${this.apiUrl}/register`, userDTO).pipe(
       catchError(error => { throw error; })
     );
@@ -65,13 +64,10 @@ export class UserService implements UserServiceInterface {
   logout(): void {
     this.httpClient.post<MessageResponse>(`${this.apiUrl}/logout`, {}).pipe(
       tap(() => {
-        // Clear authentication data after successful server logout
         this.adaptiveStorage.clearAuthData();
-        // Navigate using Angular Router for proper SPA behavior
         this.router.navigate(['/home']);
       }),
       catchError(error => {
-        // Even if server logout fails, clear local auth state
         this.adaptiveStorage.clearAuthData();
         this.router.navigate(['/home']);
         throw error;
@@ -103,48 +99,43 @@ export class UserService implements UserServiceInterface {
     }
   }
 
-  refreshAccessToken(): Observable<any> {
+  refreshAccessToken(isMobile: boolean): Observable<LoginResponse | null> {
 
-    // 1. Cas Web (Cookies) : On retourne immédiatement un Observable vide
-    if (!this.platformDetection.isMobile()) {
-      return of(null);
+    // 1 Not Mobile Cookies HTTP only 
+    if (!isMobile) {
+      return this.httpClient.post<LoginResponse>(
+        `${this.apiUrl}/refresh`,
+        {},
+        { observe: 'response' }
+      ).pipe(
+        map(response => response.body)
+      );
     }
 
-    // 2. Cas Mobile : On lance le flux asynchrone
+    // 2. Mobile - retrieve refresh token from adaptive storage and request new access token
     return from(this.adaptiveStorage.getAuthRefreshToken()).pipe(
-      switchMap((refreshToken: string | null) => {
 
-        // Si pas de jeton, on coupe le flux proprement avec throwError
+      switchMap((refreshToken: string | null) => {
         if (!refreshToken) {
           return throwError(() => new Error('No refresh token available'));
         }
 
-        // 3. Appel HTTP (avec observe: 'response' pour capturer les headers)
         return this.httpClient.post<LoginResponse>(
           `${this.apiUrl}/refresh`,
           { refreshToken },
           { observe: 'response' }
-        ).pipe(
-
-          // 4. Traitement de la réponse réseau complète
-          switchMap((httpResponse: HttpResponse<LoginResponse>) => {
-            const token = this.extractTokenFromResponse(httpResponse);
-
-            if (token) {
-              // On attend que la sauvegarde du nouveau jeton soit terminée,
-              // puis on laisse passer la réponse originale
-              return from(this.adaptiveStorage.setAuthToken(token)).pipe(
-                map(() => httpResponse.body) // On renvoie juste le body à la fin
-              );
-            }
-
-            // Si aucun token n'a été trouvé dans les headers, on passe à la suite
-            return of(httpResponse.body);
-          }),
-
-          // 5. Capture propre des erreurs du réseau
-          catchError(error => throwError(() => error))
         );
+      }),
+
+      switchMap((httpResponse: HttpResponse<LoginResponse>) => {
+        const token = this.extractTokenFromResponse(httpResponse);
+        if (token) {
+          return from(this.adaptiveStorage.setAuthToken(token)).pipe(
+            map(() => httpResponse.body)
+          );
+        }
+
+        return of(httpResponse.body);
       })
     );
   }

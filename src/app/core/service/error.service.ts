@@ -26,8 +26,8 @@ export class ErrorService implements ErrorServiceInterface {
     handleError(err: HttpErrorResponse, infoMessage: InfoMessage): void {
         let message = this.getErrorMessage(err);
 
-        if (err.status === 401 && this.platformDetection.isMobile()) {
-            this.userService.refreshAccessToken().subscribe(
+        if (err.status === 401) {
+            this.userService.refreshAccessToken(this.platformDetection.isMobile()).subscribe(
                 (response) => {
                     if (!response) {
                         this.userService.logout();

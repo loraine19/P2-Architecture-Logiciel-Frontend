@@ -13,5 +13,5 @@ export interface UserServiceInterface {
     login(login: Login): Observable<LoginResponse>;
     logout(): void;
     isLoggedIn(): boolean;
-    refreshAccessToken(): Observable<MessageResponse | any>;
+    refreshAccessToken(isMobile: boolean): Observable<MessageResponse | any>;
 }

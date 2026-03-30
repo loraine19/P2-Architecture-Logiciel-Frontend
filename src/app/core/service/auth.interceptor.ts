@@ -45,21 +45,18 @@ export class AuthInterceptor implements HttpInterceptor {
         return next.handle(request.clone({ withCredentials: true })).pipe(
             // Optionally, handle 401 responses to trigger logout or token refresh
             catchError((error: HttpErrorResponse) => {
-                if (error.status === 401 && this.platformDetection.isMobile()) {
-                    this.userService.refreshAccessToken().subscribe(
+                if (error.status === 401) {
+                    this.userService.refreshAccessToken(this.platformDetection.isMobile()).subscribe(
                         (response) => {
-                            if (!response.success) {
+                            if (!response) {
                                 this.userService.logout();
                                 this.router.navigate(['/login'], { queryParams: { msg: 'Your session has expired. Please log in again.', error: true } });
                             }
                             else {
-                                alert('Token refreshed successfully. Please retry your request.');
                                 location.reload();
                             }
                         }
-                    )
-
-
+                    );
                 }
                 return throwError(() => error);
             })
