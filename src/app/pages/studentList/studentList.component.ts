@@ -17,7 +17,7 @@ import { InfoMessage } from '../../core/DTO/InfoMessage';
   standalone: true,
   imports: [MaterialModule, RouterLink],
   templateUrl: './studentList.component.html',
-  styleUrl: '../pages.css'
+  styleUrls: ['../../../styles.css']
 })
 export class StudentListComponent implements OnInit, OnDestroy {
 

@@ -21,7 +21,7 @@ import { UserService } from '../../core/service/user.service';
     MatIconModule, MatDividerModule, MatChipsModule, RouterLink
   ],
   templateUrl: './home.component.html',
-  styleUrl: '../pages.css'
+  styleUrls: ['../../../styles.css']
 })
 export class HomeComponent {
 

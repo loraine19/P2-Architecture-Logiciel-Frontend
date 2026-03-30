@@ -19,7 +19,7 @@ import { ErrorService } from '../../core/service/error.service';
   standalone: true,
   imports: [MaterialModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styleUrl: '../pages.css'
+  styleUrls: ['../../../styles.css']
 })
 export class LoginComponent implements OnInit {
 

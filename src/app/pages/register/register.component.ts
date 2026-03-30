@@ -19,7 +19,7 @@ import { InfoMessage } from '../../core/DTO/InfoMessage';
   standalone: true,
   imports: [MaterialModule, ReactiveFormsModule],
   templateUrl: './register.component.html',
-  styleUrl: '../pages.css'
+  styleUrls: ['../../../styles.css']
 })
 export class RegisterComponent implements OnInit {
 

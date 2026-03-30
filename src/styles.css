@@ -1,28 +1,6 @@
-html,
-body {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 14px;
-  align-items: center;
-  justify-content: center;
-  background-color: #e5eaee;
-}
-body {
-  margin-top: 4rem;
-  font-family: "Montserrat", sans-serif;
-}
-
-/* THE VISUAL FIX  */
-mat-form-field {
-  --mat-form-field-outlined-outline-width: 1.5px !important;
-  --mat-form-field-outlined-focus-outline-width: 2.5px !important;
-  --mat-form-field-outlined-outline-color: #9f9f9f !important;
-  --mat-form-field-outlined-error-outline-width: 1.5px !important;
-  --mat-form-field-outlined-error-focus-outline-width: 2.5px !important;
-  --mat-notched-outline: border-radius: 92px !important;
-}
-
+/* 
+   VARIABLES & BASE DE CONCEPTION (GOOGLE MATERIAL DESIGN 3)
+   */
 :root {
   --google-blue: #041e49;
   --google-blue-hover: #032b5c;
@@ -42,20 +20,291 @@ mat-form-field {
   --google-gray-dark: #202124;
 }
 
-/* ==========================================================================
-   ALERTES ET EMPTY STATE
-   ========================================================================== */
-.alert {
+html,
+body {
+  height: 100vh;
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+}
+
+body {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  align-items: center;
+  justify-content: center;
+  background-color: #e5eaee;
+  margin-top: 4rem;
+}
+
+/* 
+   STRUCTURE PAGES
+   */
+main {
+  padding: 24px 16px;
+  height: calc(100vh - 64px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+}
+
+.page-card,
+.card {
   border-radius: 24px;
-  padding: 16px 20px;
-  margin-bottom: 16px;
+  border: 1px solid #e1e3e1;
+  background: white;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 90vw;
+  max-height: calc(100vh - 6rem);
+  overflow: hidden;
+}
+
+.card-header {
+  background: white;
+  color: var(--google-gray-dark) !important;
+  padding: 24px 24px 16px;
+  font-weight: 500;
+  border-bottom: 1px solid #e1e3e1;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
+  z-index: 2;
+}
+
+.card-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+/* 
+   FORMULAIRES & CHAMPS MATERIAL
+   */
+mat-form-field {
+  width: 100%;
+  --mat-form-field-outlined-outline-width: 1.5px !important;
+  --mat-form-field-outlined-focus-outline-width: 2.5px !important;
+  --mat-form-field-outlined-outline-color: #9f9f9f !important;
+  /* Note: border-radius sur notched-outline nécessite souvent un ciblage plus précis via .mat-mdc-outline-context */
+}
+
+/* 
+   SYSTÈME D'ICÔNES ET COULEURS DE TEXTE
+   */
+mat-icon {
+  font-family: "Material Icons", "Material Symbols Outlined", fallback;
+}
+
+.text-primary,
+.header-icon,
+.name-icon {
+  color: var(--google-blue) !important;
+}
+.text-success {
+  color: var(--google-green) !important;
+}
+.text-danger,
+.error {
+  color: var(--google-red) !important;
+}
+.text-warning {
+  color: var(--google-orange) !important;
+}
+.text-secondary,
+.info-icon {
+  color: var(--google-gray) !important;
+}
+
+.header-icon {
+  background-color: #eaecee;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 24px;
+}
+
+/* 
+   BOUTONS (CTA, ACTIONS, FAB)
+   */
+.btn-group,
+.btn-group-action {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Boutons Standards & CTA */
+button[mat-raised-button],
+.btn-cta,
+.empty-state-btn {
+  border-radius: 100px;
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+button[color="primary"],
+.btn-cta,
+.empty-state-btn {
+  background-color: var(--google-blue);
+  color: white;
+}
+
+/* Variantes de couleurs de boutons */
+button[color="warn"],
+.cancel-btn {
+  background-color: var(--google-red-light) !important;
+  color: var(--google-red) !important;
+}
+button[color="success"] {
+  background-color: var(--google-green-light) !important;
+  color: var(--google-green) !important;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Boutons d'action circulaires (Tableau) */
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.view {
+  background: var(--google-blue-light);
+  color: var(--google-blue);
+}
+.edit {
+  background: var(--google-orange-light);
+  color: var(--google-orange);
+}
+.delete {
+  background: var(--google-red-light);
+  color: var(--google-red);
+}
+
+/* Floating Action Buttons (FAB) */
+.fab-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fab-primary,
+.fab-secondary {
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.fab-primary {
+  width: 64px;
+  height: 64px;
+  background: var(--google-blue);
+  color: white;
+  font-size: 24px;
+}
+.fab-secondary {
+  width: 56px;
+  height: 56px;
+  background: var(--google-blue-light);
+  color: var(--google-blue);
+  font-size: 20px;
+}
+
+/* 
+   TABLEAU DES ÉTUDIANTS (GRID)
+   */
+.students-container {
+  border-radius: 24px;
+  border: 1px solid #e1e3e1;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.student-header-grid,
+.student-row-grid {
+  display: grid;
+  grid-template-columns: 80px 1.2fr 1.2fr 2fr 1.5fr 160px;
+  align-items: center;
+}
+
+.student-header-row {
+  background: #f8fafd;
+  border-bottom: 1px solid #e1e3e1;
+}
+.student-row-grid {
+  min-height: 64px;
+  border-bottom: 1px solid #f0f4f8;
+  transition: background 0.2s;
+}
+.student-row-grid:hover {
+  background-color: #f8fafd;
+}
+
+.header-item {
+  padding: 12px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--google-gray);
+}
+.student-cell {
+  padding: 12px;
+  font-size: 0.875rem;
+  color: var(--google-gray-dark);
+}
+.student-id {
+  background: var(--google-blue-light);
+  color: var(--google-blue);
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+}
+
+/* 
+   ALERTES ET ÉTATS VIDES
+   */
+.alert {
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   border: none;
 }
 
 .alert-info {
-  background-color: var(--google-blue-light);
+  background: var(--google-blue-light);
   color: var(--google-blue);
 }
 .alert-success {
@@ -66,208 +315,71 @@ mat-form-field {
   background: var(--google-red-light);
   color: var(--google-red);
 }
-/* Teal foncé pour correspondre au design des commandes du screenshot */
 .alert-warning {
-  background-color: var(--google-cyan);
-  color: #ffffff;
-}
-.alert-warning mat-icon {
-  color: #ffffff !important;
+  background: var(--google-orange-light);
+  color: var(--google-orange);
 }
 
 .empty-state-container {
-  padding: 3rem 2rem;
+  padding: 48px 24px;
   text-align: center;
-  background-color: #f8fafd;
-  border-radius: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-/* ==========================================================================
-   ÉTATS VIDES ET ÉLÉMENTS UTILITAIRES
-   ========================================================================== */
-.empty-state-container {
-  text-align: center;
-  padding: 48px 24px;
   color: var(--google-gray);
 }
 
 .empty-state-icon {
   font-size: 64px !important;
-  width: 64px !important;
-  height: 64px !important;
-  color: var(--google-gray) !important;
+  width: 64px;
+  height: 64px;
   margin-bottom: 16px;
 }
 
-.empty-state-title {
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: var(--google-gray-dark);
-}
-
-.empty-state-text {
-  color: var(--google-gray);
-  margin-bottom: 24px;
-}
-
-.empty-state-btn {
-  background-color: var(--google-blue);
-  color: white;
-  border-radius: 100px;
-  padding: 12px 24px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Conteneur d'icône de fonctionnalité */
-.feature-icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-}
-
-.feature-icon {
-  font-size: 1.5rem !important;
-}
-
-/* Bouton d'édition toggle */
-.edit-toggle-btn {
-  border-radius: 50% !important;
-}
-
-.info-value {
-  color: var(--google-gray-dark);
-  flex: 1;
-  word-break: break-word;
-  font-size: 0.875rem;
-}
-
-/* ==========================================================================
-   MESSAGES D'ALERTE - STYLE MATERIAL DESIGN 3
-   ========================================================================== */
-.alert {
-  padding: 16px 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: none;
-}
-
-.alert-info {
-  background-color: var(--google-blue-light);
-  color: var(--google-blue);
-}
-.alert-success {
-  background-color: var(--google-green-light);
-  color: var(--google-green);
-}
-.alert-danger {
-  background-color: var(--google-red-light);
-  color: var(--google-red);
-}
-.alert-warning {
-  background-color: var(--google-orange-light);
-  color: var(--google-orange);
-}
-.alert-warning mat-icon {
-  color: var(--google-orange);
-}
-
-/* ==========================================================================
-   FLOATING ACTION BUTTONS (FAB) - BOUTONS DE BAS DE PAGE
-   ========================================================================== */
-.fab-container {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: flex-end;
-}
-
-.fab-primary {
-  width: 64px;
-  height: 64px;
-  border-radius: 100% !important;
-  background-color: var(--google-blue);
-  color: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    0 4px 12px 0 rgb(4 30 73 / 30%),
-    0 2px 6px 0 rgb(0 0 0 / 15%);
-  transition: all 0.2s ease;
-  font-size: 24px;
-}
-
-.fab-primary:hover {
-  background-color: var(--google-blue-light);
-  color: var(--google-blue);
-  box-shadow:
-    0 6px 16px 0 rgb(4 30 73 / 35%),
-    0 3px 8px 0 rgb(0 0 0 / 20%);
-  transform: scale(1.05) translateY(-2px);
-}
-
-.fab-secondary {
-  width: 58px;
-  height: 58px;
-  border-radius: 100% !important;
-  background-color: var(--google-blue-light);
-  color: var(--google-blue);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    0 2px 8px 0 rgb(4 30 73 / 20%),
-    0 1px 4px 0 rgb(0 0 0 / 10%);
-  transition: all 0.2s ease;
-  font-size: 20px;
-}
-
-.fab-secondary:hover {
-  background-color: var(--google-blue);
-  color: white;
-  border-color: var(--google-blue);
-  box-shadow:
-    0 4px 12px 0 rgb(4 30 73 / 30%),
-    0 2px 6px 0 rgb(0 0 0 / 15%);
-  transform: scale(1.05) translateY(-2px);
-}
-/* Icônes dans les FAB */
-.fab-primary mat-icon,
-.fab-secondary mat-icon {
-  margin-top: 5%;
-  font-size: inherit;
-}
-/* FAB responsive - mobile */
+/* 
+   RESPONSIVE DESIGN (MOBILE)
+   */
 @media (max-width: 768px) {
+  .student-header-row {
+    display: none;
+  }
+
+  .student-card {
+    border: 1px solid #e1e3e1;
+    border-radius: 24px;
+    margin-bottom: 16px;
+    background: white;
+  }
+
+  .student-card-header {
+    padding: 16px;
+    background: #f8fafd;
+    display: flex;
+    justify-content: space-between;
+  }
+  .student-card-body {
+    padding: 16px;
+  }
+  .student-card-actions {
+    padding: 16px;
+    border-top: 1px solid #e1e3e1;
+    display: flex;
+    gap: 8px;
+  }
+  .student-card-actions button {
+    flex: 1;
+  }
+
   .fab-container {
     bottom: 16px;
     right: 16px;
   }
-
   .fab-primary {
+    width: 56px;
+    height: 56px;
+  }
+  .fab-secondary {
     width: 48px;
     height: 48px;
-  }
-
-  .fab-secondary {
-    width: 40px;
-    height: 40px;
   }
 }

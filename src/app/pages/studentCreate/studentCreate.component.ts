@@ -19,7 +19,7 @@ import { MaterialModule } from '../../shared/material.module';
   standalone: true,
   imports: [ReactiveFormsModule, MaterialModule],
   templateUrl: './studentCreate.component.html',
-  styleUrl: '../pages.css'
+  styleUrls: ['../../../styles.css']
 })
 export class StudentCreateComponent implements OnInit {
 

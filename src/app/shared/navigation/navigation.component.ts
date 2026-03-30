@@ -13,7 +13,7 @@ import { MaterialModule } from '../../shared/material.module';
   standalone: true,
   imports: [RouterLink, RouterLinkActive, MaterialModule],
   templateUrl: './navigation.component.html',
-  styleUrls: ['../../pages/pages.css', './navigation.css']
+  styleUrls: ['./navigation.css']
 })
 export class NavigationComponent {
 
