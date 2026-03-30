@@ -60,7 +60,7 @@ main {
   flex-direction: column;
   width: 100%;
   max-width: 90vw;
-  max-height: calc(100vh - 6rem);
+  max-height: calc(100vh - 7rem);
   overflow: hidden;
 }
 
