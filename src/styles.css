@@ -60,7 +60,8 @@ main {
   flex-direction: column;
   width: 100%;
   max-width: 90vw;
-  max-height: calc(100vh - 7rem);
+  margin-top: 2rem;
+  max-height: calc(100vh - 5.5rem);
   overflow: hidden;
 }
 
@@ -349,6 +350,10 @@ button:hover:not(:disabled) {
   width: 64px;
   height: 64px;
   margin-bottom: 16px;
+}
+
+mat-form-field {
+  margin-bottom: 5px !important;
 }
 
 /* 
