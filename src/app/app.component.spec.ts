@@ -1,29 +1,37 @@
 import { TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
-import { NavigationComponent } from './shared/navigation/navigation.component';
 
 /**
  * Unit tests for AppComponent
  * Tests main application shell, routing setup, and global functionality
+ * Updated for Angular Standalone Components architecture
  */
 describe('AppComponent', () => {
+
+  /* INITIALIZATION */
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        AppComponent,
-        NavigationComponent,
-        RouterTestingModule,
-        HttpClientTestingModule,
-        BrowserAnimationsModule
+      // AppComponent est standalone, il importe lui-même NavigationComponent et RouterOutlet
+      imports: [AppComponent],
+
+      // Utilisation des nouveaux providers Angular au lieu des anciens TestingModules
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(), // Essentiel pour intercepter les requêtes du UserService
+        provideNoopAnimations()
       ]
     }).compileComponents();
   });
 
+  /** TEST SUITE: APPLICATION SHELL */
   describe('Application Shell', () => {
+
     it('should create the app', () => {
       const fixture = TestBed.createComponent(AppComponent);
       const app = fixture.componentInstance;
@@ -39,28 +47,21 @@ describe('AppComponent', () => {
     // TODO: Implement application shell tests
     // - Test navigation component renders
     // - Test router outlet functionality
-    // - Test application layout structure
   });
 
+  /** TEST SUITE: GLOBAL FEATURES */
   describe('Global Features', () => {
     // TODO: Implement global feature tests
-    // - Test global error handling
-    // - Test application-wide loading states
-    // - Test theme consistency
   });
 
+  /** TEST SUITE: ROUTING INTEGRATION */
   describe('Routing Integration', () => {
     // TODO: Implement routing tests
-    // - Test default route navigation
-    // - Test route guard integration
-    // - Test navigation between major sections
   });
 
+  /** TEST SUITE: PERFORMANCE */
   describe('Performance', () => {
-  \n    // TODO: Implement performance tests
-    // - Test lazy loading configuration
-    // - Test initial bundle size
-    // - Test memory leak prevention
+    // TODO: Implement performance tests
   });
 });
 
@@ -69,8 +70,4 @@ describe('AppComponent', () => {
  */
 describe('AppComponent Integration', () => {
   // TODO: Implement integration tests
-  // - Test complete user authentication flow
-  // - Test complete student management workflow
-  // - Test error recovery scenarios
-  // - Test offline/network error handling
 });

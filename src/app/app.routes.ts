@@ -5,8 +5,7 @@ import { StudentCreateComponent } from './pages/studentCreate/studentCreate.comp
 import { StudentListComponent } from './pages/studentList/studentList.component';
 import { StudentDetailsComponent } from './pages/studentDetails/studentDetails.component';
 import { HomeComponent } from './pages/home/home.component';
-import { authGuard, guestGuard } from './core/guards/auth.guard';
-import { redirectGuard } from './core/guards/redirect.guard';
+import { authGuard, guestGuard, redirectGuard } from './core/guards/auth.guard';
 
 /**
  * Application routing configuration

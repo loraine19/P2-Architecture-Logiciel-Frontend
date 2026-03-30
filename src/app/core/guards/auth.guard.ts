@@ -2,13 +2,11 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../service/user.service';
 
-/**
- * Auth guard - protects routes from unauthorized access
- */
+/* AUTH GUARD*/
+// protects routes from unauthorized access/
 export const authGuard = (): boolean => {
     const userService = inject(UserService);
     const router = inject(Router);
-
     if (!userService.isLoggedIn()) {
         router.navigate(['/home']);
         return false;
@@ -16,16 +14,25 @@ export const authGuard = (): boolean => {
     return true;
 };
 
-/**
- * Guest guard - prevents authenticated users from accessing public pages
- */
+
+/* GUEST GUARD*/
+//- prevents logged-in users from accessing certain routes (e.g., login, register)
 export const guestGuard = (): boolean => {
     const userService = inject(UserService);
     const router = inject(Router);
-
     if (userService.isLoggedIn()) {
         router.navigate(['/studentList']);
         return false;
     }
     return true;
+};
+
+/* REDIRECT GUARD*/
+// redirects logged-in users to the student list
+export const redirectGuard = (): boolean => {
+    const userService = inject(UserService);
+    const router = inject(Router);
+    const route = userService.isLoggedIn() ? '/studentList' : '/home';
+    router.navigate([route]);
+    return false;
 };

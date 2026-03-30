@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { PlatformDetectionService } from './platform-detection.service';
-import { LoginResponse } from "../models/LoginResponse";
-import { UserDTO } from "../models/User";
+import { PlatformDetectionService } from './platformDetection.service';
+import { UserDTO } from '../models/User';
 import { StorageServiceInterface } from './servicesInterfaces/storageServiceInterface';
+import { LoginResponse } from '../DTO/LoginResponse';
 
 /**
  * Simple adaptive storage service for JWT tokens
@@ -15,63 +14,50 @@ import { StorageServiceInterface } from './servicesInterfaces/storageServiceInte
     providedIn: 'root'
 })
 export class AdaptiveStorageService implements StorageServiceInterface {
-    // Storage key name
+
+    // Storage keys
     private readonly JWT_KEY_NAME = 'auth_jwt_token';
     private readonly JWT_REFRESH_KEY_NAME = 'auth_refresh_token';
     private readonly AUTH_STATE_KEY_NAME = 'authState';
     private readonly DEV_MODE = true;
 
-    constructor(
-        private platformDetection: PlatformDetectionService,
-        private httpClient: HttpClient
-    ) { }
+    constructor(private platformDetection: PlatformDetectionService) { }
 
+    /** PUBLIC METHODS */
 
-
-    /**
-     * Retrieves authentication token (mobile only)
-     */
+    /* GET AUTH TOKEN */
     async getAuthToken(): Promise<string | null> {
         return await this.getMobileToken();
     }
 
-    /**
-     * Sets authentication token (mobile only)
-     * NOTE: Requires Cordova/Capacitor secure storage plugin for production
-     */
+    /* SET AUTH TOKEN */
     async setAuthToken(token: string): Promise<void> {
         return await this.storeMobileToken(token);
     }
 
-    /**
-     * Retrieves authentication refresh token (mobile only)
-     */
+    /* GET AUTH REFRESH TOKEN */
     async getAuthRefreshToken(): Promise<string | null> {
         return await this.getMobileRefreshToken();
     }
 
-    /**
-     * Sets authentication refresh token (mobile only)
-     * NOTE: Requires Cordova/Capacitor secure storage plugin for production
-     */
+    /* SET AUTH REFRESH TOKEN */
     async setAuthRefreshToken(token: string): Promise<void> {
         return await this.storeMobileRefreshToken(token);
     }
 
+    /* SET AUTH STATE */
     setAuthState(loginResponse: LoginResponse): void {
-        localStorage.setItem('authState', JSON.stringify({
+        // Store auth state in localStorage for both platforms 
+        localStorage.setItem(this.AUTH_STATE_KEY_NAME, JSON.stringify({
             isLoggedIn: loginResponse.success,
             authType: loginResponse.authType,
             user: loginResponse.user
         }));
     }
 
-
-    /**
-     * Gets authentication state by checking if token exists
-     */
+    /* GET AUTH STATE */
     getAuthState(): boolean {
-        const authStateString = localStorage.getItem('authState');
+        const authStateString = localStorage.getItem(this.AUTH_STATE_KEY_NAME);
         if (!authStateString) return false;
         try {
             const authState = JSON.parse(authStateString);
@@ -81,8 +67,9 @@ export class AdaptiveStorageService implements StorageServiceInterface {
         }
     }
 
+    /* GET AUTH STATE USER */
     getAuthStateUser(): UserDTO | null {
-        const authStateString = localStorage.getItem('authState');
+        const authStateString = localStorage.getItem(this.AUTH_STATE_KEY_NAME);
         if (!authStateString) return null;
         try {
             const authState = JSON.parse(authStateString);
@@ -92,39 +79,31 @@ export class AdaptiveStorageService implements StorageServiceInterface {
         }
     }
 
-    /**
-     * Clears authentication data from storage
-     */
+    /* CLEAR AUTH DATA */
     async clearAuthData(): Promise<void> {
-        localStorage.removeItem('authState');
+        localStorage.removeItem(this.AUTH_STATE_KEY_NAME);
         if (this.platformDetection.isMobile()) {
             await this.clearMobileStorage();
         }
     }
 
+    /** PRIVATE METHODS */
 
-    /** PRIVATE METHODS FOR MOBILE TOKEN MANAGEMENT */
-
-    /**
-     * Stores JWT token in mobile secure storage
-     * Requires: cordova-plugin-secure-storage or @capacitor/preferences
-     */
+    /* STORE MOBILE TOKEN */
     private async storeMobileToken(token: string): Promise<void> {
         if ((window as any).SecureStorage) {
             try {
                 await (window as any).SecureStorage.set(this.JWT_KEY_NAME, token);
-                return;
             } catch (error) {
                 throw new Error('Secure storage failed', { cause: error });
             }
+        } else if (this.DEV_MODE) {
+            // Mode fallback pour le développement
+            localStorage.setItem(this.JWT_KEY_NAME, token);
         }
-        // For development/testing only - do not use in production
-        else if (this.DEV_MODE) localStorage.setItem(this.JWT_KEY_NAME, token);
     }
 
-    /**
-     * Retrieves JWT token from mobile secure storage
-     */
+    /* GET MOBILE TOKEN */
     private async getMobileToken(): Promise<string | null> {
         if ((window as any).SecureStorage) {
             try {
@@ -133,32 +112,26 @@ export class AdaptiveStorageService implements StorageServiceInterface {
                 console.error('Secure storage failed', error);
                 return null;
             }
+        } else if (this.DEV_MODE) {
+            return localStorage.getItem(this.JWT_KEY_NAME);
         }
-        // For development/testing only - do not use in production
-        else if (this.DEV_MODE) return localStorage.getItem(this.JWT_KEY_NAME);
         return null;
     }
 
-    /**
-     * Stores JWT refresh token in mobile secure storage
-     * Requires: cordova-plugin-secure-storage or @capacitor/preferences
-     */
+    /* STORE MOBILE REFRESH TOKEN */
     private async storeMobileRefreshToken(token: string): Promise<void> {
         if ((window as any).SecureStorage) {
             try {
                 await (window as any).SecureStorage.set(this.JWT_REFRESH_KEY_NAME, token);
-                return;
             } catch (error) {
                 throw new Error('Secure storage failed', { cause: error });
             }
+        } else if (this.DEV_MODE) {
+            localStorage.setItem(this.JWT_REFRESH_KEY_NAME, token);
         }
-        // For development/testing only - do not use in production
-        else if (this.DEV_MODE) localStorage.setItem(this.JWT_REFRESH_KEY_NAME, token);
     }
 
-    /**
-     * Retrieves JWT refresh token from mobile secure storage
-     */
+    /* GET MOBILE REFRESH TOKEN */
     private async getMobileRefreshToken(): Promise<string | null> {
         if ((window as any).SecureStorage) {
             try {
@@ -167,22 +140,20 @@ export class AdaptiveStorageService implements StorageServiceInterface {
                 console.error('Secure storage failed', error);
                 return null;
             }
+        } else if (this.DEV_MODE) {
+            return localStorage.getItem(this.JWT_REFRESH_KEY_NAME);
         }
-        // For development/testing only - do not use in production
-        else if (this.DEV_MODE) return localStorage.getItem(this.JWT_REFRESH_KEY_NAME);
         return null;
     }
 
-    /**
-     * Clears mobile secure storage
-     */
+    /* CLEAR MOBILE STORAGE */
     private async clearMobileStorage(): Promise<void> {
         if ((window as any).SecureStorage) {
             await (window as any).SecureStorage.remove(this.JWT_KEY_NAME);
-        }
-        // For development/testing only - do not use in production
-        else if (this.DEV_MODE) {
+            await (window as any).SecureStorage.remove(this.JWT_REFRESH_KEY_NAME);
+        } else if (this.DEV_MODE) {
             localStorage.removeItem(this.JWT_KEY_NAME);
+            localStorage.removeItem(this.JWT_REFRESH_KEY_NAME);
         }
     }
 }

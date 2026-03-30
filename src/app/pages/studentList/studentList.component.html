@@ -3,8 +3,8 @@
     <mat-icon class="header-icon">people</mat-icon>
     Student List
   </h5>
+
   <div class="card-body">
-    <!-- Delete Confirmation -->
     @if (pendingDeleteId) {
       <div class="alert alert-warning" role="alert">
         <div class="d-flex w-100 justify-content-between align-items-center">
@@ -35,67 +35,59 @@
       </div>
     }
 
-    <!-- Alert Messages -->
-    @if (infoMessage.message && infoMessage.error) {
-      <div class="alert alert-danger gap-2" role="alert">
-        <mat-icon>error</mat-icon>
-        {{ infoMessage.message }}
-      </div>
-    }
-    @if (infoMessage.message && !infoMessage.error) {
-      <div class="alert alert-success" role="alert">
-        <mat-icon>check_circle</mat-icon>
+    @if (infoMessage.message) {
+      <div
+        [class]="
+          infoMessage.error ? 'alert alert-danger gap-2' : 'alert alert-success'
+        "
+        role="alert"
+      >
+        <mat-icon>{{ infoMessage.error ? "error" : "check_circle" }}</mat-icon>
         {{ infoMessage.message }}
       </div>
     }
 
-    <!-- Loading State -->
     @if (isLoading) {
       <div class="d-flex justify-content-center p-4">
         <mat-spinner diameter="40"></mat-spinner>
       </div>
     }
 
-    <!-- Responsive Student Cards -->
     @if (!isLoading && students.length > 0) {
       <div class="students-container">
-        <!-- Desktop Header (hidden on mobile) -->
         <div class="d-none d-md-block">
           <div class="student-header-row">
             <div class="student-header-grid">
               <div class="header-item id-header">
-                <mat-icon class="header-icon">tag</mat-icon>
                 <span>ID</span>
               </div>
               <div class="header-item">
-                <mat-icon class="header-icon">person</mat-icon>
+                <mat-icon class="header-icon fs-5">person</mat-icon>
                 <span>First Name</span>
               </div>
               <div class="header-item">
-                <mat-icon class="header-icon">person_outline</mat-icon>
+                <mat-icon class="header-icon fs-5">person_outline</mat-icon>
                 <span>Last Name</span>
               </div>
               <div class="header-item">
-                <mat-icon class="header-icon">email</mat-icon>
+                <mat-icon class="header-icon fs-5">email</mat-icon>
                 <span>Email</span>
               </div>
               <div class="header-item">
-                <mat-icon class="header-icon">phone</mat-icon>
+                <mat-icon class="header-icon fs-5">phone</mat-icon>
                 <span>Phone</span>
               </div>
               <div class="header-item actions-header">
-                <mat-icon class="header-icon">settings</mat-icon>
+                <mat-icon class="header-icon fs-5">settings</mat-icon>
                 <span>Actions</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Student Cards/Rows -->
         <div class="students-list">
           @for (student of students; track student.id) {
             <div class="student-card">
-              <!-- Mobile Card Layout -->
               <div class="d-block d-md-none">
                 <div class="student-card-header">
                   <div class="student-name">
@@ -151,7 +143,6 @@
                 </div>
               </div>
 
-              <!-- Desktop Row Layout -->
               <div class="d-none d-md-block">
                 <div class="student-row-grid">
                   <div class="student-cell id-cell">
@@ -205,7 +196,6 @@
       </div>
     }
 
-    <!-- No Students State -->
     @if (!isLoading && students.length === 0 && !infoMessage.error) {
       <div class="text-center p-5">
         <div class="empty-state-container">
@@ -226,30 +216,16 @@
           </button>
         </div>
       </div>
-
-      <!-- FAB pour empty state aussi -->
-      <div class="fab-container">
-        <button
-          mat-fab
-          color="primary"
-          class="fab-primary"
-          routerLink="/studentCreate"
-          title="Add First Student"
-        >
-          <mat-icon>add</mat-icon>
-        </button>
-      </div>
     }
 
-    <!-- Add Student Button -->
-    @if (!isLoading && students.length > 0 && infoMessage.error === false) {
+    @if (!isLoading && !infoMessage.error) {
       <div class="fab-container">
         <button
           mat-fab
           color="primary"
           class="fab-primary"
           routerLink="/studentCreate"
-          title="Add New Student"
+          title="Add Student"
         >
           <mat-icon>add</mat-icon>
         </button>

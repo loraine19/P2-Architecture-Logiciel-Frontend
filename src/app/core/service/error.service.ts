@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from "@angular/common/http";
-import { Router } from '@angular/router';
-import { UserService } from './user.service';
-import { InfoMessage } from '../models/InfoMessage';
-import { PlatformDetectionService } from './platform-detection.service';
+import { InfoMessage } from '../DTO/InfoMessage';
 
 /**
  * Centralized error handling service
+ * Transforms HTTP errors into user-friendly UI messages
  */
 type ErrorServiceInterface = {
     handleError(err: HttpErrorResponse, infoMessage: InfoMessage): void;
@@ -15,41 +13,28 @@ type ErrorServiceInterface = {
 @Injectable({
     providedIn: 'root'
 })
-
 export class ErrorService implements ErrorServiceInterface {
 
-    constructor(
-        private router: Router,
-        private userService: UserService,
-        private platformDetection: PlatformDetectionService) { }
+    /** PUBLIC METHODS */
 
+    /* HANDLE ERROR */
     handleError(err: HttpErrorResponse, infoMessage: InfoMessage): void {
-        let message = this.getErrorMessage(err);
-
-        if (err.status === 401) {
-            this.userService.refreshAccessToken(this.platformDetection.isMobile()).subscribe(
-                (response) => {
-                    if (!response) {
-                        this.userService.logout();
-                        this.router.navigate(['/login'], { queryParams: { msg: 'Your session has expired. Please log in again.', error: true } });
-                    }
-                    else {
-                        location.reload();
-                    }
-                }
-            );
-        }
-
+        const message = this.getErrorMessage(err);
 
         infoMessage.message = message;
         infoMessage.error = true;
     }
 
+    /** PRIVATE METHODS */
+
+    /* GET ERROR MESSAGE */
     private getErrorMessage(err: HttpErrorResponse): string {
+        // Retourne le message formaté par le GlobalExceptionHandler de Spring Boot
         if (err.error?.message) {
             return err.error.message;
         }
 
+        // Fallback en cas de crash réseau ou serveur injoignable
         switch (err.status) {
             case 0:
                 return 'Unable to connect to the server. Please check your network.';

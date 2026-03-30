@@ -9,81 +9,87 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../core/service/user.service';
 
 /**
- * Home page component displaying application overview and features
- * Shows different content based on user authentication state
+ * Home page component - Technical Showcase
+ * Designed to demonstrate full-stack mastery to mentors:
+ * Hybrid Security, DevOps orchestration, and Reactive Architecture.
  */
 @Component({
   selector: 'app-home',
+  standalone: true,
   imports: [
-    CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDividerModule,
-    MatChipsModule,
-    RouterLink
+    CommonModule, MatCardModule, MatButtonModule,
+    MatIconModule, MatDividerModule, MatChipsModule, RouterLink
   ],
   templateUrl: './home.component.html',
   styleUrl: '../pages.css'
 })
 export class HomeComponent {
+
+  // Dependency Injections
   public userService = inject(UserService);
-  // Technology stacks for repository section display
-  techStackFrontend = [
-    'Angular 18',
-    'TypeScript',
-    'Angular Material',
-    'RxJS',
-    'Jest Testing',
-    'Docker'
+
+  /* FRONTEND DEEP STACK */
+  public readonly techStackFrontend = [
+    'Angular 18 (Standalone)',
+    'TypeScript & RxJS Streams',
+    'Material Design 3 (MD3)',
+    'Responsive CSS (Mobile First)',
+    'Capacitor Native Bridge',
+    'Jest & Integration Testing'
   ];
 
-  techStackBackend = [
-    'Java',
-    'Spring Boot',
-    'Spring Security',
-    'JPA/Hibernate',
-    'Maven',
-    'Docker'
+  /* BACKEND & SECURITY STACK */
+  public readonly techStackBackend = [
+    'Java 21 & Spring Boot 3',
+    'Spring Security 6 (Stateless)',
+    'JWT & HttpOnly Cookies',
+    'JPA Hibernate / PostgreSQL',
+    'Flyway Database Migration',
+    'Docker Multi-stage Builds'
   ];
 
-  // Features for home page display
-  features = [
-    {
-      icon: 'person_add',
-      title: 'Gestion des Étudiants',
-      color: 'info',
-      description: 'Création, modification et suppression des profils étudiants'
-    },
-    {
-      icon: 'list',
-      color: 'warning',
-      title: 'Interface Utilisateur',
-      description: 'Interface moderne et responsive avec Angular Material et CSS personnalisé Material Design (Style MD3 inspiré de Google)'
-    },
+  /* DETAILED FEATURES FOR MENTOR REVIEW */
+  public readonly features = [
     {
       icon: 'security',
+      title: 'Sécurité Hybride Avancée',
       color: 'danger',
-      title: 'Authentification & Sécurité',
-      description: 'Système de connexion sécurisé avec Cookies HTTP Only et JWT(mobile)'
+      description: 'Double stratégie : Cookies HttpOnly (protection XSS) pour le Web et JWT Headers pour le Mobile natif.'
     },
     {
-      icon: 'api',
+      icon: 'sync_alt',
+      title: 'Gestion Réactive des Tokens',
+      color: 'info',
+      description: 'Intercepteur HTTP gérant silencieusement les erreurs 401 et le rafraîchissement automatique des jetons.'
+    },
+    {
+      icon: 'devices',
+      title: 'Expérience Responsive & Mobile',
+      color: 'warning',
+      description: 'Design adaptatif MD3 avec détection automatique de plateforme pour l\'accès au stockage sécurisé natif.'
+    },
+    {
+      icon: 'settings_ethernet',
+      title: 'Écosystème Dockerisé',
       color: 'success',
-      title: 'API RESTful',
-      description: 'Communication backend sécurisée via API REST'
+      description: 'Orchestration complète : Containers pour le Front (Nginx), le Back (Spring) et la Database (Postgres).'
     }
   ];
+  /* GO BACK */
+  goDocker(): void {
+    window.open('https://hub.docker.com/repositories/lorainep', '_blank');
+  }
+  constructor() { }
 
-  constructor() {
-    console.log('HomeComponent initialized');
+  /** PUBLIC METHODS */
+
+  /* OPEN REPOSITORY */
+  openRepository(url: string): void {
+    window.open(url, '_blank');
   }
 
-  /**
-   * Opens external repository URL in new tab
-   */
-  openRepository(url: string): void {
-    console.log('Opening repository:', url);
-    window.open(url, '_blank');
+  /* LOGGED IN STATE */
+  isLoggedIn(): boolean {
+    return this.userService.isLoggedIn();
   }
 }

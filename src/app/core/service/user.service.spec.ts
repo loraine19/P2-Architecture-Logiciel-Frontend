@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 
 import { UserService } from './user.service';
 import { User } from '../models/User';
-import { Login } from '../models/Login';
+import { Login } from '../DTO/Login';
 import { Register } from '../models/User';
 
 /**

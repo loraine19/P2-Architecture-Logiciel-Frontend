@@ -1,8 +1,8 @@
 import { Observable } from "rxjs";
-import { Login } from "../../models/Login";
+import { Login } from "../../DTO/Login";
 import { UserDTO } from "../../models/User";
-import { LoginResponse } from "../../models/LoginResponse";
-import { MessageResponse } from "../../models/MessageResponse";
+import { LoginResponse } from "../../DTO/LoginResponse";
+import { MessageResponse } from "../../DTO/MessageResponse";
 
 /**
  * User service interface for authentication and user management

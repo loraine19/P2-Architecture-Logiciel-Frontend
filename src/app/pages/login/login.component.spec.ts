@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { LoginComponent } from './login.component';
 import { UserService } from '../../core/service/user.service';
-import { Login } from '../../core/models/Login';
+import { Login } from '../../core/DTO/Login';
 
 /**
  * Unit tests for LoginComponent

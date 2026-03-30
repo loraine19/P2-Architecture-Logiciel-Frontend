@@ -1,19 +1,21 @@
 import { Injectable } from '@angular/core';
-import { UserDTO } from '../models/User';
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Observable, from, of, throwError } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { Login } from '../models/Login';
-import { UserServiceInterface } from './servicesInterfaces/userServicesInterface';
-import { PlatformDetectionService } from './platform-detection.service';
-import { AdaptiveStorageService } from './adaptiveStorage.service';
-import { AuthType } from '../models/AuthType';
-import { LoginResponse } from '../models/LoginResponse';
-import { MessageResponse } from '../models/MessageResponse';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Observable, from, of, throwError } from 'rxjs';
+import { map, switchMap, finalize } from 'rxjs/operators';
+
+import { UserDTO } from '../models/User';
+import { MessageResponse } from '../DTO/MessageResponse';
+import { Login } from '../DTO/Login';
+import { LoginResponse } from '../DTO/LoginResponse';
+import { AuthType } from '../DTO/AuthType';
+import { UserServiceInterface } from './servicesInterfaces/userServicesInterface';
+import { PlatformDetectionService } from './platformDetection.service';
+import { AdaptiveStorageService } from './adaptiveStorage.service';
 
 /**
- * User authentication service - handles login, logout, and session management
+ * User authentication service
+ * Handles login, logout, registration and session management
  */
 @Injectable({
   providedIn: 'root'
@@ -28,150 +30,128 @@ export class UserService implements UserServiceInterface {
     private router: Router
   ) { }
 
-  register(userDTO: UserDTO): Observable<Object> {
+  /** PUBLIC METHODS */
+
+  /* REGISTER */
+  register(userDTO: UserDTO): Observable<MessageResponse> {
     if (!userDTO?.login || !userDTO?.password) {
       throw new Error('User data is required for registration');
     }
-    return this.httpClient.post(`${this.apiUrl}/register`, userDTO).pipe(
-      catchError(error => { throw error; })
-    );
+    return this.httpClient.post<MessageResponse>(`${this.apiUrl}/register`, userDTO);
   }
 
+  /* LOGIN */
   login(login: Login): Observable<LoginResponse> {
     if (!login?.login || !login?.password) {
       throw new Error('Login credentials are required');
     }
 
-    // Add preferred auth method to the login payload instead of header
     const loginPayload: Login = {
       ...login,
       authType: this.platformDetection.isMobile() ? AuthType.HEADER : AuthType.COOKIE
     };
 
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-
-    return this.httpClient.post<LoginResponse>(`${this.apiUrl}/login`, loginPayload, { headers, observe: 'response' }).pipe(
-      switchMap((httpResponse: HttpResponse<LoginResponse>) => {
-        const response = httpResponse.body as LoginResponse;
-        return from(this.processLoginResponse(response, httpResponse));
-      }),
-      catchError(error => { throw error; })
+    return this.httpClient.post<LoginResponse>(`${this.apiUrl}/login`, loginPayload, { observe: 'response' }).pipe(
+      switchMap((httpResponse: HttpResponse<LoginResponse>) => from(this.processLoginResponse(httpResponse)))
     );
   }
 
+  /* LOGOUT */
   logout(): void {
     this.httpClient.post<MessageResponse>(`${this.apiUrl}/logout`, {}).pipe(
-      tap(() => {
+      finalize(() => {
+        // Le nettoyage s'exécute toujours, que l'API réponde 200 ou 500
         this.adaptiveStorage.clearAuthData();
         this.router.navigate(['/home']);
-      }),
-      catchError(error => {
-        this.adaptiveStorage.clearAuthData();
-        this.router.navigate(['/home']);
-        throw error;
       })
     ).subscribe({
-      next: (response) => console.log('Logout successful:', response.message),
-      error: (error) => console.error('Logout failed:', error)
+      error: (error) => console.error('Logout API call failed, but local session cleared', error)
     });
   }
 
-
+  /* GET CURRENT USER */
   getCurrentUser(): UserDTO | null {
     return this.adaptiveStorage.getAuthStateUser();
   }
 
+  /* IS LOGGED IN */
   isLoggedIn(): boolean {
     return this.adaptiveStorage.getAuthState();
   }
 
+  /* GET AUTH TOKEN */
   async getAuthToken(): Promise<string | null> {
-    return this.platformDetection.isMobile()
-      ? await this.adaptiveStorage.getAuthToken()
-      : null;
+    return this.platformDetection.isMobile() ? await this.adaptiveStorage.getAuthToken() : null;
   }
 
+  /* SET AUTH TOKEN */
   async setAuthToken(token: string): Promise<void> {
     if (this.platformDetection.isMobile()) {
       await this.adaptiveStorage.setAuthToken(token);
     }
   }
 
-  refreshAccessToken(isMobile: boolean): Observable<LoginResponse | null> {
+  /* REFRESH ACCESS TOKEN */
+  refreshAccessToken(): Observable<MessageResponse> {
+    const isMobile = this.platformDetection.isMobile();
 
-    // 1 Not Mobile Cookies HTTP only 
+    // 1. Web (Cookies HttpOnly) - Le token voyage tout seul
     if (!isMobile) {
-      return this.httpClient.post<LoginResponse>(
-        `${this.apiUrl}/refresh`,
-        {},
-        { observe: 'response' }
-      ).pipe(
-        map(response => response.body)
-      );
+      return this.httpClient.post<MessageResponse>(`${this.apiUrl}/refresh`, {});
     }
 
-    // 2. Mobile - retrieve refresh token from adaptive storage and request new access token
+    // 2. Mobile (Headers) - On récupère le refresh token du stockage natif
     return from(this.adaptiveStorage.getAuthRefreshToken()).pipe(
-
       switchMap((refreshToken: string | null) => {
-        if (!refreshToken) {
-          return throwError(() => new Error('No refresh token available'));
-        }
+        if (!refreshToken) return throwError(() => new Error('No refresh token available'));
 
-        return this.httpClient.post<LoginResponse>(
+        return this.httpClient.post<MessageResponse>(
           `${this.apiUrl}/refresh`,
           { refreshToken },
           { observe: 'response' }
         );
       }),
-
-      switchMap((httpResponse: HttpResponse<LoginResponse>) => {
+      switchMap((httpResponse: HttpResponse<MessageResponse>) => {
         const token = this.extractTokenFromResponse(httpResponse);
         if (token) {
           return from(this.adaptiveStorage.setAuthToken(token)).pipe(
-            map(() => httpResponse.body)
+            map(() => httpResponse.body as MessageResponse)
           );
         }
-
-        return of(httpResponse.body);
+        return of(httpResponse.body as MessageResponse);
       })
     );
   }
 
-
   /** PRIVATE METHODS */
-  private async processLoginResponse(response: LoginResponse, httpResponse: HttpResponse<LoginResponse>): Promise<LoginResponse> {
-    if (!response.success) return response;
+
+  /* PROCESS LOGIN RESPONSE */
+  private async processLoginResponse(httpResponse: HttpResponse<LoginResponse>): Promise<LoginResponse> {
+    const response = httpResponse.body as LoginResponse;
+    if (!response || !response.success) return response;
 
     this.adaptiveStorage.setAuthState(response);
-    console.log(response.refreshToken);
+
     if (response.authType === AuthType.HEADER && this.platformDetection.isMobile()) {
       if (response.refreshToken) {
-
         await this.adaptiveStorage.setAuthRefreshToken(response.refreshToken);
       }
+
       const token = this.extractTokenFromResponse(httpResponse);
       if (token) {
         await this.adaptiveStorage.setAuthToken(token);
-
       }
     }
 
     return response;
   }
 
+  /* EXTRACT TOKEN FROM RESPONSE */
   private extractTokenFromResponse(response: HttpResponse<any>): string | null {
-    let token: string | null = null;
-    response.headers.keys().forEach(header => {
-      if (header.toLowerCase() === 'authorization') {
-        const authHeader = response.headers.get(header);
-        if (authHeader?.startsWith('Bearer ')) {
-          token = authHeader.substring(7);
-        }
-      }
-    });
-    return token;
+    const authHeader = response.headers.get('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      return authHeader.substring(7);
+    }
+    return null;
   }
 }

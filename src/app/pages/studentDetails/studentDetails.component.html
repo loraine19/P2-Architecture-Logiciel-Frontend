@@ -20,59 +20,59 @@
         [title]="isEditMode ? 'Cancel Edit' : 'Edit Student'"
         class="edit-toggle-btn"
       >
-        <mat-icon>{{ isEditMode ? "visibility" : "edit" }}</mat-icon>
+        <mat-icon>{{ isEditMode ? "visibility_off" : "edit" }}</mat-icon>
       </button>
     }
   </h5>
 
   <div class="card-body">
-    <!-- Loading State -->
     @if (isLoading) {
       <div class="d-flex justify-content-center p-4">
         <mat-spinner diameter="40"></mat-spinner>
       </div>
     }
 
-    <!-- Student Not Found -->
     @if (!isLoading && !student) {
-      <div class="text-center p-4">
-        <mat-icon class="fa-3x text-muted mb-3" style="font-size: 72px"
+      <div class="text-center p-5">
+        <mat-icon
+          class="empty-state-icon"
+          style="font-size: 72px; height: 72px; width: 72px"
           >person_search</mat-icon
         >
-        <h5 class="text-muted">Student Not Found</h5>
-        <p class="text-muted">The student with this ID does not exist.</p>
-      </div>
-
-      <!-- FAB for student not found -->
-      <div class="fab-container">
+        <h5 class="text-muted mt-3">Student Not Found</h5>
+        <p class="text-muted">
+          The student with this ID does not exist in our records.
+        </p>
         <button
-          mat-fab
-          color="accent"
-          class="fab-secondary"
+          mat-raised-button
+          color="primary"
+          class="mt-3"
           (click)="goBackToList()"
-          title="Back to Student List"
         >
           <mat-icon>arrow_back</mat-icon>
+          Back to Student List
         </button>
       </div>
     }
 
-    <!-- Student Details Form -->
     @if (!isLoading && student) {
       <form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
-        <!-- Alert Messages -->
-        @if (infoMessage.message && infoMessage.error) {
-          <div class="alert alert-danger" role="alert">
-            {{ infoMessage.message }}
-          </div>
-        }
-        @if (infoMessage.message && !infoMessage.error) {
-          <div class="alert alert-success" role="alert">
+        @if (infoMessage.message) {
+          <div
+            [class]="
+              infoMessage.error
+                ? 'alert alert-danger gap-2'
+                : 'alert alert-success'
+            "
+            role="alert"
+          >
+            <mat-icon>{{
+              infoMessage.error ? "error" : "check_circle"
+            }}</mat-icon>
             {{ infoMessage.message }}
           </div>
         }
 
-        <!-- Personal Information Row -->
         <div class="row mb-3">
           <div class="col-md-6">
             <mat-form-field appearance="outline" class="w-100">
@@ -89,7 +89,7 @@
                     First Name is required
                   }
                   @if (form["firstName"].errors?.["minlength"]) {
-                    First Name must be at least 2 characters
+                    Must be at least 2 characters
                   }
                 </mat-error>
               }
@@ -110,7 +110,7 @@
                     Last Name is required
                   }
                   @if (form["lastName"].errors?.["minlength"]) {
-                    Last Name must be at least 2 characters
+                    Must be at least 2 characters
                   }
                 </mat-error>
               }
@@ -118,7 +118,6 @@
           </div>
         </div>
 
-        <!-- Contact Information Row -->
         <div class="row mb-3">
           <div class="col-md-6">
             <mat-form-field appearance="outline" class="w-100">
@@ -128,7 +127,7 @@
                 type="email"
                 formControlName="email"
                 [readonly]="!isEditMode"
-                placeholder="Enter email address"
+                placeholder="email@example.com"
               />
               <mat-icon matPrefix>email</mat-icon>
               @if (submitted && form["email"].errors && isEditMode) {
@@ -137,7 +136,7 @@
                     Email is required
                   }
                   @if (form["email"].errors?.["email"]) {
-                    Please enter a valid email address
+                    Invalid email format
                   }
                 </mat-error>
               }
@@ -151,16 +150,16 @@
                 type="tel"
                 formControlName="phoneNumber"
                 [readonly]="!isEditMode"
-                placeholder="Enter phone number"
+                placeholder="Phone number"
               />
               <mat-icon matPrefix>phone</mat-icon>
               @if (submitted && form["phoneNumber"].errors && isEditMode) {
                 <mat-error>
                   @if (form["phoneNumber"].errors?.["required"]) {
-                    Phone Number is required
+                    Phone is required
                   }
                   @if (form["phoneNumber"].errors?.["pattern"]) {
-                    Please enter a valid phone number
+                    Invalid phone number format
                   }
                 </mat-error>
               }
@@ -168,7 +167,6 @@
           </div>
         </div>
 
-        <!-- Address Information -->
         <div class="mb-3">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Address</mat-label>
@@ -176,20 +174,15 @@
               matInput
               formControlName="address"
               [readonly]="!isEditMode"
-              placeholder="Enter street address"
+              placeholder="Street address"
             />
             <mat-icon matPrefix>home</mat-icon>
             @if (submitted && form["address"].errors && isEditMode) {
-              <mat-error>
-                @if (form["address"].errors?.["required"]) {
-                  Address is required
-                }
-              </mat-error>
+              <mat-error>Address is required</mat-error>
             }
           </mat-form-field>
         </div>
 
-        <!-- Location Information Row -->
         <div class="row mb-3">
           <div class="col-md-8">
             <mat-form-field appearance="outline" class="w-100">
@@ -198,19 +191,14 @@
                 matInput
                 formControlName="city"
                 [readonly]="!isEditMode"
-                placeholder="Enter city"
+                placeholder="City"
               />
               <mat-icon matPrefix>location_city</mat-icon>
               @if (submitted && form["city"].errors && isEditMode) {
-                <mat-error>
-                  @if (form["city"].errors?.["required"]) {
-                    City is required
-                  }
-                </mat-error>
+                <mat-error>City is required</mat-error>
               }
             </mat-form-field>
           </div>
-
           <div class="col-md-4">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Zip Code</mat-label>
@@ -218,16 +206,16 @@
                 matInput
                 formControlName="zipCode"
                 [readonly]="!isEditMode"
-                placeholder="Enter zip code"
+                placeholder="Zip"
               />
               <mat-icon matPrefix>markunread_mailbox</mat-icon>
               @if (submitted && form["zipCode"].errors && isEditMode) {
                 <mat-error>
                   @if (form["zipCode"].errors?.["required"]) {
-                    Zip Code is required
+                    Zip is required
                   }
                   @if (form["zipCode"].errors?.["pattern"]) {
-                    Zip Code must contain only numbers
+                    Numbers only
                   }
                 </mat-error>
               }
@@ -235,7 +223,6 @@
           </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="d-flex justify-content-center gap-3 mt-4">
           @if (isEditMode) {
             <button
@@ -246,7 +233,7 @@
               [disabled]="studentForm.invalid"
             >
               <mat-icon>save</mat-icon>
-              Save Changes
+              Save
             </button>
             <button
               type="button"
@@ -262,27 +249,25 @@
             <button
               type="button"
               mat-raised-button
-              color="info"
+              color="primary"
               class="rounded-pill px-4"
               (click)="goBackToList()"
             >
               <mat-icon>arrow_back</mat-icon>
-              Back to Student List
+              Back to List
             </button>
           }
         </div>
       </form>
 
-      <!-- Floating Action Button - Toggle Edit/View -->
       <div class="fab-container">
         <button
           mat-fab
           [color]="isEditMode ? 'warn' : 'primary'"
           class="fab-primary"
           (click)="toggleEditMode()"
-          [title]="isEditMode ? 'Switch to View Mode' : 'Switch to Edit Mode'"
         >
-          <mat-icon>{{ isEditMode ? "visibility" : "edit" }}</mat-icon>
+          <mat-icon>{{ isEditMode ? "visibility_off" : "edit" }}</mat-icon>
         </button>
       </div>
     }

@@ -1,23 +1,30 @@
 <div class="page-card">
-  <h5 class="card-header">Login</h5>
+  <h5 class="card-header">
+    <mat-icon class="header-icon">login</mat-icon>
+    Login
+  </h5>
+
   <div class="card-body">
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <!-- Alert Messages -->
-      @if (infoMessage.message && infoMessage.error) {
-        <div class="alert alert-danger" role="alert">
-          {{ infoMessage.message }}
-        </div>
-      }
-      @if (infoMessage.message && !infoMessage.error) {
-        <div class="alert alert-success" role="alert">
+      @if (infoMessage.message) {
+        <div
+          [class]="
+            infoMessage.error
+              ? 'alert alert-danger gap-2'
+              : 'alert alert-success'
+          "
+          role="alert"
+        >
+          <mat-icon>{{
+            infoMessage.error ? "error" : "check_circle"
+          }}</mat-icon>
           {{ infoMessage.message }}
         </div>
       }
 
-      <!-- Login Field -->
-      <div class="mb-3">
-        <mat-form-field appearance="outline" class="w-100 outline-4">
-          <mat-label>Login</mat-label>
+      <div class="mb-4">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Login (Email)</mat-label>
           <input
             matInput
             formControlName="login"
@@ -25,7 +32,11 @@
             autocomplete="username"
           />
           <mat-icon matPrefix>person</mat-icon>
-          @if (form["login"].touched && form["login"].errors) {
+
+          @if (
+            (form["login"].dirty || form["login"].touched || submitted) &&
+            form["login"].errors
+          ) {
             <mat-error>
               @if (form["login"].errors?.["required"]) {
                 Login is required
@@ -34,16 +45,13 @@
                 Please enter a valid email address
               }
               @if (form["login"].errors?.["maxlength"]) {
-                Login cannot exceed 100 characters
+                Cannot exceed 100 characters
               }
             </mat-error>
           }
         </mat-form-field>
-      </div>
 
-      <!-- Password Field -->
-      <div class="mb-3">
-        <mat-form-field appearance="outline" class="w-100">
+        <mat-form-field appearance="outline" class="w-100 mt-2">
           <mat-label>Password</mat-label>
           <input
             matInput
@@ -56,59 +64,58 @@
           <mat-icon
             matSuffix
             (click)="togglePasswordVisibility()"
-            class="cursor-pointer"
+            style="cursor: pointer"
           >
             {{ passwordVisible ? "visibility_off" : "visibility" }}
           </mat-icon>
-          @if (form["password"].touched && form["password"].errors) {
+
+          @if (
+            (form["password"].dirty || form["password"].touched || submitted) &&
+            form["password"].errors
+          ) {
             <mat-error>
               @if (form["password"].errors?.["required"]) {
                 Password is required
               }
               @if (form["password"].errors?.["minlength"]) {
-                Password must be at least 8 characters long
-              }
-              @if (form["password"].errors?.["maxlength"]) {
-                Password cannot exceed 128 characters
+                Must be at least 8 characters
               }
               @if (form["password"].errors?.["pattern"]) {
-                Password must contain 1 lowercase 1 uppercase 1 digit & 1
-                special character
+                Uppercase, lowercase, digit and special char required
               }
             </mat-error>
           }
         </mat-form-field>
       </div>
 
-      <!-- Remember Me Checkbox -->
       <div class="mb-3">
-        <mat-checkbox formControlName="rememberMe"
-          >Remember Me for 48 hours</mat-checkbox
-        >
+        <mat-checkbox formControlName="rememberMe" color="primary">
+          Remember Me for 48 hours
+        </mat-checkbox>
       </div>
 
-      <!-- Action Buttons -->
       <div class="d-flex justify-content-center gap-3 mt-4">
         <button
           type="submit"
           mat-raised-button
-          color="accent"
+          color="primary"
           class="rounded-pill px-4"
           [disabled]="loginForm.invalid"
         >
           <mat-icon>login</mat-icon>
           Login
         </button>
+
         @if (loginForm.dirty) {
           <button
             type="button"
             mat-button
             color="warn"
-            class="rounded-pill cancel-btn px-4"
+            class="rounded-pill px-4"
             (click)="onReset()"
           >
-            <mat-icon>cancel</mat-icon>
-            Cancel
+            <mat-icon>refresh</mat-icon>
+            Reset
           </button>
         }
       </div>

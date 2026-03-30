@@ -32,21 +32,7 @@ export class Student {
         this.zipCode = zipCode;
     }
 
-    /**
-     * Factory method to create student from API response
-     */
-    static fromApiResponse(data: any): Student {
-        return new Student(
-            data.id,
-            data.firstName,
-            data.lastName,
-            data.email,
-            data.phoneNumber,
-            data.address,
-            data.city,
-            data.zipCode
-        );
-    }
+
 
 }
 

@@ -1,45 +1,52 @@
 <div class="page-card">
-  <h5 class="card-header">Registration Form</h5>
+  <h5 class="card-header">
+    <mat-icon class="header-icon">person_add</mat-icon>
+    Register
+  </h5>
+
   <div class="card-body">
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <!-- Alert Messages -->
-      @if (infoMessage.message && infoMessage.error) {
-        <div class="alert alert-danger" role="alert">
-          {{ infoMessage.message }}
-        </div>
-      }
-      @if (infoMessage.message && !infoMessage.error) {
-        <div class="alert alert-success" role="alert">
+      @if (infoMessage.message) {
+        <div
+          [class]="
+            infoMessage.error
+              ? 'alert alert-danger gap-2'
+              : 'alert alert-success'
+          "
+          role="alert"
+        >
+          <mat-icon>{{
+            infoMessage.error ? "error" : "check_circle"
+          }}</mat-icon>
           {{ infoMessage.message }}
         </div>
       }
 
-      <!-- Personal Information Row -->
       <div class="row mb-3">
         <div class="col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>First Name</mat-label>
             <input
-              type="text"
               matInput
               formControlName="firstName"
-              placeholder="Enter your first name"
+              placeholder="Enter first name"
             />
             <mat-icon matPrefix>person</mat-icon>
-            @if (form["firstName"].touched && form["firstName"].errors) {
+            @if (
+              (form["firstName"].dirty ||
+                form["firstName"].touched ||
+                submitted) &&
+              form["firstName"].errors
+            ) {
               <mat-error>
                 @if (form["firstName"].errors?.["required"]) {
                   First name is required
                 }
                 @if (form["firstName"].errors?.["minlength"]) {
-                  First name must be at least 2 characters long
-                }
-                @if (form["firstName"].errors?.["maxlength"]) {
-                  First name cannot exceed 50 characters
+                  Must be at least 2 characters
                 }
                 @if (form["firstName"].errors?.["pattern"]) {
-                  First name can only contain letters, spaces, hyphens, and
-                  apostrophes
+                  Letters, spaces, hyphens and apostrophes only
                 }
               </mat-error>
             }
@@ -50,25 +57,25 @@
             <mat-label>Last Name</mat-label>
             <input
               matInput
-              [type]="'text'"
               formControlName="lastName"
-              placeholder="Enter your last name"
+              placeholder="Enter last name"
             />
             <mat-icon matPrefix>person</mat-icon>
-            @if (form["lastName"].touched && form["lastName"].errors) {
+            @if (
+              (form["lastName"].dirty ||
+                form["lastName"].touched ||
+                submitted) &&
+              form["lastName"].errors
+            ) {
               <mat-error>
                 @if (form["lastName"].errors?.["required"]) {
                   Last name is required
                 }
                 @if (form["lastName"].errors?.["minlength"]) {
-                  Last name must be at least 2 characters long
-                }
-                @if (form["lastName"].errors?.["maxlength"]) {
-                  Last name cannot exceed 50 characters
+                  Must be at least 2 characters
                 }
                 @if (form["lastName"].errors?.["pattern"]) {
-                  Last name can only contain letters, spaces, hyphens, and
-                  apostrophes
+                  Letters, spaces, hyphens and apostrophes only
                 }
               </mat-error>
             }
@@ -76,34 +83,32 @@
         </div>
       </div>
 
-      <!-- Login Field -->
       <div class="mb-3">
         <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Login</mat-label>
+          <mat-label>Login (Email)</mat-label>
           <input
             matInput
             formControlName="login"
-            placeholder="Choose a login name"
+            placeholder="email@example.com"
             autocomplete="username"
           />
-          <mat-icon matPrefix>account_circle</mat-icon>
-          @if (form["login"].touched && form["login"].errors) {
+          <mat-icon matPrefix>email</mat-icon>
+          @if (
+            (form["login"].dirty || form["login"].touched || submitted) &&
+            form["login"].errors
+          ) {
             <mat-error>
               @if (form["login"].errors?.["required"]) {
                 Login is required
               }
               @if (form["login"].errors?.["email"]) {
-                Please enter a valid email address
-              }
-              @if (form["login"].errors?.["maxlength"]) {
-                Login cannot exceed 100 characters
+                Invalid email format
               }
             </mat-error>
           }
         </mat-form-field>
       </div>
 
-      <!-- Password Field -->
       <div class="mb-3">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Password</mat-label>
@@ -117,31 +122,29 @@
           <mat-icon
             matSuffix
             (click)="togglePasswordVisibility()"
-            class="cursor-pointer"
+            style="cursor: pointer"
           >
             {{ passwordVisible ? "visibility_off" : "visibility" }}
           </mat-icon>
-          @if (form["password"].touched && form["password"].errors) {
+          @if (
+            (form["password"].dirty || form["password"].touched || submitted) &&
+            form["password"].errors
+          ) {
             <mat-error>
               @if (form["password"].errors?.["required"]) {
                 Password is required
               }
               @if (form["password"].errors?.["minlength"]) {
-                Password must be at least 8 characters long
-              }
-              @if (form["password"].errors?.["maxlength"]) {
-                Password cannot exceed 128 characters
+                Must be at least 8 characters
               }
               @if (form["password"].errors?.["pattern"]) {
-                Password must contain 1 lowercase, 1 uppercase, 1 digit, and 1
-                special character
+                Must include 1 upper, 1 lower, 1 digit and 1 special char
               }
             </mat-error>
           }
         </mat-form-field>
       </div>
 
-      <!-- Action Buttons -->
       <div class="d-flex justify-content-center gap-3 mt-4">
         <button
           type="submit"
@@ -153,18 +156,15 @@
           <mat-icon>person_add</mat-icon>
           Register
         </button>
-        @if (registerForm.dirty) {
-          <button
-            type="button"
-            mat-button
-            color="warn"
-            class="rounded-pill cancel-btn px-4"
-            (click)="onReset()"
-          >
-            <mat-icon>cancel</mat-icon>
-            Cancel
-          </button>
-        }
+        <button
+          type="button"
+          mat-button
+          class="rounded-pill px-4"
+          (click)="onReset()"
+        >
+          <mat-icon>refresh</mat-icon>
+          Reset
+        </button>
       </div>
     </form>
   </div>

@@ -1,4 +1,4 @@
-import { LoginResponse } from "../../models/LoginResponse";
+import { LoginResponse } from "../../DTO/LoginResponse";
 import { UserDTO } from "../../models/User";
 
 export interface StorageServiceInterface {

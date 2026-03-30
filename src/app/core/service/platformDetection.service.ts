@@ -11,6 +11,9 @@ export class PlatformDetectionService {
 
     private readonly ENABLE_USER_AGENT_DETECTION = true;
 
+    /** PUBLIC METHODS */
+
+    /* IS MOBILE */
     isMobile(): boolean {
         const isNativeApp = this.isCapacitor() || this.isCordova();
 
@@ -21,22 +24,29 @@ export class PlatformDetectionService {
         return isNativeApp;
     }
 
+    /* IS WEB */
     isWeb(): boolean {
         return !this.isMobile();
     }
 
+    /* GET PLATFORM */
     getPlatform(): 'web' | 'mobile' {
         return this.isMobile() ? 'mobile' : 'web';
     }
 
+    /** PRIVATE METHODS */
+
+    /* IS CAPACITOR */
     private isCapacitor(): boolean {
         return !!(window as any)?.Capacitor;
     }
 
+    /* IS CORDOVA */
     private isCordova(): boolean {
         return !!(window as any)?.cordova;
     }
 
+    /* IS MOBILE USER AGENT */
     private isMobileUserAgent(): boolean {
         const userAgent = navigator.userAgent.toLowerCase();
         const mobileKeywords = [

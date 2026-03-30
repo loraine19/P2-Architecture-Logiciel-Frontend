@@ -1,21 +1,27 @@
 <div class="page-card">
-  <h5 class="card-header">Create Student</h5>
+  <h5 class="card-header">
+    <mat-icon class="header-icon">person_add</mat-icon>
+    Create Student
+  </h5>
 
   <div class="card-body">
     <form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
-      <!-- Alert Messages -->
-      @if (infoMessage.message && infoMessage.error) {
-        <div class="alert alert-danger" role="alert">
-          {{ infoMessage.message }}
-        </div>
-      }
-      @if (infoMessage.message && !infoMessage.error) {
-        <div class="alert alert-success" role="alert">
+      @if (infoMessage.message) {
+        <div
+          [class]="
+            infoMessage.error
+              ? 'alert alert-danger gap-2'
+              : 'alert alert-success'
+          "
+          role="alert"
+        >
+          <mat-icon>{{
+            infoMessage.error ? "error" : "check_circle"
+          }}</mat-icon>
           {{ infoMessage.message }}
         </div>
       }
 
-      <!-- Personal Information Row -->
       <div class="row mb-3">
         <div class="col-md-6">
           <mat-form-field appearance="outline" class="w-100">
@@ -25,16 +31,18 @@
               formControlName="firstName"
               placeholder="Enter first name"
             />
-            @if (form["firstName"].touched && form["firstName"].errors) {
+            @if (
+              (form["firstName"].dirty ||
+                form["firstName"].touched ||
+                submitted) &&
+              form["firstName"].errors
+            ) {
               <mat-error>
                 @if (form["firstName"].errors?.["required"]) {
                   First name is required
                 }
                 @if (form["firstName"].errors?.["minlength"]) {
-                  First name must be at least 2 characters long
-                }
-                @if (form["firstName"].errors?.["maxlength"]) {
-                  First name cannot exceed 50 characters
+                  Must be at least 2 characters
                 }
               </mat-error>
             }
@@ -48,16 +56,18 @@
               formControlName="lastName"
               placeholder="Enter last name"
             />
-            @if (form["lastName"].touched && form["lastName"].errors) {
+            @if (
+              (form["lastName"].dirty ||
+                form["lastName"].touched ||
+                submitted) &&
+              form["lastName"].errors
+            ) {
               <mat-error>
                 @if (form["lastName"].errors?.["required"]) {
                   Last name is required
                 }
                 @if (form["lastName"].errors?.["minlength"]) {
-                  Last name must be at least 2 characters long
-                }
-                @if (form["lastName"].errors?.["maxlength"]) {
-                  Last name cannot exceed 50 characters
+                  Must be at least 2 characters
                 }
               </mat-error>
             }
@@ -65,7 +75,6 @@
         </div>
       </div>
 
-      <!-- Contact Information Row -->
       <div class="row mb-3">
         <div class="col-md-6">
           <mat-form-field appearance="outline" class="w-100">
@@ -74,19 +83,19 @@
               matInput
               type="email"
               formControlName="email"
-              placeholder="Enter email address"
+              placeholder="email@example.com"
             />
             <mat-icon matPrefix>email</mat-icon>
-            @if (form["email"].touched && form["email"].errors) {
+            @if (
+              (form["email"].dirty || form["email"].touched || submitted) &&
+              form["email"].errors
+            ) {
               <mat-error>
                 @if (form["email"].errors?.["required"]) {
                   Email is required
                 }
                 @if (form["email"].errors?.["email"]) {
-                  Please enter a valid email address
-                }
-                @if (form["email"].errors?.["maxlength"]) {
-                  Email cannot exceed 100 characters
+                  Invalid email format
                 }
               </mat-error>
             }
@@ -99,83 +108,68 @@
               matInput
               type="tel"
               formControlName="phoneNumber"
-              placeholder="Enter phone number"
+              placeholder="Phone number"
             />
             <mat-icon matPrefix>phone</mat-icon>
-            @if (form["phoneNumber"].touched && form["phoneNumber"].errors) {
-              <mat-error>
-                @if (form["phoneNumber"].errors?.["pattern"]) {
-                  Please enter a valid phone number (10-20 digits with optional
-                  +, spaces, hyphens, or parentheses)
-                }
-              </mat-error>
+            @if (
+              (form["phoneNumber"].dirty ||
+                form["phoneNumber"].touched ||
+                submitted) &&
+              form["phoneNumber"].errors
+            ) {
+              <mat-error>Invalid format (10-20 digits)</mat-error>
             }
           </mat-form-field>
         </div>
       </div>
 
-      <!-- Address Information -->
       <div class="mb-3">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Address</mat-label>
           <input
             matInput
             formControlName="address"
-            placeholder="Enter street address"
+            placeholder="Street address"
           />
           <mat-icon matPrefix>home</mat-icon>
-          @if (form["address"].touched && form["address"].errors) {
-            <mat-error>
-              @if (form["address"].errors?.["required"]) {
-                Address is required
-              }
-              @if (form["address"].errors?.["maxlength"]) {
-                Address cannot exceed 200 characters
-              }
-            </mat-error>
+          @if (
+            (form["address"].dirty || form["address"].touched || submitted) &&
+            form["address"].errors
+          ) {
+            <mat-error>Address is required</mat-error>
           }
         </mat-form-field>
       </div>
 
-      <!-- Location Information Row -->
       <div class="row mb-3">
         <div class="col-md-8">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>City</mat-label>
-            <input matInput formControlName="city" placeholder="Enter city" />
+            <input matInput formControlName="city" placeholder="City" />
             <mat-icon matPrefix>location_city</mat-icon>
-            @if (form["city"].touched && form["city"].errors) {
-              <mat-error>
-                @if (form["city"].errors?.["required"]) {
-                  City is required
-                }
-                @if (form["city"].errors?.["minlength"]) {
-                  City must be at least 2 characters long
-                }
-                @if (form["city"].errors?.["maxlength"]) {
-                  City cannot exceed 100 characters
-                }
-              </mat-error>
+            @if (
+              (form["city"].dirty || form["city"].touched || submitted) &&
+              form["city"].errors
+            ) {
+              <mat-error>City is required</mat-error>
             }
           </mat-form-field>
         </div>
-
         <div class="col-md-4">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Zip Code</mat-label>
-            <input
-              matInput
-              formControlName="zipCode"
-              placeholder="Enter zip code"
-            />
+            <input matInput formControlName="zipCode" placeholder="Zip" />
             <mat-icon matPrefix>markunread_mailbox</mat-icon>
-            @if (form["zipCode"].touched && form["zipCode"].errors) {
+            @if (
+              (form["zipCode"].dirty || form["zipCode"].touched || submitted) &&
+              form["zipCode"].errors
+            ) {
               <mat-error>
                 @if (form["zipCode"].errors?.["required"]) {
-                  Zip code is required
+                  Zip is required
                 }
                 @if (form["zipCode"].errors?.["pattern"]) {
-                  Zip code must be exactly 5 digits
+                  Exactly 5 digits
                 }
               </mat-error>
             }
@@ -183,7 +177,6 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
       <div class="d-flex justify-content-center gap-3 mt-4">
         <button
           type="submit"
@@ -193,7 +186,7 @@
           [disabled]="studentForm.invalid"
         >
           <mat-icon>save</mat-icon>
-          Create Student
+          Create
         </button>
         <button
           type="button"
@@ -201,20 +194,19 @@
           class="rounded-pill px-4"
           (click)="onReset()"
         >
-          <mat-icon>cancel</mat-icon>
-          Cancel
+          <mat-icon>refresh</mat-icon>
+          Reset
         </button>
       </div>
     </form>
 
-    <!-- Floating Action Button - Back to List -->
     <div class="fab-container">
       <button
         mat-fab
-        color="accent"
-        class="fab-secondary"
+        color="primary"
+        class="fab-primary"
         (click)="goBackToList()"
-        title="Back to List"
+        title="Back to Student List"
       >
         <mat-icon>arrow_back</mat-icon>
       </button>

@@ -1,4 +1,4 @@
-import { UserDTO } from "./User";
+import { UserDTO } from "../models/User";
 import { AuthType } from "./AuthType";
 
 export class LoginResponse {
@@ -9,7 +9,12 @@ export class LoginResponse {
     authType?: typeof AuthType[keyof typeof AuthType];
     refreshToken?: string;
 
-    constructor(success: boolean, message: string, user: UserDTO, authType?: typeof AuthType[keyof typeof AuthType], refreshToken?: string) {
+    constructor(
+        success: boolean,
+        message: string,
+        user: UserDTO,
+        authType?: typeof AuthType[keyof typeof AuthType],
+        refreshToken?: string) {
         this.success = success;
         this.message = message;
         this.user = user;
