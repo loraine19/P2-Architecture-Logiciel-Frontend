@@ -7,16 +7,18 @@
   <div class="card-body">
     @if (pendingDeleteId) {
       <div class="alert alert-warning" role="alert">
-        <div class="d-flex w-100 justify-content-between align-items-center">
+        <div
+          class="d-flex flex-column gap-2 w-100 justify-content-between align-items-center"
+        >
           <div class="d-flex align-items-center">
             <mat-icon class="me-2 error">warning</mat-icon>
             <span>Are you sure you want to delete this student?</span>
           </div>
           <div class="btn-group">
             <button
-              mat-button
+              mat-stroked-button
               color="warn"
-              class="rounded-pill px-3 delete"
+              class="rounded-pill px-3 border-danger border-opacity-25"
               (click)="confirmDelete()"
             >
               <mat-icon>delete</mat-icon>
@@ -24,7 +26,8 @@
             </button>
             <button
               mat-button
-              class="rounded-pill px-3 edit"
+              color="orange"
+              class="rounded-pill px-3"
               (click)="cancelDelete()"
             >
               <mat-icon>cancel</mat-icon>
@@ -90,14 +93,16 @@
             <div class="student-card">
               <div class="d-block d-md-none">
                 <div class="student-card-header">
-                  <div class="student-name">
+                  <div class="student-name gap-3">
                     <mat-icon class="name-icon">person</mat-icon>
                     <span class="fw-bold"
-                      >{{ student.firstName }} {{ student.lastName }}</span
+                      >{{ student.firstName }}&nbsp;{{ student.lastName }}</span
                     >
                   </div>
                   <div class="student-id-badge">
-                    <span class="badge bg-primary">ID: {{ student.id }}</span>
+                    <span class="badge alert-info py-2"
+                      >ID: {{ student.id }}</span
+                    >
                   </div>
                 </div>
                 <div class="student-card-body">
@@ -116,7 +121,8 @@
                   <div class="btn-group w-100" role="group">
                     <button
                       mat-stroked-button
-                      class="flex-fill action-btn view"
+                      color="blue"
+                      class="flex-fill action-btn"
                       (click)="viewStudent(student.id)"
                     >
                       <mat-icon>visibility</mat-icon>
@@ -124,7 +130,8 @@
                     </button>
                     <button
                       mat-stroked-button
-                      class="flex-fill action-btn edit"
+                      color="orange"
+                      class="flex-fill action-btn"
                       (click)="editStudent(student.id)"
                     >
                       <mat-icon>edit</mat-icon>
@@ -163,16 +170,18 @@
                   <div class="student-cell actions-cell">
                     <div class="btn-group-action" role="group">
                       <button
+                        color="blue"
                         mat-mini-fab
-                        class="action-btn view me-1"
+                        class="action-btn me-1"
                         title="View Details"
                         (click)="viewStudent(student.id)"
                       >
                         <mat-icon>visibility</mat-icon>
                       </button>
                       <button
+                        color="orange"
                         mat-mini-fab
-                        class="action-btn edit me-1"
+                        class="action-btn me-1"
                         title="Edit Student"
                         (click)="editStudent(student.id)"
                       >
@@ -180,7 +189,8 @@
                       </button>
                       <button
                         mat-mini-fab
-                        class="action-btn delete"
+                        color="warn"
+                        class="action-btn"
                         title="Delete Student"
                         (click)="deleteStudent(student.id)"
                       >

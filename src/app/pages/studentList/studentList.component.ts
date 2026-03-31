@@ -106,7 +106,7 @@ export class StudentListComponent implements OnInit, OnDestroy {
 
   /* EDIT STUDENT */
   editStudent(id: number): void {
-    this.router.navigate(['/studentCreate', id]); // Redirige vers le formulaire en mode édition
+    this.router.navigate(['/studentEdit', id]);
   }
 
 }

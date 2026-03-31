@@ -15,9 +15,9 @@
   --google-green-light: #dbf8db;
   --google-cyan: #00acc1;
   --google-cyan-light: #e0f7fa;
-  --google-gray: #5f6368;
+  --google-gray: #838a93;
   --google-gray-light: #f8f9fa;
-  --google-gray-dark: #202124;
+  --google-gray-dark: #3e4048;
 }
 
 html,
@@ -49,7 +49,9 @@ main {
   justify-content: center;
   width: 100%;
 }
-
+.page-card {
+  margin-top: 2rem;
+}
 .page-card,
 .card {
   border-radius: 24px;
@@ -60,9 +62,9 @@ main {
   flex-direction: column;
   width: 100%;
   max-width: 90vw;
-  margin-top: 2rem;
-  max-height: calc(100vh - 5.5rem);
+  max-height: calc(100vh - 6rem);
   overflow: hidden;
+  min-width: 250px;
 }
 
 .card-header {
@@ -92,6 +94,22 @@ mat-form-field {
   --mat-form-field-outlined-focus-outline-width: 2.5px !important;
   --mat-form-field-outlined-outline-color: #9f9f9f !important;
   /* Note: border-radius sur notched-outline nécessite souvent un ciblage plus précis via .mat-mdc-outline-context */
+}
+
+.form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border-radius: 0 0 24px 24px;
+  gap: 15% !important;
+  margin: 0 !important;
+  position: sticky;
+  margin-left: -24px !important;
+  bottom: -24px;
+  backdrop-filter: blur(2px);
+  background-image: linear-gradient(to bottom, #ffffff23, #ffffff);
+  width: calc(100% + 48px);
 }
 
 /* 
@@ -171,15 +189,37 @@ button[color="warn"],
   background-color: var(--google-red-light) !important;
   color: var(--google-red) !important;
 }
+button[color="primary"]:hover:not(:disabled) {
+  background-color: var(--google-blue-hover) !important;
+  color: var(--google-blue-light) !important;
+}
+
 button[color="success"] {
   background-color: var(--google-green-light) !important;
   color: var(--google-green) !important;
+}
+button[color="warn"]:hover:not(:disabled) {
+  background-color: var(--google-red) !important;
+  color: var(--google-red-light) !important;
+}
+button[color="orange"]:hover:not(:disabled) {
+  background-color: var(--google-orange) !important;
+  color: var(--google-orange-light) !important;
+}
+
+button[color="blue"]:hover:not(:disabled) {
+  background-color: var(--google-blue) !important;
+  color: var(--google-blue-light) !important;
 }
 
 button:hover:not(:disabled) {
   transform: translateY(-1px);
   filter: brightness(0.95);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mat-raised-button {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Boutons d'action circulaires (Tableau) */
@@ -199,24 +239,20 @@ button:hover:not(:disabled) {
   margin-top: 4px;
 }
 
-.view {
+button[color="blue"] {
   background: var(--google-blue-light);
   color: var(--google-blue);
 }
-.edit {
+button[color="orange"] {
   background: var(--google-orange-light);
   color: var(--google-orange);
-}
-.delete {
-  background: var(--google-red-light);
-  color: var(--google-red);
 }
 
 /* Floating Action Buttons (FAB) */
 .fab-container {
   position: fixed;
   bottom: 24px;
-  right: 24px;
+  right: max(5%, 24px);
   z-index: 1000;
   display: flex;
   flex-direction: column;

@@ -1,6 +1,6 @@
 <div class="top-bar">
   <div class="brand-section">
-    <a class="brand-link" [routerLink]="['/']">
+    <a class="brand-link" [routerLink]="['/home']">
       <mat-icon class="brand-icon">school</mat-icon>
       {{ userFirstName() }}
     </a>
@@ -105,7 +105,7 @@
   @if (isAuthenticated()) {
     <div class="menu-footer">
       <button
-        mat-raised-button
+        mat-button
         color="warn"
         class="logout-btn"
         (click)="userService.logout(); closeMenu()"

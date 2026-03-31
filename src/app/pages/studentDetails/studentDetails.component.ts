@@ -48,6 +48,7 @@ export class StudentDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.loadStudentFromRoute();
+    this.getEditModeFromRoute();
   }
 
   /* TOGGLE EDIT MODE */
@@ -131,6 +132,11 @@ export class StudentDetailsComponent implements OnInit {
     } else {
       this.isLoading = false;
     }
+  }
+
+  private getEditModeFromRoute(): void {
+    const url = this.router.url;
+    this.isEditMode = url.includes('/studentEdit');
   }
 
   /* FETCH STUDENT DATA */

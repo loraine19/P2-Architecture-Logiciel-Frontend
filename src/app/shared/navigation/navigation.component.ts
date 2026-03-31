@@ -31,7 +31,7 @@ export class NavigationComponent {
   public userFirstName(): string {
     // Utilise la méthode existante de ton service pour récupérer l'utilisateur
     const user: UserDTO | null = this.userService.getCurrentUser();
-    return user ? user.firstName : 'Student Management';
+    return user ? `Hi ${user.firstName} !` : 'Welcome in Student Management';
   }
 
   /* TOGGLE MOBILE MENU */
