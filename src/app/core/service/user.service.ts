@@ -95,12 +95,12 @@ export class UserService implements UserServiceInterface {
   refreshAccessToken(): Observable<MessageResponse> {
     const isMobile = this.platformDetection.isMobile();
 
-    // 1. Web (Cookies HttpOnly) - Le token voyage tout seul
+    // 1. Web 
     if (!isMobile) {
       return this.httpClient.post<MessageResponse>(`${this.apiUrl}/refresh`, {});
     }
 
-    // 2. Mobile (Headers) - On récupère le refresh token du stockage natif
+    // 2. Mobile (Headers) 
     return from(this.adaptiveStorage.getAuthRefreshToken()).pipe(
       switchMap((refreshToken: string | null) => {
         if (!refreshToken) return throwError(() => new Error('No refresh token available'));

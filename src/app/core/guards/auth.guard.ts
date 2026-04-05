@@ -16,7 +16,7 @@ export const authGuard = (): boolean => {
 
 
 /* GUEST GUARD*/
-//- prevents logged-in users from accessing certain routes (e.g., login, register)
+// prevents logged-in users from accessing certain routes 
 export const guestGuard = (): boolean => {
     const userService = inject(UserService);
     const router = inject(Router);

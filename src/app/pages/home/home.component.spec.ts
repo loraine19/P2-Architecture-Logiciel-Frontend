@@ -1,34 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { provideRouter } from '@angular/router';
 
 import { HomeComponent } from './home.component';
+import { UserService } from '../../core/service/user.service';
 
 /**
  * Unit tests for HomeComponent
- * Tests dashboard display, navigation, and user interface elements
  */
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
 
   beforeEach(async () => {
+    const userSpy = { isLoggedIn: jest.fn().mockReturnValue(false) };
+
     await TestBed.configureTestingModule({
-      imports: [
-        HomeComponent,
-        RouterTestingModule,
-        BrowserAnimationsModule,
-        MatCardModule,
-        MatButtonModule,
-        MatIconModule
+      imports: [HomeComponent],
+      providers: [
+        provideRouter([]),
+        { provide: UserService, useValue: userSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
   describe('Component Initialization', () => {
@@ -36,39 +32,20 @@ describe('HomeComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    // TODO: Implement initialization tests
-    // - Test component renders welcome message
-    // - Test technology stack display
-    // - Test feature cards rendering
-  });
+    it('should expose frontend tech stack', () => {
+      expect(component.techStackFrontend.length).toBeGreaterThan(0);
+      expect(component.techStackFrontend).toContain('Angular 18 (Standalone)');
+    });
 
-  describe('Dashboard Display', () => {
-    // TODO: Implement dashboard tests
-    // - Test frontend technology stack display
-    // - Test backend technology stack display
-    // - Test feature highlight cards
-    // - Test responsive layout on different screen sizes
-  });
+    it('should expose backend tech stack', () => {
+      expect(component.techStackBackend.length).toBeGreaterThan(0);
+      expect(component.techStackBackend).toContain('Java 21 & Spring Boot 3');
+    });
 
-  describe('Navigation Elements', () => {
-    // TODO: Implement navigation tests
-    // - Test navigation buttons functionality
-    // - Test external links (GitHub repositories)
-    // - Test route navigation to student management
-    // - Test card click interactions
+    it('should expose features list', () => {
+      expect(component.features.length).toBeGreaterThan(0);
+      expect(component.features[0]).toHaveProperty('icon');
+      expect(component.features[0]).toHaveProperty('title');
+    });
   });
-
-  describe('User Interface', () => {
-    // TODO: Implement UI tests
-    // - Test Material Design component integration
-    // - Test color scheme and theming
-    // - Test responsive behavior
-    // - Test accessibility features
-  });
-
-  describe('External Links', () => {
-    // TODO: Implement external link tests
-    // - Test GitHub repository links
-    // - Test link opening behavior
-    // - Test external link accessibility
-  });
+});

@@ -1,53 +1,45 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { provideRouter, Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
 
 import { StudentCreateComponent } from './studentCreate.component';
 import { StudentService } from '../../core/service/student.service';
+import { ErrorService } from '../../core/service/error.service';
+import { MaterialModule } from '../../shared/material.module';
 import { Student } from '../../core/models/Student';
 
 /**
  * Unit tests for StudentCreateComponent
- * Tests student creation form, validation, and submission
  */
 describe('StudentCreateComponent', () => {
   let component: StudentCreateComponent;
   let fixture: ComponentFixture<StudentCreateComponent>;
-  let studentService: jasmine.SpyObj<StudentService>;
+  let studentService: jest.Mocked<StudentService>;
+  let router: Router;
+
+  const validForm = {
+    firstName: 'John', lastName: 'Doe', email: 'john@test.com',
+    phoneNumber: '0600000000', address: '1 rue Test', city: 'Paris', zipCode: '75001'
+  };
 
   beforeEach(async () => {
-    const studentServiceSpy = jasmine.createSpyObj('StudentService', [
-      'createStudent'
-    ]);
+    const studentSpy = { createStudent: jest.fn() };
 
     await TestBed.configureTestingModule({
-      imports: [
-        StudentCreateComponent,
-        ReactiveFormsModule,
-        HttpClientTestingModule,
-        RouterTestingModule,
-        BrowserAnimationsModule,
-        MatCardModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatButtonModule,
-        MatIconModule
-      ],
+      imports: [StudentCreateComponent, ReactiveFormsModule, MaterialModule],
       providers: [
-        { provide: StudentService, useValue: studentServiceSpy }
+        provideRouter([]),
+        { provide: StudentService, useValue: studentSpy },
+        { provide: ErrorService, useValue: { handleError: jest.fn() } }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(StudentCreateComponent);
     component = fixture.componentInstance;
-    studentService = TestBed.inject(StudentService) as jasmine.SpyObj<StudentService>;
+    studentService = TestBed.inject(StudentService) as jest.Mocked<StudentService>;
+    router = TestBed.inject(Router);
+    fixture.detectChanges();
   });
 
   describe('Component Initialization', () => {
@@ -55,48 +47,114 @@ describe('StudentCreateComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    // TODO: Implement initialization tests
-    // - Test form initialization with empty values
-    // - Test form field setup and validators
-    // - Test initial form state (pristine, invalid)
+    it('should initialize form with empty values', () => {
+      expect(component.studentForm.get('firstName')?.value).toBe('');
+      expect(component.studentForm.get('lastName')?.value).toBe('');
+      expect(component.studentForm.get('email')?.value).toBe('');
+    });
+
+    it('should start with submitted as false', () => {
+      expect(component.submitted).toBe(false);
+    });
+
+    it('should start with invalid form', () => {
+      expect(component.studentForm.invalid).toBe(true);
+    });
   });
 
   describe('Form Validation', () => {
-    // TODO: Implement validation tests
-    // - Test required field validation (firstName, lastName, email)
-    // - Test email format validation
-    // - Test phone number format validation
-    // - Test address field validation
-    // - Test form submission with invalid data
+    it('should require firstName', () => {
+      component.studentForm.get('firstName')?.setValue('');
+      expect(component.studentForm.get('firstName')?.errors?.['required']).toBeTruthy();
+    });
+
+    it('should require lastName', () => {
+      component.studentForm.get('lastName')?.setValue('');
+      expect(component.studentForm.get('lastName')?.errors?.['required']).toBeTruthy();
+    });
+
+    it('should require a valid email', () => {
+      component.studentForm.get('email')?.setValue('not-an-email');
+      expect(component.studentForm.get('email')?.errors?.['email']).toBeTruthy();
+    });
+
+    it('should require email', () => {
+      component.studentForm.get('email')?.setValue('');
+      expect(component.studentForm.get('email')?.errors?.['required']).toBeTruthy();
+    });
+
+    it('should require address', () => {
+      component.studentForm.get('address')?.setValue('');
+      expect(component.studentForm.get('address')?.errors?.['required']).toBeTruthy();
+    });
+
+    it('should require zipCode to be 5 digits', () => {
+      component.studentForm.get('zipCode')?.setValue('123');
+      expect(component.studentForm.get('zipCode')?.errors?.['pattern']).toBeTruthy();
+    });
+
+    it('should be valid with all correct values', () => {
+      component.studentForm.setValue(validForm);
+      expect(component.studentForm.valid).toBe(true);
+    });
   });
 
-  describe('Form Interaction', () => {
-    // TODO: Implement form interaction tests
-    // - Test form field input and updates
-    // - Test form reset functionality
-    // - Test form dirty state tracking
-    // - Test cancel button behavior
+  describe('onSubmit()', () => {
+    it('should not call createStudent when form is invalid', () => {
+      component.onSubmit();
+      expect(studentService.createStudent).not.toHaveBeenCalled();
+    });
+
+    it('should set submitted to true on submit', () => {
+      component.onSubmit();
+      expect(component.submitted).toBe(true);
+    });
+
+    it('should call createStudent with form values when valid', () => {
+      component.studentForm.setValue(validForm);
+      const createdStudent = { id: 1, ...validForm };
+      studentService.createStudent.mockReturnValue(of(createdStudent as any));
+      component.onSubmit();
+      expect(studentService.createStudent).toHaveBeenCalledWith(validForm);
+    });
+
+    it('should show success message after creation', () => {
+      component.studentForm.setValue(validForm);
+      studentService.createStudent.mockReturnValue(of({ id: 1, ...validForm } as any));
+      component.onSubmit();
+      expect(component.infoMessage.error).toBe(false);
+      expect(component.infoMessage.message).toContain('John');
+    });
+
+    it('should navigate to /studentList after 2s on success', fakeAsync(() => {
+      const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
+      component.studentForm.setValue(validForm);
+      studentService.createStudent.mockReturnValue(of({ id: 1, ...validForm } as any));
+      component.onSubmit();
+      tick(2000);
+      expect(navigateSpy).toHaveBeenCalledWith(['/studentList']);
+    }));
   });
 
-  describe('Student Creation', () => {
-    // TODO: Implement creation tests
-    // - Test successful student creation
-    // - Test loading state during submission
-    // - Test error handling for creation failures
-    // - Test navigation after successful creation
+  describe('onReset()', () => {
+    it('should reset submitted flag', () => {
+      component.submitted = true;
+      component.onReset();
+      expect(component.submitted).toBe(false);
+    });
+
+    it('should reset form to pristine state', () => {
+      component.studentForm.setValue(validForm);
+      component.onReset();
+      expect(component.studentForm.pristine).toBe(true);
+    });
   });
 
-  describe('Error Handling', () => {
-    // TODO: Implement error handling tests
-    // - Test network error handling
-    // - Test validation error display
-    // - Test duplicate student error handling
-    // - Test error message display and clearing
+  describe('goBackToList()', () => {
+    it('should navigate to /studentList', () => {
+      const navigateSpy = jest.spyOn(router, 'navigate');
+      component.goBackToList();
+      expect(navigateSpy).toHaveBeenCalledWith(['/studentList']);
+    });
   });
-
-  describe('Navigation', () => {
-    // TODO: Implement navigation tests
-    // - Test cancel navigation back to list
-    // - Test navigation after successful creation
-    // - Test FAB back button functionality
-  });
+});

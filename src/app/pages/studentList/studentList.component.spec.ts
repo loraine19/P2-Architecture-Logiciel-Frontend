@@ -1,49 +1,46 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule } from '@angular/material/dialog';
+import { provideRouter, Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
 
 import { StudentListComponent } from './studentList.component';
 import { StudentService } from '../../core/service/student.service';
+import { ErrorService } from '../../core/service/error.service';
+import { MaterialModule } from '../../shared/material.module';
 import { Student } from '../../core/models/Student';
+
+const mockStudents: Student[] = [
+  new Student(1, 'John', 'Doe', 'john@test.com', '0600000000', '1 rue Test', 'Paris', '75001'),
+  new Student(2, 'Jane', 'Smith', 'jane@test.com', '0600000001', '2 rue Test', 'Lyon', '69001')
+];
 
 /**
  * Unit tests for StudentListComponent
- * Tests student list display, CRUD operations, and user interactions
  */
 describe('StudentListComponent', () => {
   let component: StudentListComponent;
   let fixture: ComponentFixture<StudentListComponent>;
-  let studentService: jasmine.SpyObj<StudentService>;
+  let studentService: jest.Mocked<StudentService>;
+  let router: Router;
 
   beforeEach(async () => {
-    const studentServiceSpy = jasmine.createSpyObj('StudentService', [
-      'getAllStudents', 'deleteStudent', 'getStudentById'
-    ]);
+    const studentSpy = { getAllStudents: jest.fn(), deleteStudent: jest.fn() };
 
     await TestBed.configureTestingModule({
-      imports: [
-        StudentListComponent,
-        HttpClientTestingModule,
-        RouterTestingModule,
-        BrowserAnimationsModule,
-        MatCardModule,
-        MatButtonModule,
-        MatIconModule,
-        MatDialogModule
-      ],
+      imports: [StudentListComponent, MaterialModule],
       providers: [
-        { provide: StudentService, useValue: studentServiceSpy }
+        provideRouter([]),
+        { provide: StudentService, useValue: studentSpy },
+        { provide: ErrorService, useValue: { handleError: jest.fn() } }
       ]
     }).compileComponents();
 
+    studentService = TestBed.inject(StudentService) as jest.Mocked<StudentService>;
+    studentService.getAllStudents.mockReturnValue(of(mockStudents));
+
     fixture = TestBed.createComponent(StudentListComponent);
     component = fixture.componentInstance;
-    studentService = TestBed.inject(StudentService) as jasmine.SpyObj<StudentService>;
+    router = TestBed.inject(Router);
+    fixture.detectChanges();
   });
 
   describe('Component Initialization', () => {
@@ -51,47 +48,70 @@ describe('StudentListComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    // TODO: Implement initialization tests
-    // - Test component loads students on init
-    // - Test loading state display
-    // - Test empty state when no students
+    it('should load students on init', () => {
+      expect(studentService.getAllStudents).toHaveBeenCalled();
+      expect(component.students.length).toBe(2);
+    });
+
+    it('should set isLoading to false after loading', () => {
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should handle error during loading', () => {
+      const errorService = TestBed.inject(ErrorService) as jest.Mocked<ErrorService>;
+      errorService.handleError.mockImplementation((_err, msg) => { msg.error = true; msg.message = 'Error'; });
+      studentService.getAllStudents.mockReturnValue(throwError(() => ({ status: 500 })));
+      component.loadStudents();
+      expect(component.isLoading).toBe(false);
+      expect(component.infoMessage.error).toBe(true);
+    });
   });
 
-  describe('Student List Display', () => {
-    // TODO: Implement display tests
-    // - Test students table rendering
-    // - Test student data display (name, email, phone)
-    // - Test responsive card layout on mobile
-    // - Test action buttons (view, edit, delete)
+  describe('deleteStudent()', () => {
+    it('should set pendingDeleteId', () => {
+      component.deleteStudent(1);
+      expect(component.pendingDeleteId).toBe(1);
+    });
   });
 
-  describe('Student Operations', () => {
-    // TODO: Implement CRUD operation tests
-    // - Test view student navigation
-    // - Test edit student navigation
-    // - Test delete confirmation dialog
-    // - Test successful student deletion
-    // - Test error handling for failed operations
+  describe('confirmDelete()', () => {
+    it('should call deleteStudent and remove from list', () => {
+      studentService.deleteStudent.mockReturnValue(of(undefined));
+      component.deleteStudent(1);
+      component.confirmDelete();
+      expect(studentService.deleteStudent).toHaveBeenCalledWith(1);
+      expect(component.students.find(s => s.id === 1)).toBeUndefined();
+      expect(component.infoMessage.message).toContain('deleted');
+    });
+
+    it('should do nothing when pendingDeleteId is null', () => {
+      component.pendingDeleteId = null;
+      component.confirmDelete();
+      expect(studentService.deleteStudent).not.toHaveBeenCalled();
+    });
   });
 
-  describe('Search and Filter', () => {
-    // TODO: Implement search functionality tests
-    // - Test student search by name
-    // - Test search by email
-    // - Test no results state
-    // - Test search reset functionality
+  describe('cancelDelete()', () => {
+    it('should reset pendingDeleteId', () => {
+      component.pendingDeleteId = 1;
+      component.cancelDelete();
+      expect(component.pendingDeleteId).toBeNull();
+    });
   });
 
-  describe('Responsive Behavior', () => {
-    // TODO: Implement responsive tests
-    // - Test table to cards transformation on mobile
-    // - Test FAB button visibility
-    // - Test touch interactions on mobile
+  describe('viewStudent()', () => {
+    it('should navigate to /studentDetails/:id', () => {
+      const navigateSpy = jest.spyOn(router, 'navigate');
+      component.viewStudent(1);
+      expect(navigateSpy).toHaveBeenCalledWith(['/studentDetails', 1]);
+    });
   });
 
-  describe('Navigation', () => {
-    // TODO: Implement navigation tests
-    // - Test add new student navigation
-    // - Test view student details navigation
-    // - Test edit student navigation
+  describe('editStudent()', () => {
+    it('should navigate to /studentEdit/:id', () => {
+      const navigateSpy = jest.spyOn(router, 'navigate');
+      component.editStudent(2);
+      expect(navigateSpy).toHaveBeenCalledWith(['/studentEdit', 2]);
+    });
   });
+});

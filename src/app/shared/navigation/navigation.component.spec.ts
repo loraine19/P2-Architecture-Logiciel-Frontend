@@ -1,44 +1,40 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
 import { NavigationComponent } from './navigation.component';
 import { UserService } from '../../core/service/user.service';
+import { MaterialModule } from '../material.module';
+import { UserDTO } from '../../core/models/User';
+
+const mockUser: UserDTO = { firstName: 'John', lastName: 'Doe', login: 'john@test.com', password: '' };
 
 /**
  * Unit tests for NavigationComponent
- * Tests navigation menu, authentication state, and responsive behavior
  */
 describe('NavigationComponent', () => {
   let component: NavigationComponent;
   let fixture: ComponentFixture<NavigationComponent>;
-  let userService: jasmine.SpyObj<UserService>;
+  let userService: jest.Mocked<UserService>;
 
   beforeEach(async () => {
-    const userServiceSpy = jasmine.createSpyObj('UserService', [
-      'isAuthenticated', 'logout'
-    ]);
+    const userSpy = {
+      isLoggedIn: jest.fn().mockReturnValue(false),
+      getCurrentUser: jest.fn().mockReturnValue(null),
+      logout: jest.fn()
+    };
 
     await TestBed.configureTestingModule({
-      imports: [
-        NavigationComponent,
-        RouterTestingModule,
-        BrowserAnimationsModule,
-        HttpClientTestingModule,
-        MatIconModule,
-        MatButtonModule
-      ],
+      imports: [NavigationComponent, MaterialModule],
       providers: [
-        { provide: UserService, useValue: userServiceSpy }
+        provideRouter([]),
+        { provide: UserService, useValue: userSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(NavigationComponent);
     component = fixture.componentInstance;
-    userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+    userService = TestBed.inject(UserService) as jest.Mocked<UserService>;
+    fixture.detectChanges();
   });
 
   describe('Component Initialization', () => {
@@ -46,56 +42,49 @@ describe('NavigationComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    // TODO: Implement initialization tests
-    // - Test component renders brand elements
-    // - Test menu initial state (closed)
-    // - Test authentication state detection
-  });
-
-  describe('Brand Elements', () => {
-    // TODO: Implement brand tests
-    // - Test brand icon display
-    // - Test brand text display
-    // - Test brand link navigation to home
-    // - Test brand styling consistency
+    it('should start with menu closed', () => {
+      expect(component.isMenuOpen).toBe(false);
+    });
   });
 
   describe('Menu Management', () => {
-    // TODO: Implement menu tests
-    // - Test menu toggle functionality
-    // - Test menu open/close animations
-    // - Test menu overlay click closes menu
-    // - Test menu close button functionality
-  });
+    it('should open menu on toggleMenu()', () => {
+      component.toggleMenu();
+      expect(component.isMenuOpen).toBe(true);
+    });
 
-  describe('Navigation Items', () => {
-    // TODO: Implement navigation tests
-    // - Test menu items display
-    // - Test active route highlighting
-    // - Test navigation item click behavior
-    // - Test menu closure after navigation
+    it('should close menu on second toggleMenu()', () => {
+      component.toggleMenu();
+      component.toggleMenu();
+      expect(component.isMenuOpen).toBe(false);
+    });
+
+    it('should close menu on closeMenu()', () => {
+      component.isMenuOpen = true;
+      component.closeMenu();
+      expect(component.isMenuOpen).toBe(false);
+    });
   });
 
   describe('Authentication Integration', () => {
-    // TODO: Implement auth integration tests
-    // - Test authenticated user menu display
-    // - Test unauthenticated user menu display
-    // - Test logout functionality
-    // - Test navigation after logout
-  });
+    it('should return false when user is not logged in', () => {
+      userService.isLoggedIn.mockReturnValue(false);
+      expect(component.isAuthenticated()).toBe(false);
+    });
 
-  describe('Responsive Behavior', () => {
-    // TODO: Implement responsive tests
-    // - Test hamburger menu on mobile
-    // - Test side menu slide animation
-    // - Test menu positioning on different screen sizes
-    // - Test touch interactions
-  });
+    it('should return true when user is logged in', () => {
+      userService.isLoggedIn.mockReturnValue(true);
+      expect(component.isAuthenticated()).toBe(true);
+    });
 
-  describe('Accessibility', () => {
-    // TODO: Implement accessibility tests
-    // - Test keyboard navigation
-    // - Test ARIA attributes
-    // - Test focus management
-    // - Test screen reader compatibility
+    it('should show welcome message when no user', () => {
+      userService.getCurrentUser.mockReturnValue(null);
+      expect(component.userFirstName()).toBe('Welcome in Student Management');
+    });
+
+    it('should show user first name when logged in', () => {
+      userService.getCurrentUser.mockReturnValue(mockUser);
+      expect(component.userFirstName()).toBe('Hi John !');
+    });
+  });
 });

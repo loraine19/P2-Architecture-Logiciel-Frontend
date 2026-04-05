@@ -39,6 +39,7 @@ export const routes: Routes = [
     title: 'Login - Student Management'
   },
 
+
   // Protected routes - authentication required
   {
     path: 'studentCreate',
@@ -69,5 +70,7 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'login'
-  }
+  },
+
+
 ];
