@@ -9,9 +9,8 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../core/service/user.service';
 
 /**
- * Home page component - Technical Showcase
- * Designed to demonstrate full-stack mastery to mentors:
- * Hybrid Security, DevOps orchestration, and Reactive Architecture.
+ * Component - Landing page showing the project tech stack and features
+ * Content is static so no service calls are needed
  */
 @Component({
   selector: 'app-home',
@@ -25,10 +24,8 @@ import { UserService } from '../../core/service/user.service';
 })
 export class HomeComponent {
 
-  // Dependency Injections
   public userService = inject(UserService);
 
-  /* FRONTEND DEEP STACK */
   public readonly techStackFrontend = [
     'Angular 18 (Standalone)',
     'TypeScript & RxJS Streams',
@@ -38,7 +35,6 @@ export class HomeComponent {
     'Jest & Integration Testing'
   ];
 
-  /* BACKEND & SECURITY STACK */
   public readonly techStackBackend = [
     'Java 21 & Spring Boot 3',
     'Spring Security 6 (Stateless)',
@@ -48,7 +44,6 @@ export class HomeComponent {
     'Docker Multi-stage Builds'
   ];
 
-  /* DETAILED FEATURES FOR MENTOR REVIEW */
   public readonly features = [
     {
       icon: 'security',
@@ -75,20 +70,15 @@ export class HomeComponent {
       description: 'Orchestration complète : Containers pour le Front (Nginx), le Back (Spring) et la Database (Postgres).'
     }
   ];
-  /* GO BACK */
   goDocker(): void {
     window.open('https://hub.docker.com/repositories/lorainep', '_blank');
   }
   constructor() { }
 
-  /** PUBLIC METHODS */
-
-  /* OPEN REPOSITORY */
   openRepository(url: string): void {
     window.open(url, '_blank');
   }
 
-  /* LOGGED IN STATE */
   isLoggedIn(): boolean {
     return this.userService.isLoggedIn();
   }

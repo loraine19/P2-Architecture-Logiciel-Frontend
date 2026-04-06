@@ -4,9 +4,6 @@ import { provideRouter } from '@angular/router';
 import { HomeComponent } from './home.component';
 import { UserService } from '../../core/service/user.service';
 
-/**
- * Unit tests for HomeComponent
- */
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;

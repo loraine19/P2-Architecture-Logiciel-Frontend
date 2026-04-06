@@ -11,8 +11,8 @@ import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
 
 /**
- * Student details component for viewing and editing student information
- * Supports both view and edit modes with comprehensive validation
+ * Component - View and edit a single student record
+ * Starts in read-only mode; edit mode is toggled by the user or the URL path
  */
 @Component({
   selector: 'app-student-details',
@@ -23,7 +23,6 @@ import { MaterialModule } from '../../shared/material.module';
 })
 export class StudentDetailsComponent implements OnInit {
 
-  // Dependency Injections
   private studentService = inject(StudentService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
@@ -31,7 +30,6 @@ export class StudentDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  // Component State
   studentForm!: FormGroup;
   submitted: boolean = false;
   infoMessage: InfoMessage = { message: '', error: false };
@@ -42,15 +40,15 @@ export class StudentDetailsComponent implements OnInit {
 
   constructor() { }
 
-  /** PUBLIC METHODS */
-
-  /* INITIALIZATION */
+  /** LIFECYCLE */
+  /* NG ON INIT */
   ngOnInit(): void {
     this.initializeForm();
     this.loadStudentFromRoute();
     this.getEditModeFromRoute();
   }
 
+  /** PUBLIC */
   /* TOGGLE EDIT MODE */
   toggleEditMode(): void {
     this.isEditMode = !this.isEditMode;
@@ -58,14 +56,13 @@ export class StudentDetailsComponent implements OnInit {
     this.infoMessage = { message: '', error: false };
   }
 
-  /* SUBMIT FORM */
+  /* ON SUBMIT */
   onSubmit(): void {
     if (!this.isEditMode || !this.studentId) return;
 
     this.submitted = true;
     if (this.studentForm.invalid) return;
 
-    // Fusionne les valeurs du formulaire avec l'ID de l'étudiant
     const updatedStudent: Student = { ...this.studentForm.value, id: this.studentId };
 
     this.studentService.updateStudent(this.studentId, updatedStudent)
@@ -85,7 +82,8 @@ export class StudentDetailsComponent implements OnInit {
       });
   }
 
-  /* CANCEL ACTION */
+  /* ON CANCEL */
+  // in edit mode: discard changes | otherwise: go back to the list
   onCancel(): void {
     if (this.isEditMode) {
       if (this.student) this.populateForm(this.student);
@@ -98,19 +96,19 @@ export class StudentDetailsComponent implements OnInit {
     }
   }
 
-  /* GO BACK */
+  /* GO BACK TO LIST */
   goBackToList(): void {
     this.router.navigate(['/studentList']);
   }
 
-  /* FORM CONTROLS ACCESSOR */
+  /** GETTER */
+  /* FORM */
   get form() {
     return this.studentForm.controls;
   }
 
-  /** PRIVATE METHODS */
-
-  /* INITIALIZE FORM STRUCTURE */
+  /** PRIVATE */
+  /* INITIALIZE FORM */
   private initializeForm(): void {
     this.studentForm = this.formBuilder.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -123,7 +121,8 @@ export class StudentDetailsComponent implements OnInit {
     });
   }
 
-  /* GET ID FROM ROUTE */
+  /* LOAD STUDENT FROM ROUTE */
+  // get the student ID from the URL param
   private loadStudentFromRoute(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -134,12 +133,14 @@ export class StudentDetailsComponent implements OnInit {
     }
   }
 
+  /* GET EDIT MODE FROM ROUTE */
+  // check URL to determine if we're on the edit path
   private getEditModeFromRoute(): void {
     const url = this.router.url;
     this.isEditMode = url.includes('/studentEdit');
   }
 
-  /* FETCH STUDENT DATA */
+  /* LOAD STUDENT */
   private loadStudent(): void {
     if (!this.studentId) return;
 
@@ -158,13 +159,15 @@ export class StudentDetailsComponent implements OnInit {
       });
   }
 
-  /* FILL FORM WITH DATA */
+  /* POPULATE FORM */
+  // fill form fields with the loaded student data and lock the form
   private populateForm(student: Student): void {
     this.studentForm.patchValue(student);
     this.setFormReadonlyState(true);
   }
 
-  /* MANAGE FORM STATE */
+  /* SET FORM READONLY STATE */
+  // disable/enable all fields to switch between view and edit mode
   private setFormReadonlyState(readonly: boolean): void {
     readonly ? this.studentForm.disable() : this.studentForm.enable();
   }

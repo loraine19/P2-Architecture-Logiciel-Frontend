@@ -16,8 +16,9 @@ export const routes: Routes = [
   // Root redirect route
   {
     path: '',
+    pathMatch: 'full',
     canActivate: [redirectGuard],
-    children: []
+    component: HomeComponent
   },
 
   // Public routes - accessible to all users
@@ -69,7 +70,7 @@ export const routes: Routes = [
   // Catch-all route - redirects unknown paths
   {
     path: '**',
-    redirectTo: 'login'
+    redirectTo: 'home'
   },
 
 

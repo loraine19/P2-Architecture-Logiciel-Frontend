@@ -13,9 +13,6 @@ const mockStudents: Student[] = [
   new Student(2, 'Jane', 'Smith', 'jane@test.com', '0600000001', '2 rue Test', 'Lyon', '69001')
 ];
 
-/**
- * Unit tests for StudentListComponent
- */
 describe('StudentListComponent', () => {
   let component: StudentListComponent;
   let fixture: ComponentFixture<StudentListComponent>;

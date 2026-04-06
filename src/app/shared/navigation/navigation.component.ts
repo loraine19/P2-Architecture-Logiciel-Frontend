@@ -5,8 +5,8 @@ import { UserDTO } from '../../core/models/User';
 import { MaterialModule } from '../../shared/material.module';
 
 /**
- * Main navigation component for the application
- * Provides responsive navigation menu with authentication-aware content
+ * Component - Main navigation bar with authentication-aware menu items
+ * Exposes a responsive hamburger menu for mobile and a full navbar for desktop
  */
 @Component({
   selector: 'app-navigation',
@@ -17,34 +17,33 @@ import { MaterialModule } from '../../shared/material.module';
 })
 export class NavigationComponent {
 
-  // Dependency Injection
   public userService = inject(UserService);
 
-  // Component State
   isMenuOpen = false;
 
   constructor() { }
 
-  /** PUBLIC METHODS */
-
-  /* GET USER DISPLAY NAME */
+  /** PUBLIC */
+  /* USER FIRST NAME */
   public userFirstName(): string {
-    // Utilise la méthode existante de ton service pour récupérer l'utilisateur
     const user: UserDTO | null = this.userService.getCurrentUser();
     return user ? `Hi ${user.firstName} !` : 'Welcome in Student Management';
   }
 
-  /* TOGGLE MOBILE MENU */
+  /* TOGGLE MENU */
+  // flip the menu open/closed state
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
-  /* CLOSE MOBILE MENU */
+  /* CLOSE MENU */
+  // close the menu when a link is clicked
   closeMenu(): void {
     this.isMenuOpen = false;
   }
 
-  /* CHECK AUTHENTICATION STATUS */
+  /* IS AUTHENTICATED */
+  // used by the template to show/hide the logout button
   isAuthenticated(): boolean {
     return this.userService.isLoggedIn();
   }

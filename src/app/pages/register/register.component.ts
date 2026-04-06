@@ -11,8 +11,8 @@ import { MaterialModule } from '../../shared/material.module';
 import { InfoMessage } from '../../core/DTO/InfoMessage';
 
 /**
- * Registration page component for new user account creation
- * Provides secure registration form with validation and password visibility toggle
+ * Component - Registration page that creates a new user account
+ * Redirects to /login with a success message after registration
  */
 @Component({
   selector: 'app-register',
@@ -23,14 +23,12 @@ import { InfoMessage } from '../../core/DTO/InfoMessage';
 })
 export class RegisterComponent implements OnInit {
 
-  // Dependency Injections
   private userService = inject(UserService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
   private errorService = inject(ErrorService);
   private router = inject(Router);
 
-  // Component State
   registerForm!: FormGroup;
   submitted: boolean = false;
   infoMessage: InfoMessage = { message: '', error: false };
@@ -38,30 +36,30 @@ export class RegisterComponent implements OnInit {
 
   constructor() { }
 
-  /** PUBLIC METHODS */
-
-  /* INITIALIZATION */
+  /** LIFECYCLE */
+  /* NG ON INIT */
   ngOnInit(): void {
     this.initializeForm();
   }
 
-  /* FORM CONTROLS ACCESSOR */
+  /** GETTER */
+  /* FORM */
   get form() {
     return this.registerForm.controls;
   }
 
+  /** PUBLIC */
   /* TOGGLE PASSWORD VISIBILITY */
   togglePasswordVisibility(): void {
     this.passwordVisible = !this.passwordVisible;
   }
 
-  /* SUBMIT REGISTRATION */
+  /* ON SUBMIT */
   onSubmit(): void {
     this.submitted = true;
 
     if (this.registerForm.invalid) return;
 
-    // Récupère l'objet utilisateur directement depuis le formulaire
     const registerUser: UserDTO = this.registerForm.value;
 
     this.userService.register(registerUser)
@@ -73,7 +71,6 @@ export class RegisterComponent implements OnInit {
             error: false
           };
 
-          // Redirection avec les queryParams correctement formatés
           setTimeout(() => {
             this.router.navigate(['/login'], {
               queryParams: {
@@ -87,15 +84,14 @@ export class RegisterComponent implements OnInit {
       });
   }
 
-  /* RESET FORM */
+  /* ON RESET */
   onReset(): void {
     this.submitted = false;
     this.registerForm.reset();
   }
 
-  /** PRIVATE METHODS */
-
-  /* INITIALIZE FORM STRUCTURE */
+  /** PRIVATE */
+  /* INITIALIZE FORM */
   private initializeForm(): void {
     this.registerForm = this.formBuilder.group({
       firstName: ['', [

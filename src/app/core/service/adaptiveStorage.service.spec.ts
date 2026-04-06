@@ -7,11 +7,6 @@ import { UserDTO } from '../models/User';
 
 const mockUser: UserDTO = { firstName: 'John', lastName: 'Doe', login: 'john@test.com', password: '' };
 
-/**
- * Unit tests for AdaptiveStorageService
- * DEV_MODE is true and window.SecureStorage is not defined in tests,
- * so all token operations fall back to localStorage.
- */
 describe('AdaptiveStorageService', () => {
     let service: AdaptiveStorageService;
     let platformSpy: jest.Mocked<PlatformDetectionService>;

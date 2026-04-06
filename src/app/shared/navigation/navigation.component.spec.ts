@@ -8,9 +8,6 @@ import { UserDTO } from '../../core/models/User';
 
 const mockUser: UserDTO = { firstName: 'John', lastName: 'Doe', login: 'john@test.com', password: '' };
 
-/**
- * Unit tests for NavigationComponent
- */
 describe('NavigationComponent', () => {
   let component: NavigationComponent;
   let fixture: ComponentFixture<NavigationComponent>;

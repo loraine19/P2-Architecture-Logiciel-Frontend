@@ -11,8 +11,8 @@ import { InfoMessage } from '../../core/DTO/InfoMessage';
 import { ErrorService } from '../../core/service/error.service';
 
 /**
- * Login page component for user authentication
- * Provides secure login form with validation and error handling
+ * Component - Login page with form validation and query-params message display
+ * Redirects to returnUrl or /studentList after successful authentication
  */
 @Component({
   selector: 'app-login',
@@ -23,7 +23,6 @@ import { ErrorService } from '../../core/service/error.service';
 })
 export class LoginComponent implements OnInit {
 
-  // Dependency Injections
   private userService = inject(UserService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
@@ -31,7 +30,6 @@ export class LoginComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private errorService = inject(ErrorService);
 
-  // Component State
   loginForm!: FormGroup;
   submitted: boolean = false;
   infoMessage: InfoMessage = { message: '', error: false };
@@ -39,20 +37,21 @@ export class LoginComponent implements OnInit {
 
   constructor() { }
 
-  /** PUBLIC METHODS */
-
-  /* INITIALIZATION */
+  /** LIFECYCLE */
+  /* NG ON INIT */
   ngOnInit(): void {
     this.initializeForm();
     this.checkQueryParams();
   }
 
-  /* FORM CONTROLS ACCESSOR */
+  /** GETTER */
+  /* FORM */
   get form() {
     return this.loginForm.controls;
   }
 
-  /* SUBMIT LOGIN */
+  /** PUBLIC */
+  /* ON SUBMIT */
   onSubmit(): void {
     this.submitted = true;
     this.infoMessage = { message: '', error: false };
@@ -67,7 +66,6 @@ export class LoginComponent implements OnInit {
         next: () => {
           this.infoMessage = { message: `Hi, ${credentials.login}! You are now logged in!`, error: false };
 
-          // Redirection après succès
           setTimeout(() => {
             const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/studentList';
             this.router.navigateByUrl(returnUrl);
@@ -77,7 +75,7 @@ export class LoginComponent implements OnInit {
       });
   }
 
-  /* RESET FORM */
+  /* ON RESET */
   onReset(): void {
     this.submitted = false;
     this.infoMessage = { message: '', error: false };
@@ -89,9 +87,8 @@ export class LoginComponent implements OnInit {
     this.passwordVisible = !this.passwordVisible;
   }
 
-  /** PRIVATE METHODS */
-
-  /* INITIALIZE FORM STRUCTURE */
+  /** PRIVATE */
+  /* INITIALIZE FORM */
   private initializeForm(): void {
     this.loginForm = this.formBuilder.group({
       login: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
@@ -105,7 +102,8 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  /* CAPTURE QUERY PARAMETERS MESSAGES */
+  /* CHECK QUERY PARAMS */
+  // read msg/error params passed by register or session-expired redirect
   private checkQueryParams(): void {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))

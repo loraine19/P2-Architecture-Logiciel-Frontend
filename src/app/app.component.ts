@@ -3,8 +3,8 @@ import { RouterOutlet } from '@angular/router';
 import { NavigationComponent } from "./shared/navigation/navigation.component";
 
 /**
- * Root application component
- * Provides the main application shell with navigation and router outlet
+ * Component - Root application shell
+ * Renders the navigation bar and the router outlet for all page components
  */
 @Component({
   selector: 'app-root',
@@ -19,6 +19,8 @@ export class AppComponent {
   /** Application title for identification */
   title = 'etudiant-frontend';
 
+  /** LIFECYCLE */
+  /* APP COMPONENT */
   constructor() {
     console.log('AppComponent initialized - Application root loaded');
     console.log('Application title:', this.title);

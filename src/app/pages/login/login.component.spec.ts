@@ -4,14 +4,11 @@ import { Router, ActivatedRoute } from "@angular/router";
 import { of, throwError } from "rxjs";
 import { ErrorService } from "../../core/service/error.service";
 import { UserService } from "../../core/service/user.service";
+import { LoginResponse } from "../../core/DTO/LoginResponse";
 import { MaterialModule } from "../../shared/material.module";
 import { LoginComponent } from "./login.component";
 
 
-/**
- * Unit tests for LoginComponent
- * Validates authentication logic, form constraints and navigation
- */
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
@@ -49,9 +46,6 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
   });
 
-  /** TEST SUITE */
-
-  /* COMPONENT INITIALIZATION */
   describe('Component Initialization', () => {
     it('should initialize with default values', () => {
       expect(component.loginForm).toBeDefined();
@@ -60,7 +54,6 @@ describe('LoginComponent', () => {
     });
   });
 
-  /* FORM VALIDATION */
   describe('Form Validation', () => {
     it('should validate required fields', () => {
       const login = component.loginForm.get('login');
@@ -89,12 +82,15 @@ describe('LoginComponent', () => {
     });
   });
 
-  /* AUTHENTICATION FLOW */
   describe('Authentication Flow', () => {
     it('should navigate on successful login', fakeAsync(() => {
-      const credentials = { login: 'test@example.com', password: 'Password123!', rememberMe: true };
+      const credentials = {
+        login: 'test@example.com',
+        password: 'Password123!',
+        rememberMe: true
+      };
       component.loginForm.setValue(credentials);
-      userService.login.mockReturnValue(of({}));
+      userService.login.mockReturnValue(of({ message: '', success: true, user: {} } as LoginResponse));
 
       component.onSubmit();
       tick(2000); // Wait for redirect timeout
@@ -114,7 +110,6 @@ describe('LoginComponent', () => {
     });
   });
 
-  /* FORM INTERACTION */
   describe('Form Interaction', () => {
     it('should toggle password visibility', () => {
       expect(component.passwordVisible).toBe(false);

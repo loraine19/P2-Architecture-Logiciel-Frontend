@@ -14,8 +14,8 @@ import { PlatformDetectionService } from './platformDetection.service';
 import { AdaptiveStorageService } from './adaptiveStorage.service';
 
 /**
- * User authentication service
- * Handles login, logout, registration and session management
+ * Service - Handles user authentication, session management and token refresh
+ * Platform-aware: uses cookies on web and JWT headers on mobile
  */
 @Injectable({
   providedIn: 'root'
@@ -30,8 +30,7 @@ export class UserService implements UserServiceInterface {
     private router: Router
   ) { }
 
-  /** PUBLIC METHODS */
-
+  /** PUBLIC */
   /* REGISTER */
   register(userDTO: UserDTO): Observable<MessageResponse> {
     if (!userDTO?.login || !userDTO?.password) {
@@ -60,7 +59,7 @@ export class UserService implements UserServiceInterface {
   logout(): void {
     this.httpClient.post<MessageResponse>(`${this.apiUrl}/logout`, {}).pipe(
       finalize(() => {
-        // Le nettoyage s'exécute toujours, que l'API réponde 200 ou 500
+        // cleanup always runs, even if the logout API call fails
         this.adaptiveStorage.clearAuthData();
         this.router.navigate(['/home']);
       })
@@ -95,12 +94,10 @@ export class UserService implements UserServiceInterface {
   refreshAccessToken(): Observable<MessageResponse> {
     const isMobile = this.platformDetection.isMobile();
 
-    // 1. Web 
     if (!isMobile) {
       return this.httpClient.post<MessageResponse>(`${this.apiUrl}/refresh`, {});
     }
 
-    // 2. Mobile (Headers) 
     return from(this.adaptiveStorage.getAuthRefreshToken()).pipe(
       switchMap((refreshToken: string | null) => {
         if (!refreshToken) return throwError(() => new Error('No refresh token available'));
@@ -123,8 +120,7 @@ export class UserService implements UserServiceInterface {
     );
   }
 
-  /** PRIVATE METHODS */
-
+  /** PRIVATE */
   /* PROCESS LOGIN RESPONSE */
   private async processLoginResponse(httpResponse: HttpResponse<LoginResponse>): Promise<LoginResponse> {
     const response = httpResponse.body as LoginResponse;

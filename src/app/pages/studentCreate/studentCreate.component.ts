@@ -11,8 +11,8 @@ import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
 
 /**
- * Student creation component for adding new students to the system
- * Provides comprehensive form validation and error handling
+ * Component - Form for creating a new student record
+ * Redirects to /studentList after a successful creation
  */
 @Component({
   selector: 'app-student-create',
@@ -23,39 +23,37 @@ import { MaterialModule } from '../../shared/material.module';
 })
 export class StudentCreateComponent implements OnInit {
 
-  // Dependency Injections
   private studentService = inject(StudentService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
   private errorService = inject(ErrorService);
   private router = inject(Router);
 
-  // Component State
   studentForm!: FormGroup;
   submitted: boolean = false;
   infoMessage: InfoMessage = { message: '', error: false };
 
   constructor() { }
 
-  /** PUBLIC METHODS */
-
-  /* INITIALIZATION */
+  /** LIFECYCLE */
+  /* NG ON INIT */
   ngOnInit(): void {
     this.initializeForm();
   }
 
-  /* FORM CONTROLS ACCESSOR */
+  /** GETTER */
+  /* FORM */
   get form() {
     return this.studentForm.controls;
   }
 
-  /* SUBMIT FORM */
+  /** PUBLIC */
+  /* ON SUBMIT */
   onSubmit(): void {
     this.submitted = true;
 
     if (this.studentForm.invalid) return;
 
-    // Récupère directement les données du formulaire
     const newStudent: Student = this.studentForm.value;
 
     this.studentService.createStudent(newStudent)
@@ -67,7 +65,6 @@ export class StudentCreateComponent implements OnInit {
             error: false
           };
 
-          // Redirection après un court délai pour laisser lire le message
           setTimeout(() => {
             this.router.navigate(['/studentList']);
           }, 2000);
@@ -76,21 +73,20 @@ export class StudentCreateComponent implements OnInit {
       });
   }
 
-  /* RESET FORM */
+  /* ON RESET */
   onReset(): void {
     this.submitted = false;
     this.studentForm.reset();
     this.infoMessage = { message: '', error: false };
   }
 
-  /* GO BACK */
+  /* GO BACK TO LIST */
   goBackToList(): void {
     this.router.navigate(['/studentList']);
   }
 
-  /** PRIVATE METHODS */
-
-  /* INITIALIZE FORM STRUCTURE */
+  /** PRIVATE */
+  /* INITIALIZE FORM */
   private initializeForm(): void {
     this.studentForm = this.formBuilder.group({
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],

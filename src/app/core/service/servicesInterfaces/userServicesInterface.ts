@@ -5,9 +5,11 @@ import { LoginResponse } from "../../DTO/LoginResponse";
 import { MessageResponse } from "../../DTO/MessageResponse";
 
 /**
- * User service interface for authentication and user management
- * Defines contract for user-related operations
+ * Interface - Contract for user authentication and session management
+ * Defines all user-related operations that any implementation must provide
  */
+/** INTERFACE */
+/* USER SERVICE INTERFACE */
 export interface UserServiceInterface {
     register(user: UserDTO): Observable<Object>;
     login(login: Login): Observable<LoginResponse>;

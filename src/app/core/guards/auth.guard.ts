@@ -1,38 +1,40 @@
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, UrlTree } from '@angular/router';
 import { UserService } from '../service/user.service';
 
-/* AUTH GUARD*/
-// protects routes from unauthorized access/
-export const authGuard = (): boolean => {
+/**
+ * Route guards for authentication-based access control
+ * Returns UrlTree instead of calling navigate() so the router handles the redirect cleanly
+ */
+
+/** GUARD FUNCTION */
+/* AUTH GUARD */
+// blocks unauthenticated users from reaching protected routes
+export const authGuard = (): boolean | UrlTree => {
     const userService = inject(UserService);
-    const router = inject(Router);
     if (!userService.isLoggedIn()) {
-        router.navigate(['/home']);
-        return false;
+        return inject(Router).createUrlTree(['/home']);
     }
     return true;
 };
 
 
-/* GUEST GUARD*/
-// prevents logged-in users from accessing certain routes 
-export const guestGuard = (): boolean => {
+/** GUARD FUNCTION */
+/* GUEST GUARD */
+// prevents already logged-in users from seeing the login or register pages
+export const guestGuard = (): boolean | UrlTree => {
     const userService = inject(UserService);
-    const router = inject(Router);
     if (userService.isLoggedIn()) {
-        router.navigate(['/studentList']);
-        return false;
+        return inject(Router).createUrlTree(['/studentList']);
     }
     return true;
 };
 
-/* REDIRECT GUARD*/
-// redirects logged-in users to the student list
-export const redirectGuard = (): boolean => {
+/** GUARD FUNCTION */
+/* REDIRECT GUARD */
+// root path always redirects to the right page based on login state
+export const redirectGuard = (): UrlTree => {
     const userService = inject(UserService);
-    const router = inject(Router);
     const route = userService.isLoggedIn() ? '/studentList' : '/home';
-    router.navigate([route]);
-    return false;
+    return inject(Router).createUrlTree([route]);
 };

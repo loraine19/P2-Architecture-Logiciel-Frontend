@@ -9,9 +9,6 @@ import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
 import { Student } from '../../core/models/Student';
 
-/**
- * Unit tests for StudentCreateComponent
- */
 describe('StudentCreateComponent', () => {
   let component: StudentCreateComponent;
   let fixture: ComponentFixture<StudentCreateComponent>;

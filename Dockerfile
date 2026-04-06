@@ -10,8 +10,8 @@ RUN npm ci
 # Copy source
 COPY . .
 
-# Run tests — image build fails if any test fails
-RUN npm test -- --no-coverage --watchAll=false
+# Run tests and generate coverage report (build fails if any test fails)
+RUN npm test -- --coverage --watchAll=false
 
 # Build production bundle
 RUN npm run build --configuration=production

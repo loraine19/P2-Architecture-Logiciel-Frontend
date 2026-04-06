@@ -2,9 +2,11 @@ import { Observable } from "rxjs";
 import { Student, StudentDto } from "../../models/Student";
 
 /**
- * Student service interface for CRUD operations
- * Defines contract for student data management
+ * Interface - Contract for student CRUD operations
+ * Defines all methods any student service implementation must expose
  */
+/** INTERFACE */
+/* STUDENT SERVICE INTERFACE */
 export interface StudentServiceInterface {
   getAllStudents(): Observable<Student[]>;
   getStudentById(id: number): Observable<Student>;

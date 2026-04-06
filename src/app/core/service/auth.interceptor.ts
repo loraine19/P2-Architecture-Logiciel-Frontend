@@ -8,8 +8,8 @@ import { UserService } from './user.service';
 import { Router } from '@angular/router';
 
 /**
- * HTTP Interceptor for hybrid authentication and automatic token refresh
- * Mobile: JWT in Bearer header, Web: HTTP-only cookies
+ * Interceptor - Handles platform-aware authentication and automatic token refresh
+ * Mobile: attaches JWT in Bearer header | Web: adds withCredentials for cookie forwarding
  */
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -21,14 +21,14 @@ export class AuthInterceptor implements HttpInterceptor {
         private router: Router
     ) { }
 
+    /** PUBLIC */
+    /* INTERCEPT */
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-        // Skip authentication for public endpoints
         if (this.isPublicEndpoint(request.url)) {
             return next.handle(request);
         }
 
-        //  Clone the request to modify it & attach credentials if needed
         let authRequest = request;
         if (!this.platformDetection.isMobile()) {
             authRequest = request.clone({ withCredentials: true });
@@ -46,10 +46,8 @@ export class AuthInterceptor implements HttpInterceptor {
             )
             : next.handle(authRequest);
 
-        // Handle 401 errors globally
         return requestObservable.pipe(
             catchError((error: HttpErrorResponse) => {
-                // If 401 and it's NOT the refresh route itself failing
                 if (error.status === 401 && !request.url.includes('/api/refresh')) {
                     return this.handle401Error(authRequest, next);
                 }
@@ -58,19 +56,17 @@ export class AuthInterceptor implements HttpInterceptor {
         );
     }
 
-    /** PRIVATE METHODS */
-
+    /** PRIVATE */
     /* HANDLE 401 ERROR */
+    // token expired: try to refresh, then retry the original request
     private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return this.userService.refreshAccessToken().pipe(
             switchMap(() => {
-                // Token successfully refreshed.
-                // For Web, simply retry the request (cookies are automatically attached)
                 if (!this.platformDetection.isMobile()) {
                     return next.handle(request.clone({ withCredentials: true }));
                 }
 
-                // For Mobile, fetch the newly stored token and attach it
+                // fetch the newly stored token and attach it for mobile
                 return from(this.adaptiveStorage.getAuthToken()).pipe(
                     switchMap((newToken: string | null) => {
                         return next.handle(request.clone({
@@ -80,7 +76,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 );
             }),
             catchError((refreshError) => {
-                // Refresh failed (e.g., refresh token also expired)
+                // refresh token expired or invalid
                 this.userService.logout();
                 this.router.navigate(['/login'], { queryParams: { msg: 'Session expired. Please log in again.', error: true } });
                 return throwError(() => refreshError);
@@ -89,6 +85,7 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     /* IS PUBLIC ENDPOINT */
+    // skip auth for open endpoints to avoid unnecessary token lookups
     private isPublicEndpoint(url: string): boolean {
         const publicEndpoints = ['/api/register', '/api/login', '/api/public', '/assets/'];
         return publicEndpoints.some(endpoint => url.includes(endpoint));

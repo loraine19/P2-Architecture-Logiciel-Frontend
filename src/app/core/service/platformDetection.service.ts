@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 
 /**
- * Platform detection service
- * Detects native apps (Capacitor/Cordova) vs web browsers
+ * Service - Detects whether the app runs in a native mobile container or a web browser
+ * Supports Capacitor, Cordova, and user-agent-based detection
  */
 @Injectable({
     providedIn: 'root'
 })
 export class PlatformDetectionService {
 
+    // toggle to also include mobile user-agent strings in detection
     private readonly ENABLE_USER_AGENT_DETECTION = true;
 
-    /** PUBLIC METHODS */
-
+    /** PUBLIC */
     /* IS MOBILE */
     isMobile(): boolean {
         const isNativeApp = this.isCapacitor() || this.isCordova();
@@ -34,8 +34,7 @@ export class PlatformDetectionService {
         return this.isMobile() ? 'mobile' : 'web';
     }
 
-    /** PRIVATE METHODS */
-
+    /** PRIVATE */
     /* IS CAPACITOR */
     private isCapacitor(): boolean {
         return !!(window as any)?.Capacitor;

@@ -8,10 +8,6 @@ import { MaterialModule } from "../../shared/material.module";
 import { RegisterComponent } from "./register.component";
 
 
-/**
- * Unit tests for RegisterComponent
- * Validates registration logic, form constraints and navigation
- */
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
@@ -49,9 +45,6 @@ describe('RegisterComponent', () => {
     fixture.detectChanges();
   });
 
-  /** TEST SUITE */
-
-  /* COMPONENT INITIALIZATION */
   describe('Component Initialization', () => {
     it('should initialize with default values', () => {
       expect(component.registerForm).toBeDefined();
@@ -60,7 +53,6 @@ describe('RegisterComponent', () => {
     });
   });
 
-  /* FORM VALIDATION */
   describe('Form Validation', () => {
     it('should validate required fields', () => {
 
@@ -82,12 +74,11 @@ describe('RegisterComponent', () => {
   });
 
 
-  /* AUTHENTICATION FLOW */
   describe('Authentication Flow', () => {
     it('should navigate on successful login', fakeAsync(() => {
       const credentials = { firstName: 'John', lastName: 'Doe', login: 'test@example.com', password: 'Password123!' };
       component.registerForm.setValue(credentials);
-      userService.register.mockReturnValue(of({}));
+      userService.register.mockReturnValue(of({ message: '' }));
 
       component.onSubmit();
       tick(2000); // Wait for redirect timeout
@@ -107,7 +98,6 @@ describe('RegisterComponent', () => {
     });
   });
 
-  /* FORM INTERACTION */
   describe('Form Interaction', () => {
     it('should toggle password visibility', () => {
       expect(component.passwordVisible).toBe(false);

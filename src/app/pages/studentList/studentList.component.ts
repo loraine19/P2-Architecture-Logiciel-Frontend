@@ -9,8 +9,8 @@ import { ErrorService } from '../../core/service/error.service';
 import { InfoMessage } from '../../core/DTO/InfoMessage';
 
 /**
- * Student list component displaying all students with CRUD operations
- * Provides responsive table/card layout and confirmation dialogs
+ * Component - Displays all students with delete, view and edit shortcuts
+ * Uses a Subject to unsubscribe from Observables on destroy
  */
 @Component({
   selector: 'app-student-list',
@@ -21,35 +21,33 @@ import { InfoMessage } from '../../core/DTO/InfoMessage';
 })
 export class StudentListComponent implements OnInit, OnDestroy {
 
-  // Dependency Injections
   private studentService = inject(StudentService);
   private errorService = inject(ErrorService);
   private router = inject(Router);
 
-  // Component State
   students: Student[] = [];
   isLoading: boolean = true;
   infoMessage: InfoMessage = { message: '', error: false };
   pendingDeleteId: number | null = null;
 
-  // Cleanup Subject
   private destroy$ = new Subject<void>();
 
   constructor() { }
 
-  /** PUBLIC METHODS */
-
-  /* INITIALIZATION */
+  /** LIFECYCLE */
+  /* NG ON INIT */
   ngOnInit(): void {
     this.loadStudents();
   }
 
-  /* CLEANUP */
+  /* NG ON DESTROY */
+  // complete the Subject so all takeUntil subscriptions are unsubscribed
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
+  /** PUBLIC */
   /* LOAD STUDENTS */
   loadStudents(): void {
     this.isLoading = true;
@@ -67,7 +65,8 @@ export class StudentListComponent implements OnInit, OnDestroy {
       });
   }
 
-  /* DELETE STUDENT (PREPARATION) */
+  /* DELETE STUDENT */
+  // store the pending ID so the template can show a confirmation dialog
   deleteStudent(id: number): void {
     this.pendingDeleteId = id;
     this.infoMessage = { message: '', error: false };
@@ -81,7 +80,7 @@ export class StudentListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          // Mise à jour de la liste locale sans recharger tout le serveur
+          // update local list without refetching from server
           this.students = this.students.filter(s => s.id !== this.pendingDeleteId);
           this.infoMessage = { message: 'Student deleted successfully', error: false };
           this.pendingDeleteId = null;

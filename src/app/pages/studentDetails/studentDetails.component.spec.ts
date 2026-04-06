@@ -11,9 +11,6 @@ import { Student } from '../../core/models/Student';
 
 const mockStudent = new Student(1, 'John', 'Doe', 'john@test.com', '0600000000', '1 rue Test', 'Paris', '75001');
 
-/**
- * Unit tests for StudentDetailsComponent
- */
 describe('StudentDetailsComponent', () => {
   let component: StudentDetailsComponent;
   let fixture: ComponentFixture<StudentDetailsComponent>;

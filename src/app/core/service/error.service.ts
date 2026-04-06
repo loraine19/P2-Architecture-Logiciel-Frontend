@@ -3,8 +3,8 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { InfoMessage } from '../DTO/InfoMessage';
 
 /**
- * Centralized error handling service
- * Transforms HTTP errors into user-friendly UI messages
+ * Service - Centralizes HTTP error handling
+ * Converts HTTP status codes into user-friendly messages for the template
  */
 type ErrorServiceInterface = {
     handleError(err: HttpErrorResponse, infoMessage: InfoMessage): void;
@@ -15,8 +15,7 @@ type ErrorServiceInterface = {
 })
 export class ErrorService implements ErrorServiceInterface {
 
-    /** PUBLIC METHODS */
-
+    /** PUBLIC */
     /* HANDLE ERROR */
     handleError(err: HttpErrorResponse, infoMessage: InfoMessage): void {
         const message = this.getErrorMessage(err);
@@ -25,16 +24,13 @@ export class ErrorService implements ErrorServiceInterface {
         infoMessage.error = true;
     }
 
-    /** PRIVATE METHODS */
-
+    /** PRIVATE */
     /* GET ERROR MESSAGE */
     private getErrorMessage(err: HttpErrorResponse): string {
-        // Retourne le message formaté par le GlobalExceptionHandler de Spring Boot
         if (err.error?.message) {
             return err.error.message;
         }
 
-        // Fallback en cas de crash réseau ou serveur injoignable
         switch (err.status) {
             case 0:
                 return 'Unable to connect to the server. Please check your network.';

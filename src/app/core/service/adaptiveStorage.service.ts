@@ -5,26 +5,24 @@ import { StorageServiceInterface } from './servicesInterfaces/storageServiceInte
 import { LoginResponse } from '../DTO/LoginResponse';
 
 /**
- * Simple adaptive storage service for JWT tokens
- * Mobile: Uses native secure storage ONLY (Keychain/Keystore)
- * Web: Not used (cookies handled by browser)
- * NO encryption fallback - secure storage or nothing
+ * Service - Platform-aware token storage for mobile JWT flows
+ * On mobile: uses native SecureStorage (Keychain/Keystore)
+ * On web: cookies are handled by the browser — this service is not used
  */
 @Injectable({
     providedIn: 'root'
 })
 export class AdaptiveStorageService implements StorageServiceInterface {
 
-    // Storage keys
     private readonly JWT_KEY_NAME = 'auth_jwt_token';
     private readonly JWT_REFRESH_KEY_NAME = 'auth_refresh_token';
     private readonly AUTH_STATE_KEY_NAME = 'authState';
+    // DEV_MODE allows localStorage fallback when native secure storage is unavailable
     private readonly DEV_MODE = true;
 
     constructor(private platformDetection: PlatformDetectionService) { }
 
-    /** PUBLIC METHODS */
-
+    /** PUBLIC */
     /* GET AUTH TOKEN */
     async getAuthToken(): Promise<string | null> {
         return await this.getMobileToken();
@@ -46,8 +44,8 @@ export class AdaptiveStorageService implements StorageServiceInterface {
     }
 
     /* SET AUTH STATE */
+    // stores login result in localStorage so isLoggedIn() works across page reloads
     setAuthState(loginResponse: LoginResponse): void {
-        // Store auth state in localStorage for both platforms 
         localStorage.setItem(this.AUTH_STATE_KEY_NAME, JSON.stringify({
             isLoggedIn: loginResponse.success,
             authType: loginResponse.authType,
@@ -87,8 +85,7 @@ export class AdaptiveStorageService implements StorageServiceInterface {
         }
     }
 
-    /** PRIVATE METHODS */
-
+    /** PRIVATE */
     /* STORE MOBILE TOKEN */
     private async storeMobileToken(token: string): Promise<void> {
         if ((window as any).SecureStorage) {
@@ -98,7 +95,6 @@ export class AdaptiveStorageService implements StorageServiceInterface {
                 throw new Error('Secure storage failed', { cause: error });
             }
         } else if (this.DEV_MODE) {
-            // Mode fallback pour le développement
             localStorage.setItem(this.JWT_KEY_NAME, token);
         }
     }
