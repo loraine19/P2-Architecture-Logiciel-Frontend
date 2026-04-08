@@ -6,9 +6,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { StudentService } from '../../core/service/student.service';
 import { Student } from '../../core/models/Student';
-import { InfoMessage } from '../../core/DTO/InfoMessage';
+import { InfoMessage } from '../../core/constants/InfoMessage';
 import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
+import { AppNotificationMessage } from '../../core/constants/appNotification';
 
 /**
  * Component - Form for creating a new student record
@@ -61,7 +62,7 @@ export class StudentCreateComponent implements OnInit {
       .subscribe({
         next: () => {
           this.infoMessage = {
-            message: `Student ${newStudent.firstName} ${newStudent.lastName} created successfully`,
+            message: AppNotificationMessage.STUDENT_CREATED(newStudent.firstName, newStudent.lastName),
             error: false
           };
 

@@ -8,7 +8,15 @@ import { StudentService } from '../../core/service/student.service';
 import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
 import { Student } from '../../core/models/Student';
+import { AppNotificationMessage } from '../../core/constants/appNotification';
 
+/**
+ * Unit tests for StudentDetailsComponent — view and edit a single student record
+ * The component starts in read-only mode; isEditMode controls whether the form is enabled
+ * setupWithId() reconfigures TestBed with a specific route param to test with or without an ID
+ */
+
+// shared mock student reused across multiple tests
 const mockStudent = new Student(1, 'John', 'Doe', 'john@test.com', '0600000000', '1 rue Test', 'Paris', '75001');
 
 describe('StudentDetailsComponent', () => {
@@ -17,6 +25,7 @@ describe('StudentDetailsComponent', () => {
   let studentService: jest.Mocked<StudentService>;
   let router: Router;
 
+  // route params are always strings in Angular — the component converts the id to a number internally
   const setupWithId = async (id: string | null = '1') => {
     const studentSpy = { getStudentById: jest.fn(), updateStudent: jest.fn() };
 
@@ -34,6 +43,7 @@ describe('StudentDetailsComponent', () => {
     }).compileComponents();
 
     studentService = TestBed.inject(StudentService) as jest.Mocked<StudentService>;
+    // set return value before createComponent so ngOnInit finds data immediately
     studentService.getStudentById.mockReturnValue(of(mockStudent));
 
     fixture = TestBed.createComponent(StudentDetailsComponent);
@@ -42,8 +52,12 @@ describe('StudentDetailsComponent', () => {
     fixture.detectChanges();
   };
 
+  /** TEST SETUP */
+  /* beforeEach */
   beforeEach(async () => setupWithId('1'));
 
+  /** COMPONENT TESTS */
+  /* COMPONENT INITIALIZATION */
   describe('Component Initialization', () => {
     it('should create', () => {
       expect(component).toBeTruthy();
@@ -63,6 +77,7 @@ describe('StudentDetailsComponent', () => {
       expect(component.studentForm.get('email')?.value).toBe('john@test.com');
     });
 
+    // resetTestingModule() is needed to reinitialize TestBed with a different route param
     it('should not load student when no ID in route', async () => {
       TestBed.resetTestingModule();
       await setupWithId(null);
@@ -71,6 +86,8 @@ describe('StudentDetailsComponent', () => {
     });
   });
 
+  /* VIEW MODE */
+  // form is disabled in read-only mode — toggleEditMode() enables it so the user can type
   describe('View Mode', () => {
     it('should start in view mode (form disabled)', () => {
       expect(component.isEditMode).toBe(false);
@@ -84,6 +101,7 @@ describe('StudentDetailsComponent', () => {
     });
   });
 
+  /* ON SUBMIT */
   describe('onSubmit()', () => {
     it('should not submit when not in edit mode', () => {
       component.isEditMode = false;
@@ -103,7 +121,7 @@ describe('StudentDetailsComponent', () => {
       studentService.updateStudent.mockReturnValue(of(mockStudent));
       component.onSubmit();
       expect(component.infoMessage.error).toBe(false);
-      expect(component.infoMessage.message).toContain('updated');
+      expect(component.infoMessage.message).toBe(AppNotificationMessage.STUDENT_UPDATED('John', 'Doe'));
     });
 
     it('should exit edit mode after successful update', () => {
@@ -114,6 +132,8 @@ describe('StudentDetailsComponent', () => {
     });
   });
 
+  /* ON CANCEL */
+  // in edit mode: discards changes and restores original values | otherwise: navigates back to the list
   describe('onCancel()', () => {
     it('should navigate to /studentList when not in edit mode', () => {
       const navigateSpy = jest.spyOn(router, 'navigate');
@@ -131,6 +151,7 @@ describe('StudentDetailsComponent', () => {
     });
   });
 
+  /* GO BACK TO LIST */
   describe('goBackToList()', () => {
     it('should navigate to /studentList', () => {
       const navigateSpy = jest.spyOn(router, 'navigate');

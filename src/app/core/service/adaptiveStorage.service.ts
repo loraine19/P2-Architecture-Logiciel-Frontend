@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { PlatformDetectionService } from './platformDetection.service';
 import { UserDTO } from '../models/User';
-import { StorageServiceInterface } from './servicesInterfaces/storageServiceInterface';
+import { StorageServiceInterface } from './servicesImpl/storageServiceInterface';
 import { LoginResponse } from '../DTO/LoginResponse';
+import { UserErrorMessage } from '../constants/userErrorMessage';
 
 /**
  * Service - Platform-aware token storage for mobile JWT flows
@@ -92,7 +93,7 @@ export class AdaptiveStorageService implements StorageServiceInterface {
             try {
                 await (window as any).SecureStorage.set(this.JWT_KEY_NAME, token);
             } catch (error) {
-                throw new Error('Secure storage failed', { cause: error });
+                throw new Error(UserErrorMessage.SECURE_STORAGE_FAILED, { cause: error });
             }
         } else if (this.DEV_MODE) {
             localStorage.setItem(this.JWT_KEY_NAME, token);
@@ -105,7 +106,7 @@ export class AdaptiveStorageService implements StorageServiceInterface {
             try {
                 return await (window as any).SecureStorage.get(this.JWT_KEY_NAME);
             } catch (error) {
-                console.error('Secure storage failed', error);
+                console.error(UserErrorMessage.SECURE_STORAGE_FAILED, error);
                 return null;
             }
         } else if (this.DEV_MODE) {
@@ -120,7 +121,7 @@ export class AdaptiveStorageService implements StorageServiceInterface {
             try {
                 await (window as any).SecureStorage.set(this.JWT_REFRESH_KEY_NAME, token);
             } catch (error) {
-                throw new Error('Secure storage failed', { cause: error });
+                throw new Error(UserErrorMessage.SECURE_STORAGE_FAILED, { cause: error });
             }
         } else if (this.DEV_MODE) {
             localStorage.setItem(this.JWT_REFRESH_KEY_NAME, token);
@@ -133,7 +134,7 @@ export class AdaptiveStorageService implements StorageServiceInterface {
             try {
                 return await (window as any).SecureStorage.get(this.JWT_REFRESH_KEY_NAME);
             } catch (error) {
-                console.error('Secure storage failed', error);
+                console.error(UserErrorMessage.SECURE_STORAGE_FAILED, error);
                 return null;
             }
         } else if (this.DEV_MODE) {

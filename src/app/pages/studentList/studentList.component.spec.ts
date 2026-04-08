@@ -7,7 +7,14 @@ import { StudentService } from '../../core/service/student.service';
 import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
 import { Student } from '../../core/models/Student';
+import { AppNotification } from '../../core/constants/appNotification';
 
+/**
+ * Unit tests for StudentListComponent — student list with a two-step delete confirmation flow
+ * StudentService is mocked so no real HTTP calls are made
+ */
+
+// shared mock students reused across multiple tests
 const mockStudents: Student[] = [
   new Student(1, 'John', 'Doe', 'john@test.com', '0600000000', '1 rue Test', 'Paris', '75001'),
   new Student(2, 'Jane', 'Smith', 'jane@test.com', '0600000001', '2 rue Test', 'Lyon', '69001')
@@ -19,6 +26,9 @@ describe('StudentListComponent', () => {
   let studentService: jest.Mocked<StudentService>;
   let router: Router;
 
+  /** TEST SETUP */
+  /* beforeEach */
+  // mocks StudentService and creates the component — getAllStudents fires automatically on ngOnInit
   beforeEach(async () => {
     const studentSpy = { getAllStudents: jest.fn(), deleteStudent: jest.fn() };
 
@@ -32,6 +42,7 @@ describe('StudentListComponent', () => {
     }).compileComponents();
 
     studentService = TestBed.inject(StudentService) as jest.Mocked<StudentService>;
+    // set return value before createComponent so ngOnInit finds data immediately
     studentService.getAllStudents.mockReturnValue(of(mockStudents));
 
     fixture = TestBed.createComponent(StudentListComponent);
@@ -40,6 +51,8 @@ describe('StudentListComponent', () => {
     fixture.detectChanges();
   });
 
+  /** COMPONENT TESTS */
+  /* COMPONENT INITIALIZATION */
   describe('Component Initialization', () => {
     it('should create', () => {
       expect(component).toBeTruthy();
@@ -64,6 +77,8 @@ describe('StudentListComponent', () => {
     });
   });
 
+  /* DELETE STUDENT */
+  // stores the id to delete so the template can show a confirmation dialog before calling the API
   describe('deleteStudent()', () => {
     it('should set pendingDeleteId', () => {
       component.deleteStudent(1);
@@ -71,6 +86,7 @@ describe('StudentListComponent', () => {
     });
   });
 
+  /* CONFIRM DELETE */
   describe('confirmDelete()', () => {
     it('should call deleteStudent and remove from list', () => {
       studentService.deleteStudent.mockReturnValue(of(undefined));
@@ -78,7 +94,7 @@ describe('StudentListComponent', () => {
       component.confirmDelete();
       expect(studentService.deleteStudent).toHaveBeenCalledWith(1);
       expect(component.students.find(s => s.id === 1)).toBeUndefined();
-      expect(component.infoMessage.message).toContain('deleted');
+      expect(component.infoMessage.message).toBe(AppNotification.STUDENT_DELETED);
     });
 
     it('should do nothing when pendingDeleteId is null', () => {
@@ -88,6 +104,7 @@ describe('StudentListComponent', () => {
     });
   });
 
+  /* CANCEL DELETE */
   describe('cancelDelete()', () => {
     it('should reset pendingDeleteId', () => {
       component.pendingDeleteId = 1;
@@ -96,6 +113,7 @@ describe('StudentListComponent', () => {
     });
   });
 
+  /* VIEW STUDENT */
   describe('viewStudent()', () => {
     it('should navigate to /studentDetails/:id', () => {
       const navigateSpy = jest.spyOn(router, 'navigate');
@@ -104,6 +122,7 @@ describe('StudentListComponent', () => {
     });
   });
 
+  /* EDIT STUDENT */
   describe('editStudent()', () => {
     it('should navigate to /studentEdit/:id', () => {
       const navigateSpy = jest.spyOn(router, 'navigate');

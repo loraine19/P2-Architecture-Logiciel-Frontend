@@ -8,7 +8,8 @@ import { UserService } from '../../core/service/user.service';
 import { UserDTO } from '../../core/models/User';
 import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
-import { InfoMessage } from '../../core/DTO/InfoMessage';
+import { InfoMessage } from '../../core/constants/InfoMessage';
+import { AppNotification, AppNotificationMessage } from '../../core/constants/appNotification';
 
 /**
  * Component - Registration page that creates a new user account
@@ -67,14 +68,14 @@ export class RegisterComponent implements OnInit {
       .subscribe({
         next: () => {
           this.infoMessage = {
-            message: `Hi, ${registerUser.login}! You are now registered, you can now log in!`,
+            message: AppNotificationMessage.REGISTER_WELCOME(registerUser.login),
             error: false
           };
 
           setTimeout(() => {
             this.router.navigate(['/login'], {
               queryParams: {
-                msg: 'Registration successful! Please log in.',
+                msg: AppNotification.REGISTRATION_SUCCESS,
                 error: 'false'
               }
             });

@@ -6,9 +6,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { Student } from '../../core/models/Student';
 import { StudentService } from '../../core/service/student.service';
-import { InfoMessage } from '../../core/DTO/InfoMessage';
+import { InfoMessage } from '../../core/constants/InfoMessage';
 import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
+import { AppNotificationMessage } from '../../core/constants/appNotification';
 
 /**
  * Component - View and edit a single student record
@@ -71,7 +72,7 @@ export class StudentDetailsComponent implements OnInit {
         next: (student) => {
           this.student = student;
           this.infoMessage = {
-            message: `Student ${student.firstName} ${student.lastName} has been updated successfully`,
+            message: AppNotificationMessage.STUDENT_UPDATED(student.firstName, student.lastName),
             error: false
           };
           this.isEditMode = false;

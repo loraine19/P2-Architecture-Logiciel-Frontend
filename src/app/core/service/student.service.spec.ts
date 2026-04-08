@@ -5,6 +5,13 @@ import { provideHttpClient } from '@angular/common/http';
 import { StudentService } from './student.service';
 import { Student, StudentDto } from '../models/Student';
 
+/**
+ * Unit tests for StudentService — student CRUD operations via HTTP
+ * All HTTP calls are intercepted by HttpTestingController so no real server is needed
+ * subscribe() must be called before flush() to register the observer
+ */
+
+// shared mock data reused across multiple tests
 const mockStudent: Student = new Student(1, 'John', 'Doe', 'john@test.com', '0600000000', '1 rue Test', 'Paris', '75001');
 const mockStudents: Student[] = [
     mockStudent,
@@ -16,6 +23,9 @@ describe('StudentService', () => {
     let service: StudentService;
     let httpMock: HttpTestingController;
 
+    /** TEST SETUP */
+    /* beforeEach */
+    // provideHttpClientTesting replaces HttpClient with a version that intercepts real requests
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [StudentService, provideHttpClient(), provideHttpClientTesting()]
@@ -24,14 +34,18 @@ describe('StudentService', () => {
         httpMock = TestBed.inject(HttpTestingController);
     });
 
+    // checks that no unexpected HTTP calls were made during the test
     afterEach(() => httpMock.verify());
 
+    /** SERVICE TESTS */
+    /* SERVICE INITIALIZATION */
     describe('Service Initialization', () => {
         it('should be created', () => {
             expect(service).toBeTruthy();
         });
     });
 
+    /* GET ALL STUDENTS */
     describe('getAllStudents()', () => {
         it('should GET /api/students and return all students', () => {
             service.getAllStudents().subscribe(students => {
@@ -51,6 +65,7 @@ describe('StudentService', () => {
         });
     });
 
+    /* GET STUDENT BY ID */
     describe('getStudentById()', () => {
         it('should GET /api/students/:id and return a student', () => {
             service.getStudentById(1).subscribe(student => {
@@ -61,6 +76,7 @@ describe('StudentService', () => {
             req.flush(mockStudent);
         });
 
+        // flush() can also simulate error responses — the Observable error handler receives the HttpErrorResponse
         it('should propagate 404 error when student not found', () => {
             let error: any;
             service.getStudentById(999).subscribe({ error: (e) => (error = e) });
@@ -69,6 +85,7 @@ describe('StudentService', () => {
         });
     });
 
+    /* CREATE STUDENT */
     describe('createStudent()', () => {
         it('should POST to /api/students and return created student', () => {
             service.createStudent(mockStudentDto).subscribe(student => {
@@ -81,6 +98,7 @@ describe('StudentService', () => {
         });
     });
 
+    /* UPDATE STUDENT */
     describe('updateStudent()', () => {
         it('should PUT to /api/students/:id and return updated student', () => {
             const updated = { ...mockStudentDto, firstName: 'Jonathan' };
@@ -94,6 +112,7 @@ describe('StudentService', () => {
         });
     });
 
+    /* DELETE STUDENT */
     describe('deleteStudent()', () => {
         it('should DELETE /api/students/:id', () => {
             service.deleteStudent(1).subscribe();

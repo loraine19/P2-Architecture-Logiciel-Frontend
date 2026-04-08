@@ -7,7 +7,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { MaterialModule } from '../../shared/material.module';
 import { UserService } from '../../core/service/user.service';
 import { Login } from '../../core/DTO/Login';
-import { InfoMessage } from '../../core/DTO/InfoMessage';
+import { InfoMessage } from '../../core/constants/InfoMessage';
 import { ErrorService } from '../../core/service/error.service';
 
 /**

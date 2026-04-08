@@ -6,6 +6,7 @@ import { PlatformDetectionService } from './platformDetection.service';
 import { AdaptiveStorageService } from './adaptiveStorage.service';
 import { UserService } from './user.service';
 import { Router } from '@angular/router';
+import { HttpErrorMessage } from '../constants/httpErrorMessage';
 
 /**
  * Interceptor - Handles platform-aware authentication and automatic token refresh
@@ -78,7 +79,7 @@ export class AuthInterceptor implements HttpInterceptor {
             catchError((refreshError) => {
                 // refresh token expired or invalid
                 this.userService.logout();
-                this.router.navigate(['/login'], { queryParams: { msg: 'Session expired. Please log in again.', error: true } });
+                this.router.navigate(['/login'], { queryParams: { msg: HttpErrorMessage.SESSION_EXPIRED, error: true } });
                 return throwError(() => refreshError);
             })
         );

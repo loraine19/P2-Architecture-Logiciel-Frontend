@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Student, StudentDto } from '../models/Student';
-import { StudentServiceInterface } from './servicesInterfaces/studentServicesInterface';
+import { StudentServiceInterface } from './servicesImpl/studentServicesInterface';
 
 /**
  * Service - Manages student CRUD operations via HTTP

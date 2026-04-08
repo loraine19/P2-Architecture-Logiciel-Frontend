@@ -1,21 +1,34 @@
 import { PlatformDetectionService } from './platformDetection.service';
 
+/**
+ * Unit tests for PlatformDetectionService — mobile and web platform detection
+ * navigator.userAgent is overridden in each test using Object.defineProperty
+ * Capacitor and Cordova globals are deleted in beforeEach to start from a clean slate
+ */
+
 describe('PlatformDetectionService', () => {
     let service: PlatformDetectionService;
 
+    /** TEST SETUP */
+    /* beforeEach */
+    // creates a new instance directly — no TestBed needed since PlatformDetectionService has no dependencies
     beforeEach(() => {
         service = new PlatformDetectionService();
-        // Ensure no Capacitor/Cordova globals are set
+        // remove any leftover Capacitor / Cordova globals so tests start isolated
         delete (window as any).Capacitor;
         delete (window as any).cordova;
     });
 
+    /** SERVICE TESTS */
+    /* SERVICE INITIALIZATION */
     describe('Service Initialization', () => {
         it('should be created', () => {
             expect(service).toBeTruthy();
         });
     });
 
+    /* IS MOBILE */
+    // Object.defineProperty overrides the read-only userAgent — configurable:true allows redefining it in the next test
     describe('isMobile()', () => {
         it('should return false on desktop user agent', () => {
             Object.defineProperty(navigator, 'userAgent', {
@@ -41,6 +54,7 @@ describe('PlatformDetectionService', () => {
             expect(service.isMobile()).toBe(true);
         });
 
+        // Capacitor is the native mobile bridge — its presence means the app runs in a native container
         it('should return true when Capacitor is present', () => {
             (window as any).Capacitor = {};
             Object.defineProperty(navigator, 'userAgent', {
@@ -52,6 +66,7 @@ describe('PlatformDetectionService', () => {
         });
     });
 
+    /* IS WEB */
     describe('isWeb()', () => {
         it('should return true on desktop', () => {
             Object.defineProperty(navigator, 'userAgent', {
@@ -70,6 +85,7 @@ describe('PlatformDetectionService', () => {
         });
     });
 
+    /* GET PLATFORM */
     describe('getPlatform()', () => {
         it('should return "web" on desktop', () => {
             Object.defineProperty(navigator, 'userAgent', {

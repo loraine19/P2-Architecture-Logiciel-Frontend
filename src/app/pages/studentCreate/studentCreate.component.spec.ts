@@ -8,6 +8,12 @@ import { StudentService } from '../../core/service/student.service';
 import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
 import { Student } from '../../core/models/Student';
+import { AppNotificationMessage } from '../../core/constants/appNotification';
+
+/**
+ * Unit tests for StudentCreateComponent — student creation form and post-submit redirect
+ * StudentService is mocked so no real HTTP calls are made
+ */
 
 describe('StudentCreateComponent', () => {
   let component: StudentCreateComponent;
@@ -15,11 +21,15 @@ describe('StudentCreateComponent', () => {
   let studentService: jest.Mocked<StudentService>;
   let router: Router;
 
+  // reusable valid form data — matches all field validators
   const validForm = {
     firstName: 'John', lastName: 'Doe', email: 'john@test.com',
     phoneNumber: '0600000000', address: '1 rue Test', city: 'Paris', zipCode: '75001'
   };
 
+  /** TEST SETUP */
+  /* beforeEach */
+  // builds the form and injects a mocked StudentService before each test
   beforeEach(async () => {
     const studentSpy = { createStudent: jest.fn() };
 
@@ -39,6 +49,8 @@ describe('StudentCreateComponent', () => {
     fixture.detectChanges();
   });
 
+  /** COMPONENT TESTS */
+  /* COMPONENT INITIALIZATION */
   describe('Component Initialization', () => {
     it('should create', () => {
       expect(component).toBeTruthy();
@@ -59,6 +71,7 @@ describe('StudentCreateComponent', () => {
     });
   });
 
+  /* FORM VALIDATION */
   describe('Form Validation', () => {
     it('should require firstName', () => {
       component.studentForm.get('firstName')?.setValue('');
@@ -96,6 +109,7 @@ describe('StudentCreateComponent', () => {
     });
   });
 
+  /* ON SUBMIT */
   describe('onSubmit()', () => {
     it('should not call createStudent when form is invalid', () => {
       component.onSubmit();
@@ -120,7 +134,7 @@ describe('StudentCreateComponent', () => {
       studentService.createStudent.mockReturnValue(of({ id: 1, ...validForm } as any));
       component.onSubmit();
       expect(component.infoMessage.error).toBe(false);
-      expect(component.infoMessage.message).toContain('John');
+      expect(component.infoMessage.message).toBe(AppNotificationMessage.STUDENT_CREATED('John', 'Doe'));
     });
 
     it('should navigate to /studentList after 2s on success', fakeAsync(() => {
@@ -128,11 +142,13 @@ describe('StudentCreateComponent', () => {
       component.studentForm.setValue(validForm);
       studentService.createStudent.mockReturnValue(of({ id: 1, ...validForm } as any));
       component.onSubmit();
+      // tick(2000) advances the fake timer — the redirect runs inside a setTimeout in onSubmit()
       tick(2000);
       expect(navigateSpy).toHaveBeenCalledWith(['/studentList']);
     }));
   });
 
+  /* ON RESET */
   describe('onReset()', () => {
     it('should reset submitted flag', () => {
       component.submitted = true;
@@ -147,6 +163,7 @@ describe('StudentCreateComponent', () => {
     });
   });
 
+  /* GO BACK TO LIST */
   describe('goBackToList()', () => {
     it('should navigate to /studentList', () => {
       const navigateSpy = jest.spyOn(router, 'navigate');

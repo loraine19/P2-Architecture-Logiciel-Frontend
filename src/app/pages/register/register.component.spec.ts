@@ -6,7 +6,12 @@ import { ErrorService } from "../../core/service/error.service";
 import { UserService } from "../../core/service/user.service";
 import { MaterialModule } from "../../shared/material.module";
 import { RegisterComponent } from "./register.component";
+import { AppNotification } from "../../core/constants/appNotification";
 
+/**
+ * Unit tests for RegisterComponent — registration form and post-submit redirect flow
+ * UserService and ErrorService are replaced with spies so no real HTTP calls are made
+ */
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -15,6 +20,9 @@ describe('RegisterComponent', () => {
   let router: jest.Mocked<Router>;
   let errorService: jest.Mocked<ErrorService>;
 
+  /** TEST SETUP */
+  /* beforeEach */
+  // builds the form and injects all required mocks before each test
   beforeEach(async () => {
     const userServiceSpy = { register: jest.fn(), login: jest.fn() };
     const routerSpy = { navigate: jest.fn() };
@@ -45,6 +53,8 @@ describe('RegisterComponent', () => {
     fixture.detectChanges();
   });
 
+  /** COMPONENT TESTS */
+  /* COMPONENT INITIALIZATION */
   describe('Component Initialization', () => {
     it('should initialize with default values', () => {
       expect(component.registerForm).toBeDefined();
@@ -53,6 +63,7 @@ describe('RegisterComponent', () => {
     });
   });
 
+  /* FORM VALIDATION */
   describe('Form Validation', () => {
     it('should validate required fields', () => {
 
@@ -74,6 +85,7 @@ describe('RegisterComponent', () => {
   });
 
 
+  /* AUTHENTICATION FLOW */
   describe('Authentication Flow', () => {
     it('should navigate on successful login', fakeAsync(() => {
       const credentials = { firstName: 'John', lastName: 'Doe', login: 'test@example.com', password: 'Password123!' };
@@ -81,10 +93,11 @@ describe('RegisterComponent', () => {
       userService.register.mockReturnValue(of({ message: '' }));
 
       component.onSubmit();
+      // tick(2000) advances the fake timer — the redirect runs inside a setTimeout in the component
       tick(2000); // Wait for redirect timeout
 
       expect(userService.register).toHaveBeenCalledWith(credentials);
-      expect(router.navigate).toHaveBeenCalledWith(['/login'], { queryParams: { msg: 'Registration successful! Please log in.', error: 'false' } });
+      expect(router.navigate).toHaveBeenCalledWith(['/login'], { queryParams: { msg: AppNotification.REGISTRATION_SUCCESS, error: 'false' } });
     }));
 
     it('should handle login failure', () => {
@@ -98,6 +111,7 @@ describe('RegisterComponent', () => {
     });
   });
 
+  /* FORM INTERACTION */
   describe('Form Interaction', () => {
     it('should toggle password visibility', () => {
       expect(component.passwordVisible).toBe(false);

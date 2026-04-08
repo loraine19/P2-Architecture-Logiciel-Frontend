@@ -8,19 +8,33 @@ import { PlatformDetectionService } from './platformDetection.service';
 import { AdaptiveStorageService } from './adaptiveStorage.service';
 import { Login } from '../DTO/Login';
 import { UserDTO } from '../models/User';
-import { LoginResponse } from '../DTO/LoginResponse';
 import { AuthType } from '../DTO/AuthType';
+import { UserErrorMessage } from '../constants/userErrorMessage';
 
+/**
+ * Unit tests for UserService — authentication, session management and token refresh
+ * All HTTP calls are intercepted by HttpTestingController so no real server is needed
+ * web vs mobile is tested by toggling isMobile() on the spy
+ */
+
+// shared mock user reused across multiple tests
 const mockUser: UserDTO = { firstName: 'John', lastName: 'Doe', login: 'john@test.com', password: '' };
 
 describe('UserService', () => {
   let service: UserService;
+  // HttpTestingController intercepts HTTP requests and lets us assert on them without a real server
   let httpMock: HttpTestingController;
   let adaptiveStorage: jest.Mocked<AdaptiveStorageService>;
   let router: jest.Mocked<Router>;
 
+  /** TEST SETUP */
+  /* beforeEach */
+  // runs before every test — creates a fresh TestBed module with all real dependencies replaced by spies
   beforeEach(() => {
+    // default: web platform (isMobile = false)
     const platformSpy = { isMobile: jest.fn().mockReturnValue(false) };
+    // every storage method is mocked so tests stay isolated from real storage logic
+    // async methods use mockResolvedValue because they return Promises
     const storageSpy = {
       getAuthState: jest.fn().mockReturnValue(false),
       getAuthStateUser: jest.fn().mockReturnValue(null),
@@ -50,18 +64,26 @@ describe('UserService', () => {
     router = TestBed.inject(Router) as jest.Mocked<Router>;
   });
 
+  // Checks that no unexpected HTTP calls were made 
   afterEach(() => httpMock.verify());
 
+
+
+  /** SERVICE TESTS */
+  /* SERVICE INITIALIZATION */
   describe('Service Initialization', () => {
     it('should be created', () => {
       expect(service).toBeTruthy();
     });
   });
 
+  /* REGISTER */
+  // mirrors register -> posts user data, throws synchronously on missing fields
   describe('register()', () => {
     it('should POST to /api/register', () => {
       const userDTO: UserDTO = { firstName: 'John', lastName: 'Doe', login: 'john@test.com', password: 'Password1!' };
       service.register(userDTO).subscribe();
+      // expectOne() intercepts the request and throws if the URL was not called exactly once
       const req = httpMock.expectOne('/api/register');
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(userDTO);
@@ -69,28 +91,32 @@ describe('UserService', () => {
     });
 
     it('should throw synchronously if login is missing', () => {
-      expect(() => service.register({ firstName: 'J', lastName: 'D', password: 'P' } as any)).toThrow('User data is required for registration');
+      expect(() => service.register({ firstName: 'John', lastName: 'Doe', password: 'Password1' } as any)).toThrow(UserErrorMessage.MISSING_FIELDS);
     });
 
     it('should throw synchronously if password is missing', () => {
-      expect(() => service.register({ firstName: 'J', lastName: 'D', login: 'j@test.com' } as any)).toThrow('User data is required for registration');
+      expect(() => service.register({ firstName: 'John', lastName: 'Doe', login: 'john@test.com' } as any)).toThrow(UserErrorMessage.MISSING_FIELDS);
     });
   });
 
+  /* LOGIN */
+  // mirrors the login() method: posts credentials, processes response, handles errors
   describe('login()', () => {
+    // default web credentials — authType COOKIE is used on web platform
     const credentials: Login = { login: 'john@test.com', password: 'Password1!', rememberMe: false, authType: 'COOKIE' as any };
 
     it('should POST to /api/login', () => {
       service.login(credentials).subscribe();
       const req = httpMock.expectOne('/api/login');
       expect(req.request.method).toBe('POST');
-      req.flush({ success: true, message: 'OK', user: mockUser });
+      req.flush({ success: true, user: mockUser });
     });
 
     it('should call setAuthState on successful login', fakeAsync(() => {
       service.login(credentials).subscribe();
       const req = httpMock.expectOne('/api/login');
-      req.flush({ success: true, message: 'OK', user: mockUser });
+      req.flush({ success: true, user: mockUser });
+      // flushMicrotasks resolves all pending Promises (from async pipe operators) before asserting
       flushMicrotasks();
       expect(adaptiveStorage.setAuthState).toHaveBeenCalled();
     }));
@@ -104,14 +130,16 @@ describe('UserService', () => {
     }));
 
     it('should throw synchronously if login field is missing', () => {
-      expect(() => service.login({ password: 'P' } as any)).toThrow('Login credentials are required');
+      expect(() => service.login({ password: 'Password1!' } as any)).toThrow(UserErrorMessage.MISSING_FIELDS);
     });
 
     it('should throw synchronously if password is missing', () => {
-      expect(() => service.login({ login: 'j@test.com' } as any)).toThrow('Login credentials are required');
+      expect(() => service.login({ login: 'john@test.com' } as any)).toThrow(UserErrorMessage.MISSING_FIELDS);
     });
   });
 
+  /* LOGOUT */
+  // logout uses finalize() so cleanup always runs — even when the API call fails
   describe('logout()', () => {
     it('should POST to /api/logout', () => {
       service.logout();
@@ -129,12 +157,15 @@ describe('UserService', () => {
 
     it('should still clear auth data and navigate when logout API fails', () => {
       service.logout();
+      // simulate a network error — finalize() must still run
       httpMock.expectOne('/api/logout').error(new ErrorEvent('network error'));
       expect(adaptiveStorage.clearAuthData).toHaveBeenCalled();
       expect(router.navigate).toHaveBeenCalledWith(['/home']);
     });
   });
 
+  /* IS LOGGED IN */
+  // delegates directly to adaptiveStorage.getAuthState()
   describe('isLoggedIn()', () => {
     it('should return false when not logged in', () => {
       adaptiveStorage.getAuthState.mockReturnValue(false);
@@ -147,6 +178,8 @@ describe('UserService', () => {
     });
   });
 
+  /* GET CURRENT USER */
+  // delegates directly to adaptiveStorage.getAuthStateUser()
   describe('getCurrentUser()', () => {
     it('should return null when no user in storage', () => {
       adaptiveStorage.getAuthStateUser.mockReturnValue(null);
@@ -159,6 +192,9 @@ describe('UserService', () => {
     });
   });
 
+  /* GET AUTH TOKEN */
+  // on web, always returns null — tokens are in HTTP-only cookies, not accessible to JS
+  // on mobile, reads from adaptiveStorage (Keychain/Keystore)
   describe('getAuthToken()', () => {
     it('should return null on web platform', async () => {
       const platformSpy = TestBed.inject(PlatformDetectionService) as jest.Mocked<PlatformDetectionService>;
@@ -174,6 +210,9 @@ describe('UserService', () => {
     });
   });
 
+  /* SET AUTH TOKEN */
+  // on web, does nothing — the browser handles cookies automatically
+  // on mobile, stores the token in secure storage
   describe('setAuthToken()', () => {
     it('should not call adaptiveStorage on web platform', async () => {
       const platformSpy = TestBed.inject(PlatformDetectionService) as jest.Mocked<PlatformDetectionService>;
@@ -190,6 +229,9 @@ describe('UserService', () => {
     });
   });
 
+  /* REFRESH ACCESS TOKEN */
+  // on web, a simple POST is enough — the browser sends the refresh cookie automatically
+  // on mobile, the refresh token must be read from storage and sent in the request body
   describe('refreshAccessToken()', () => {
     it('should POST to /api/refresh on web platform', () => {
       const platformSpy = TestBed.inject(PlatformDetectionService) as jest.Mocked<PlatformDetectionService>;
@@ -222,6 +264,8 @@ describe('UserService', () => {
     }));
   });
 
+  /* LOGIN — MOBILE PLATFORM */
+  // when authType is HEADER, the server returns a refresh token that must be saved to storage
   describe('login() with mobile platform', () => {
     const credentials: Login = { login: 'john@test.com', password: 'Password1!', rememberMe: false, authType: 'HEADER' as any };
 
@@ -232,11 +276,10 @@ describe('UserService', () => {
 
       service.login(credentials).subscribe();
       const req = httpMock.expectOne('/api/login');
-      req.flush({ success: true, message: 'OK', user: mockUser, authType: AuthType.HEADER, refreshToken: 'ref-tok' });
+      req.flush({ success: true, user: mockUser, authType: AuthType.HEADER, refreshToken: 'ref-tok' });
       flushMicrotasks();
       expect(adaptiveStorage.setAuthRefreshToken).toHaveBeenCalledWith('ref-tok');
       expect(adaptiveStorage.setAuthState).toHaveBeenCalled();
     }));
   });
 });
-

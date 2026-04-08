@@ -6,7 +6,8 @@ import { StudentService } from '../../core/service/student.service';
 import { Student } from '../../core/models/Student';
 import { MaterialModule } from '../../shared/material.module';
 import { ErrorService } from '../../core/service/error.service';
-import { InfoMessage } from '../../core/DTO/InfoMessage';
+import { InfoMessage } from '../../core/constants/InfoMessage';
+import { AppNotification } from '../../core/constants/appNotification';
 
 /**
  * Component - Displays all students with delete, view and edit shortcuts
@@ -82,7 +83,7 @@ export class StudentListComponent implements OnInit, OnDestroy {
         next: () => {
           // update local list without refetching from server
           this.students = this.students.filter(s => s.id !== this.pendingDeleteId);
-          this.infoMessage = { message: 'Student deleted successfully', error: false };
+          this.infoMessage = { message: AppNotification.STUDENT_DELETED, error: false };
           this.pendingDeleteId = null;
         },
         error: (err) => {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from "@angular/common/http";
-import { InfoMessage } from '../DTO/InfoMessage';
+import { InfoMessage } from '../constants/InfoMessage';
+import { HttpErrorMessage } from '../constants/httpErrorMessage';
 
 /**
  * Service - Centralizes HTTP error handling
@@ -32,18 +33,12 @@ export class ErrorService implements ErrorServiceInterface {
         }
 
         switch (err.status) {
-            case 0:
-                return 'Unable to connect to the server. Please check your network.';
-            case 401:
-                return 'Unauthorized. Please log in again.';
-            case 403:
-                return 'Access denied.';
-            case 404:
-                return 'Service not found.';
-            case 500:
-                return 'Internal server error. Please try again later.';
-            default:
-                return 'An unexpected error occurred. Please try again.';
+            case 0: return HttpErrorMessage.NETWORK;
+            case 401: return HttpErrorMessage.UNAUTHORIZED;
+            case 403: return HttpErrorMessage.FORBIDDEN;
+            case 404: return HttpErrorMessage.NOT_FOUND;
+            case 500: return HttpErrorMessage.SERVER_ERROR;
+            default: return HttpErrorMessage.UNKNOWN;
         }
     }
 }

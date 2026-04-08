@@ -116,7 +116,89 @@ Ce document définit la stratégie de test pour atteindre l'objectif de 80% de c
 
 ---
 
-## 3. Scénarios End-to-End (hors périmètre tests unitaires)
+## 3. Tests E2E — Cypress 15.13.0
 
-- **Flux 1 : Cycle de vie d'un compte** — Inscription → Connexion → Déconnexion
-- **Flux 2 : Gestion complète étudiant** — Connexion admin → Création → Modification → Suppression
+**Objectif de couverture : 100% des parcours utilisateur**  
+**Résultat atteint : 61 tests répartis sur 5 fichiers**
+
+> Les tests E2E tournent dans un vrai navigateur (Chrome). Ils ne dépendent pas d'un backend actif : chaque requête HTTP est interceptée via `cy.intercept()` et retourne des données de fixture.
+
+### Configuration
+
+- **`cypress.config.ts`** : `baseUrl: http://localhost:4200`, `defaultCommandTimeout: 8000`
+- **`cypress/tsconfig.json`** : `moduleResolution: node`, types `["cypress", "node"]`
+- **`cypress/support/commands.ts`** : `cy.login()` (UI complète) et `cy.logout()` (via menu nav)
+- **`cypress/support/e2e.ts`** : `beforeEach(() => cy.clearLocalStorage())`
+- **Fixtures** : `user.json`, `student.json`, `students.json`
+
+### Scripts disponibles
+
+```bash
+npm run cy:open          # interface graphique Cypress
+npm run cy:run           # headless CI
+npm run cy:run:headed    # navigateur visible
+```
+
+### `cypress/e2e/auth/register.cy.ts` — 11 tests ✅
+
+- Affichage du formulaire, bouton submit désactivé si vide
+- guestGuard : redirection d'un utilisateur déjà connecté
+- Erreurs required sur les 4 champs, erreur minlength firstName
+- Submit désactivé si invalide, activé si tous les champs valides
+- POST 201 → redirection `/login` + message de succès
+- Vérification du corps de la requête POST
+- Erreur 400 (email déjà pris), erreur 500 (serveur)
+
+### `cypress/e2e/auth/login.cy.ts` — 13 tests ✅
+
+- Affichage du formulaire, bouton désactivé si vide
+- guestGuard : redirection d'un utilisateur déjà connecté
+- Erreurs required, format email, minlength password, pattern (majuscule)
+- Submit activé si valide
+- POST succès → redirection `/studentList` + message
+- Vérification du corps POST
+- 401 (credentials invalides), erreur réseau
+- Toggle visibilité mot de passe, reset formulaire
+- Déconnexion → redirection `/home`, masquage des liens protégés
+
+### `cypress/e2e/students/studentList.cy.ts` — 12 tests ✅
+
+- authGuard : redirection vers `/home` si non authentifié
+- Affichage header, cards, noms et emails depuis fixture
+- État vide quand API retourne `[]`
+- Navigation : View Details → `/studentDetails/:id`, Edit → `/studentEdit/:id`, Create via menu
+- Suppression : dialogue de confirmation, confirm → DELETE + retrait de la liste, cancel → liste intacte
+- Erreur de chargement (500)
+
+### `cypress/e2e/students/studentCreate.cy.ts` — 12 tests ✅
+
+- authGuard : redirection vers `/home` si non authentifié
+- Affichage formulaire vide, submit désactivé
+- Erreurs required, format email, pattern zipCode (5 chiffres)
+- POST 201 → message de succès + redirection `/studentList` après 2s
+- Vérification du corps POST
+- Erreur 409 (conflit), reset formulaire, retour à la liste
+
+### `cypress/e2e/students/studentDetails.cy.ts` — 13 tests ✅
+
+- authGuard : redirection vers `/home` si non authentifié
+- Mode vue : nom dans le header, formulaire pré-rempli, désactivé, bouton Edit présent
+- Mode édition : formulaire activé, header "Edit Student", cancel restaure les valeurs
+- PUT 200 → message de succès + retour au mode vue
+- Vérification du corps PUT
+- Erreur 409 (conflit lors de la mise à jour)
+- Retour à la liste (Back to List, Cancel en mode vue)
+- 404 → état "not found"
+
+---
+
+## 4. Décisions Techniques
+
+| Problème                                                              | Solution                                                                           |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `ErrorService.handleError` est un mock → ne modifie pas `infoMessage` | `mockImplementation((_e, msg) => { msg.error = true; })` dans le test              |
+| `TestBed.configureTestingModule()` deux fois en même suite            | `TestBed.resetTestingModule()` avant la 2ème configuration                         |
+| Router réel sans routes → `NG04002` lors de `navigate()`              | `jest.spyOn(router, 'navigate').mockResolvedValue(true)`                           |
+| Chaîne `async/await` dans `fakeAsync`                                 | `flushMicrotasks()` une fois par `await` dans la chaîne                            |
+| E2E : guards Angular bloquent avant le rendu                          | `cy.window().then(win => win.localStorage.setItem(...))` via `cy.login()` UI       |
+| E2E : fixture JSON typée sans `import`                                | `cy.fixture('students.json')` (string ref) — pas de `resolveJsonModule` nécessaire |

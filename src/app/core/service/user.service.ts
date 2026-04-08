@@ -9,9 +9,10 @@ import { MessageResponse } from '../DTO/MessageResponse';
 import { Login } from '../DTO/Login';
 import { LoginResponse } from '../DTO/LoginResponse';
 import { AuthType } from '../DTO/AuthType';
-import { UserServiceInterface } from './servicesInterfaces/userServicesInterface';
+import { UserServiceInterface } from './servicesImpl/userServicesInterface';
 import { PlatformDetectionService } from './platformDetection.service';
 import { AdaptiveStorageService } from './adaptiveStorage.service';
+import { UserErrorMessage } from '../constants/userErrorMessage';
 
 /**
  * Service - Handles user authentication, session management and token refresh
@@ -34,7 +35,7 @@ export class UserService implements UserServiceInterface {
   /* REGISTER */
   register(userDTO: UserDTO): Observable<MessageResponse> {
     if (!userDTO?.login || !userDTO?.password) {
-      throw new Error('User data is required for registration');
+      throw new Error(UserErrorMessage.MISSING_FIELDS);
     }
     return this.httpClient.post<MessageResponse>(`${this.apiUrl}/register`, userDTO);
   }
@@ -42,7 +43,7 @@ export class UserService implements UserServiceInterface {
   /* LOGIN */
   login(login: Login): Observable<LoginResponse> {
     if (!login?.login || !login?.password) {
-      throw new Error('Login credentials are required');
+      throw new Error(UserErrorMessage.MISSING_FIELDS);
     }
 
     const loginPayload: Login = {
@@ -100,7 +101,7 @@ export class UserService implements UserServiceInterface {
 
     return from(this.adaptiveStorage.getAuthRefreshToken()).pipe(
       switchMap((refreshToken: string | null) => {
-        if (!refreshToken) return throwError(() => new Error('No refresh token available'));
+        if (!refreshToken) return throwError(() => new Error(UserErrorMessage.REFRESH_TOKEN_NOT_AVAILABLE));
 
         return this.httpClient.post<MessageResponse>(
           `${this.apiUrl}/refresh`,

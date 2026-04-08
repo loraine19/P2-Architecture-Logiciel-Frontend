@@ -6,6 +6,12 @@ import { UserService } from '../../core/service/user.service';
 import { MaterialModule } from '../material.module';
 import { UserDTO } from '../../core/models/User';
 
+/**
+ * Unit tests for NavigationComponent — authentication-aware navigation bar
+ * UserService is mocked to control isLoggedIn() and getCurrentUser() return values
+ */
+
+// shared mock user for getCurrentUser tests
 const mockUser: UserDTO = { firstName: 'John', lastName: 'Doe', login: 'john@test.com', password: '' };
 
 describe('NavigationComponent', () => {
@@ -13,6 +19,9 @@ describe('NavigationComponent', () => {
   let fixture: ComponentFixture<NavigationComponent>;
   let userService: jest.Mocked<UserService>;
 
+  /** TEST SETUP */
+  /* beforeEach */
+  // compiles the standalone component and injects a mocked UserService before each test
   beforeEach(async () => {
     const userSpy = {
       isLoggedIn: jest.fn().mockReturnValue(false),
@@ -34,6 +43,8 @@ describe('NavigationComponent', () => {
     fixture.detectChanges();
   });
 
+  /** COMPONENT TESTS */
+  /* COMPONENT INITIALIZATION */
   describe('Component Initialization', () => {
     it('should create', () => {
       expect(component).toBeTruthy();
@@ -44,6 +55,8 @@ describe('NavigationComponent', () => {
     });
   });
 
+  /* MENU MANAGEMENT */
+  // toggleMenu() flips isMenuOpen — two consecutive calls return to the original state
   describe('Menu Management', () => {
     it('should open menu on toggleMenu()', () => {
       component.toggleMenu();
@@ -63,6 +76,7 @@ describe('NavigationComponent', () => {
     });
   });
 
+  /* AUTHENTICATION INTEGRATION */
   describe('Authentication Integration', () => {
     it('should return false when user is not logged in', () => {
       userService.isLoggedIn.mockReturnValue(false);

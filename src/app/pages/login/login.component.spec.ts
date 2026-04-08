@@ -7,8 +7,10 @@ import { UserService } from "../../core/service/user.service";
 import { LoginResponse } from "../../core/DTO/LoginResponse";
 import { MaterialModule } from "../../shared/material.module";
 import { LoginComponent } from "./login.component";
-
-
+/**
+ * Unit tests for LoginComponent — login form validation and authentication flow
+ * UserService and ErrorService are replaced with spies so no real HTTP calls are made
+ */
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
@@ -16,6 +18,9 @@ describe('LoginComponent', () => {
   let router: jest.Mocked<Router>;
   let errorService: jest.Mocked<ErrorService>;
 
+  /** TEST SETUP */
+  /* beforeEach */
+  // builds the form and injects all required mocks before each test
   beforeEach(async () => {
     const userServiceSpy = { login: jest.fn() };
     const routerSpy = { navigateByUrl: jest.fn() };
@@ -46,6 +51,8 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
   });
 
+  /** COMPONENT TESTS */
+  /* COMPONENT INITIALIZATION */
   describe('Component Initialization', () => {
     it('should initialize with default values', () => {
       expect(component.loginForm).toBeDefined();
@@ -54,6 +61,7 @@ describe('LoginComponent', () => {
     });
   });
 
+  /* FORM VALIDATION */
   describe('Form Validation', () => {
     it('should validate required fields', () => {
       const login = component.loginForm.get('login');
@@ -82,6 +90,7 @@ describe('LoginComponent', () => {
     });
   });
 
+  /* AUTHENTICATION FLOW */
   describe('Authentication Flow', () => {
     it('should navigate on successful login', fakeAsync(() => {
       const credentials = {
@@ -93,6 +102,7 @@ describe('LoginComponent', () => {
       userService.login.mockReturnValue(of({ message: '', success: true, user: {} } as LoginResponse));
 
       component.onSubmit();
+      // tick(2000) advances the fake timer — the redirect runs inside a setTimeout in the component
       tick(2000); // Wait for redirect timeout
 
       expect(userService.login).toHaveBeenCalledWith(credentials);
@@ -110,6 +120,7 @@ describe('LoginComponent', () => {
     });
   });
 
+  /* FORM INTERACTION */
   describe('Form Interaction', () => {
     it('should toggle password visibility', () => {
       expect(component.passwordVisible).toBe(false);

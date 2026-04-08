@@ -5,8 +5,16 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { AppComponent } from './app.component';
 
+/**
+ * Unit tests for AppComponent — the root application shell
+ * Checks that the component boots and that the title property is set correctly
+ */
+
 describe('AppComponent', () => {
 
+  /** TEST SETUP */
+  /* beforeEach */
+  // compiles the standalone component with router and HTTP providers before each test
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
@@ -18,6 +26,8 @@ describe('AppComponent', () => {
     }).compileComponents();
   });
 
+  /** COMPONENT TESTS */
+  /* APPLICATION SHELL */
   describe('Application Shell', () => {
 
     it('should create the app', () => {
