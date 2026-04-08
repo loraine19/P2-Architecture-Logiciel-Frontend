@@ -1,5 +1,11 @@
-// Cypress global type declarations
 /// <reference types="cypress" />
+
+/**
+ * E2E — Custom Commands
+ *
+ * Reusable Cypress commands shared across all spec files.
+ * Loaded automatically via cypress/support/e2e.ts.
+ */
 
 export { };
 
@@ -20,17 +26,14 @@ declare global {
     }
 }
 
-// ─── AUTH COMMANDS ────────────────────────────────────────────────────────────
+/** AUTH COMMANDS */
 
-/**
- * cy.login()
- *
- * Goes through the full login UI flow with a mocked API response.
- * After calling this command, localStorage["authState"] is set and
- * the app is on /studentList. Use this in beforeEach() of tests that
- * require an authenticated user.
- */
+/* LOGIN */
+// goes through the full login UI flow with a mocked API — app lands on /studentList
 Cypress.Commands.add('login', (email = 'john@test.com', password = 'Password123!') => {
+    // mock student list that the component loads right after login redirect
+    cy.intercept('GET', '/api/students', { fixture: 'students.json' });
+
     cy.intercept('POST', '/api/login', {
         statusCode: 200,
         body: {
@@ -46,16 +49,12 @@ Cypress.Commands.add('login', (email = 'john@test.com', password = 'Password123!
     cy.get('[formcontrolname="password"]').type(password);
     cy.get('button[type="submit"]').click();
     cy.wait('@loginRequest');
-    // The component has a 2-second delay before navigating
+    // component has a 2-second delay before navigating after successful login
     cy.url({ timeout: 5000 }).should('include', '/studentList');
 });
 
-/**
- * cy.logout()
- *
- * Opens the navigation menu and clicks the Logout button (mocks the API).
- * After this command the app is on /home.
- */
+/* LOGOUT */
+// opens the navigation menu and clicks Logout — app lands on /home
 Cypress.Commands.add('logout', () => {
     cy.intercept('POST', '/api/logout', { statusCode: 200, body: {} }).as('logoutRequest');
     cy.get('.menu-toggle-btn').click();

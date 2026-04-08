@@ -5,27 +5,33 @@
  *
  * Covers:
  *  - Auth guard: unauthenticated access → redirect to /home
- *  - Page load — student data displayed, form disabled in view mode
- *  - Toggle to edit mode — form enabled
- *  - Cancel edit — form reset to original values, back to view mode
+ *  - Page load: student data displayed, form disabled in view mode
+ *  - Toggle to edit mode: form enabled
+ *  - Cancel edit: form reset to original values, back to view mode
  *  - Successful update → success message, back to view mode
  *  - API error during update → error message shown
  *  - Back to list navigation
  *  - Student not found (404) → not-found state shown
  */
 describe('Student Details / Edit Page', () => {
-    // ─── Auth Guard ───────────────────────────────────────────────────────────
+
+    /** AUTH GUARD */
 
     describe('Auth Guard', () => {
+
+        /* SHOULD REDIRECT UNAUTHENTICATED USER */
         it('should redirect unauthenticated user to /home', () => {
             cy.visit('/studentDetails/1');
             cy.url().should('include', '/home');
         });
     });
 
-    // ─── Authenticated Access ─────────────────────────────────────────────────
+    /** WHEN AUTHENTICATED */
 
     describe('When authenticated', () => {
+
+        /** BEFORE EACH */
+        // log in and load student #1 before each test
         beforeEach(() => {
             cy.intercept('GET', '/api/students', { fixture: 'students.json' });
             cy.intercept('GET', '/api/students/1', { fixture: 'student.json' }).as('getStudent');
@@ -34,59 +40,72 @@ describe('Student Details / Edit Page', () => {
             cy.wait('@getStudent');
         });
 
-        // ─── Page Load — View Mode ───────────────────────────────────────────────
+        /** VIEW MODE */
 
         describe('View Mode', () => {
+
+            /* SHOULD DISPLAY STUDENT NAME IN HEADER */
             it('should display the student name in the header', () => {
                 cy.contains('Alice').should('be.visible');
                 cy.contains('Martin').should('be.visible');
             });
 
+            /* SHOULD POPULATE FORM WITH STUDENT DATA */
             it('should populate the form with the student data', () => {
                 cy.get('[formcontrolname="firstName"]').should('have.value', 'Alice');
                 cy.get('[formcontrolname="email"]').should('have.value', 'alice@test.com');
                 cy.get('[formcontrolname="city"]').should('have.value', 'Paris');
             });
 
+            /* SHOULD START WITH FORM DISABLED */
             it('should start with the form disabled (view mode)', () => {
-                // In view mode, inputs are readonly / form is disabled
+                // inputs are disabled in view mode
                 cy.get('[formcontrolname="firstName"]').should('be.disabled');
             });
 
+            /* SHOULD SHOW EDIT TOGGLE BUTTON */
             it('should show an Edit toggle button', () => {
-                // The edit toggle is a mat-icon-button
                 cy.get('[title="Edit Student"]').should('be.visible');
             });
         });
 
-        // ─── Toggle to Edit Mode ─────────────────────────────────────────────────
+        /** EDIT MODE */
 
         describe('Edit Mode', () => {
+
+            /** BEFORE EACH */
+            // click the edit toggle before each test in this group
             beforeEach(() => {
                 cy.get('[title="Edit Student"]').click();
             });
 
+            /* SHOULD ENABLE FORM AFTER CLICKING EDIT */
             it('should enable the form after clicking Edit', () => {
                 cy.get('[formcontrolname="firstName"]').should('not.be.disabled');
                 cy.get('[formcontrolname="email"]').should('not.be.disabled');
             });
 
+            /* SHOULD SHOW EDIT STUDENT IN HEADER */
             it('should show "Edit Student" in the header when in edit mode', () => {
                 cy.contains('Edit Student').should('be.visible');
             });
 
+            /* SHOULD CANCEL EDIT AND RESTORE ORIGINAL VALUES */
             it('should cancel edit and restore original values', () => {
                 cy.get('[formcontrolname="firstName"]').clear().type('ChangedName');
                 cy.contains('button', 'Cancel').click();
 
+                // original value restored and form locked again
                 cy.get('[formcontrolname="firstName"]').should('have.value', 'Alice');
-                cy.get('[formcontrolname="firstName"]').should('be.disabled'); // back to view mode
+                cy.get('[formcontrolname="firstName"]').should('be.disabled');
             });
         });
 
-        // ─── Successful Update ───────────────────────────────────────────────────
+        /** SUCCESSFUL UPDATE */
 
         describe('Successful Update', () => {
+
+            /* SHOULD SHOW SUCCESS MESSAGE AFTER UPDATING */
             it('should show a success message after updating the student', () => {
                 cy.intercept('PUT', '/api/students/1', {
                     statusCode: 200,
@@ -104,6 +123,7 @@ describe('Student Details / Edit Page', () => {
                 cy.contains('updated').should('be.visible');
             });
 
+            /* SHOULD RETURN TO VIEW MODE AFTER SUCCESSFUL UPDATE */
             it('should return to view mode after a successful update', () => {
                 cy.intercept('PUT', '/api/students/1', {
                     statusCode: 200,
@@ -118,10 +138,11 @@ describe('Student Details / Edit Page', () => {
                 cy.get('button[type="submit"]').click();
                 cy.wait('@updateStudent');
 
-                // After update, form should be disabled again (view mode)
+                // form is disabled again after a successful update
                 cy.get('[formcontrolname="firstName"]').should('be.disabled');
             });
 
+            /* SHOULD PUT CORRECT DATA TO API */
             it('should PUT the correct data to /api/students/:id', () => {
                 cy.intercept('PUT', '/api/students/1', (req) => {
                     expect(req.body.firstName).to.eq('AliceUpdated');
@@ -136,9 +157,11 @@ describe('Student Details / Edit Page', () => {
             });
         });
 
-        // ─── Update Failure ──────────────────────────────────────────────────────
+        /** UPDATE FAILURE */
 
         describe('Update Failure', () => {
+
+            /* SHOULD SHOW ERROR MESSAGE WHEN UPDATE FAILS */
             it('should show an error message when update fails (409 conflict)', () => {
                 cy.intercept('PUT', '/api/students/1', {
                     statusCode: 409,
@@ -154,24 +177,23 @@ describe('Student Details / Edit Page', () => {
             });
         });
 
-        // ─── Back Navigation ─────────────────────────────────────────────────────
+        /** BACK NAVIGATION */
 
         describe('Back Navigation', () => {
-            it('should navigate to /studentList when clicking Back to List', () => {
-                cy.contains('button', 'Back to Student List').click();
-                cy.url().should('include', '/studentList');
-            });
 
-            it('should navigate to /studentList when cancelling from view mode', () => {
-                cy.contains('button', 'Cancel').click();
+            /* SHOULD NAVIGATE TO STUDENTLIST WHEN CLICKING BACK TO LIST */
+            it('should navigate to /studentList when clicking Back to List', () => {
+                cy.contains('button', 'Back to List').click();
                 cy.url().should('include', '/studentList');
             });
         });
     });
 
-    // ─── Student Not Found ────────────────────────────────────────────────────
+    /** STUDENT NOT FOUND */
 
     describe('Student Not Found', () => {
+
+        /* SHOULD SHOW NOT FOUND STATE WHEN STUDENT DOES NOT EXIST */
         it('should show a not-found state when student does not exist', () => {
             cy.intercept('GET', '/api/students', { fixture: 'students.json' });
             cy.intercept('GET', '/api/students/999', {
