@@ -4,6 +4,8 @@ import { Router, ActivatedRoute } from "@angular/router";
 import { of, throwError } from "rxjs";
 import { ErrorService } from "../../core/service/error.service";
 import { UserService } from "../../core/service/user.service";
+import { AdaptiveStorageService } from "../../core/service/adaptiveStorage.service";
+import { PlatformDetectionService } from "../../core/service/platformDetection.service";
 import { MaterialModule } from "../../shared/material.module";
 import { RegisterComponent } from "./register.component";
 import { AppNotification } from "../../core/constants/appNotification";
@@ -82,6 +84,28 @@ describe('RegisterComponent', () => {
       expect(login?.errors?.['required']).toBe(true);
       expect(password?.errors?.['required']).toBe(true);
     });
+
+    // CORRECTION : branche erreur non testée — login : format email invalide → errors['email']
+    it('should validate email format on login field', () => {
+      const login = component.registerForm.get('login');
+      login?.setValue('not-an-email');
+      expect(login?.errors?.['email']).toBeTruthy();
+    });
+
+    // CORRECTION : branche erreur non testée — password : pattern → mot de passe sans majuscule invalide
+    it('should validate password complexity pattern', () => {
+      const password = component.registerForm.get('password');
+      // contient chiffre et spécial mais pas de majuscule → pattern échoue
+      password?.setValue('lowercase123!');
+      expect(password?.errors?.['pattern']).toBeTruthy();
+    });
+
+    // CORRECTION : branche erreur non testée — firstName : minlength → 1 caractère sous le seuil de 2
+    it('should validate firstName minLength', () => {
+      const firstName = component.registerForm.get('firstName');
+      firstName?.setValue('a');
+      expect(firstName?.errors?.['minlength']).toBeTruthy();
+    });
   });
 
 
@@ -98,6 +122,18 @@ describe('RegisterComponent', () => {
 
       expect(userService.register).toHaveBeenCalledWith(credentials);
       expect(router.navigate).toHaveBeenCalledWith(['/login'], { queryParams: { msg: AppNotification.REGISTRATION_SUCCESS, error: 'false' } });
+    }));
+
+    // CORRECTION : branche erreur non testée — succès register → infoMessage affiché avant la redirection
+    it('should show welcome message with login before redirect on successful register', fakeAsync(() => {
+      const credentials = { firstName: 'John', lastName: 'Doe', login: 'test@example.com', password: 'Password123!' };
+      component.registerForm.setValue(credentials);
+      userService.register.mockReturnValue(of({ message: '' }));
+      component.onSubmit();
+      // le message doit être visible immédiatement, avant que le setTimeout redirige
+      expect(component.infoMessage.message).toContain('test@example.com');
+      expect(component.infoMessage.error).toBe(false);
+      tick(2000);
     }));
 
     it('should handle login failure', () => {
@@ -124,6 +160,14 @@ describe('RegisterComponent', () => {
       component.onReset();
       expect(component.submitted).toBe(false);
       expect(component.registerForm.pristine).toBe(true);
+    });
+
+    // CORRECTION : branche erreur non testée — formulaire invalide → submitted=true mais register() non appelé
+    it('should set submitted to true and not call register when form is invalid', () => {
+      // le formulaire est vide (invalide) par défaut à l'initialisation
+      component.onSubmit();
+      expect(component.submitted).toBe(true);
+      expect(userService.register).not.toHaveBeenCalled();
     });
   });
 });

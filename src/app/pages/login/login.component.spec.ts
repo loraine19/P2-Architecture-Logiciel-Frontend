@@ -1,12 +1,17 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from "@angular/core/testing";
+import { ComponentFixture, TestBed, fakeAsync, tick, flushMicrotasks } from "@angular/core/testing";
 import { ReactiveFormsModule } from "@angular/forms";
 import { Router, ActivatedRoute } from "@angular/router";
-import { of, throwError } from "rxjs";
+import { of, throwError, Subject } from "rxjs";
+import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
+import { provideHttpClient } from "@angular/common/http";
 import { ErrorService } from "../../core/service/error.service";
 import { UserService } from "../../core/service/user.service";
+import { AdaptiveStorageService } from "../../core/service/adaptiveStorage.service";
+import { PlatformDetectionService } from "../../core/service/platformDetection.service";
 import { LoginResponse } from "../../core/DTO/LoginResponse";
 import { MaterialModule } from "../../shared/material.module";
 import { LoginComponent } from "./login.component";
+import { UserDTO } from "../../core/models/User";
 /**
  * Unit tests for LoginComponent — login form validation and authentication flow
  * UserService and ErrorService are replaced with spies so no real HTTP calls are made
@@ -102,11 +107,22 @@ describe('LoginComponent', () => {
       userService.login.mockReturnValue(of({ message: '', success: true, user: {} } as LoginResponse));
 
       component.onSubmit();
-      // tick(2000) advances the fake timer — the redirect runs inside a setTimeout in the component
-      tick(2000); // Wait for redirect timeout
+      // tick(5000) advances the fake timer — the redirect runs inside a setTimeout(5000) in the component
+      tick(5000); // Wait for redirect timeout
 
       expect(userService.login).toHaveBeenCalledWith(credentials);
       expect(router.navigateByUrl).toHaveBeenCalledWith('/studentList');
+    }));
+
+    // CORRECTION : branche erreur non testée — succès login → infoMessage affiché avant la redirection
+    it('should show welcome message with login email after successful login', fakeAsync(() => {
+      component.loginForm.setValue({ login: 'test@example.com', password: 'Password123!', rememberMe: true });
+      userService.login.mockReturnValue(of({ message: '', success: true, user: {} } as LoginResponse));
+      component.onSubmit();
+      // le message doit être visible immédiatement avant que le setTimeout redirige
+      expect(component.infoMessage.message).toContain('test@example.com');
+      expect(component.infoMessage.error).toBe(false);
+      tick(2000);
     }));
 
     it('should handle login failure', () => {
@@ -133,6 +149,60 @@ describe('LoginComponent', () => {
       component.onReset();
       expect(component.submitted).toBe(false);
       expect(component.loginForm.pristine).toBe(true);
+    });
+
+    // CORRECTION : branche erreur non testée — formulaire invalide → submitted=true mais login() non appelé
+    it('should set submitted to true and not call login when form is invalid', () => {
+      // le formulaire est vide (invalide) par défaut à l'initialisation
+      component.onSubmit();
+      expect(component.submitted).toBe(true);
+      expect(userService.login).not.toHaveBeenCalled();
+    });
+  });
+
+  /* QUERY PARAMS */
+  // checkQueryParams() lit les params msg et error passés par register ou une session expirée
+  describe('Query Params', () => {
+    let params$: Subject<any>;
+    let comp: LoginComponent;
+    let fix: ComponentFixture<LoginComponent>;
+
+    // setup dédié avec un Subject contrôlable pour queryParams
+    beforeEach(async () => {
+      TestBed.resetTestingModule();
+      params$ = new Subject();
+
+      await TestBed.configureTestingModule({
+        imports: [LoginComponent, ReactiveFormsModule, MaterialModule],
+        providers: [
+          { provide: UserService, useValue: { login: jest.fn() } },
+          { provide: Router, useValue: { navigateByUrl: jest.fn() } },
+          { provide: ErrorService, useValue: { handleError: jest.fn() } },
+          {
+            provide: ActivatedRoute,
+            useValue: { snapshot: { queryParams: {} }, queryParams: params$ }
+          }
+        ]
+      }).compileComponents();
+
+      fix = TestBed.createComponent(LoginComponent);
+      comp = fix.componentInstance;
+      // ngOnInit s'exécute ici — la subscription à queryParams est enregistrée
+      fix.detectChanges();
+    });
+
+    // CORRECTION : branche erreur non testée — query param msg présent avec error='false' → infoMessage affiché
+    it('should set infoMessage from query params with error=false', () => {
+      params$.next({ msg: 'Registration successful!', error: 'false' });
+      expect(comp.infoMessage.message).toBe('Registration successful!');
+      expect(comp.infoMessage.error).toBe(false);
+    });
+
+    // CORRECTION : branche erreur non testée — query param error='true' → infoMessage.error=true
+    it('should set infoMessage.error to true when error query param is true', () => {
+      params$.next({ msg: 'Session expired', error: 'true' });
+      expect(comp.infoMessage.message).toBe('Session expired');
+      expect(comp.infoMessage.error).toBe(true);
     });
   });
 });

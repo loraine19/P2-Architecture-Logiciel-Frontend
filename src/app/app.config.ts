@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter, withDebugTracing } from '@angular/router';
+import { provideRouter } from '@angular/router';
 // use DI-based interceptors so class-based interceptors (AuthInterceptor) are picked up
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { routes } from './app.routes';
@@ -20,6 +20,6 @@ export const appConfig: ApplicationConfig = {
     },
 
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes, withDebugTracing())
+    provideRouter(routes)
   ]
 };

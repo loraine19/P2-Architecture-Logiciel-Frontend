@@ -4,6 +4,7 @@ import { AdaptiveStorageService } from './adaptiveStorage.service';
 import { PlatformDetectionService } from './platformDetection.service';
 import { LoginResponse } from '../DTO/LoginResponse';
 import { UserDTO } from '../models/User';
+import { UserErrorMessage } from '../constants/userErrorMessage';
 
 /**
  * Unit tests for AdaptiveStorageService — platform-aware token and session storage
@@ -59,6 +60,20 @@ describe('AdaptiveStorageService', () => {
             await service.setAuthToken('my-jwt-token');
             expect(await service.getAuthToken()).toBe('my-jwt-token');
         });
+
+        // CORRECTION : branche erreur non testée — SecureStorage.set() lève une exception → relancer SECURE_STORAGE_FAILED
+        it('should throw SECURE_STORAGE_FAILED when SecureStorage.set() throws', async () => {
+            (window as any).SecureStorage = { set: jest.fn().mockRejectedValue(new Error('native fail')) };
+            await expect(service.setAuthToken('jwt')).rejects.toThrow(UserErrorMessage.SECURE_STORAGE_FAILED);
+            delete (window as any).SecureStorage;
+        });
+
+        // CORRECTION : branche erreur non testée — SecureStorage.get() lève une exception → retourner null silencieusement
+        it('should return null when SecureStorage.get() throws', async () => {
+            (window as any).SecureStorage = { get: jest.fn().mockRejectedValue(new Error('native fail')) };
+            expect(await service.getAuthToken()).toBeNull();
+            delete (window as any).SecureStorage;
+        });
     });
 
     /* GET AUTH REFRESH TOKEN / SET AUTH REFRESH TOKEN */
@@ -70,6 +85,20 @@ describe('AdaptiveStorageService', () => {
         it('should store and retrieve refresh token via localStorage in dev mode', async () => {
             await service.setAuthRefreshToken('my-refresh-token');
             expect(await service.getAuthRefreshToken()).toBe('my-refresh-token');
+        });
+
+        // CORRECTION : branche erreur non testée — SecureStorage.set() lève une exception → relancer SECURE_STORAGE_FAILED
+        it('should throw SECURE_STORAGE_FAILED when SecureStorage.set() throws for refresh token', async () => {
+            (window as any).SecureStorage = { set: jest.fn().mockRejectedValue(new Error('native fail')) };
+            await expect(service.setAuthRefreshToken('refresh')).rejects.toThrow(UserErrorMessage.SECURE_STORAGE_FAILED);
+            delete (window as any).SecureStorage;
+        });
+
+        // CORRECTION : branche erreur non testée — SecureStorage.get() lève une exception → retourner null silencieusement
+        it('should return null when SecureStorage.get() throws for refresh token', async () => {
+            (window as any).SecureStorage = { get: jest.fn().mockRejectedValue(new Error('native fail')) };
+            expect(await service.getAuthRefreshToken()).toBeNull();
+            delete (window as any).SecureStorage;
         });
     });
 

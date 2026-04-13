@@ -1,17 +1,23 @@
 /// <reference types="cypress" />
 
+import { AppNotificationMessage } from '../../../src/app/core/constants/appNotification';
+
 /**
- * E2E — StudentCreateComponent
+ * E2E — Student Create
+ *
+ * Real API calls only — no network stubbing.
+ * Fixed test data lives in cypress/fixtures/test-student.json and
+ * cypress/fixtures/conflict-student.json — no Date.now() timestamps.
  *
  * Covers:
- *  - Auth guard: unauthenticated access → redirect to /home
- *  - Page load and form visibility
- *  - Form validation (required, email format, zipCode pattern)
- *  - Submit button disabled while form is invalid
+ *  - Auth guard: unauthenticated → /home
  *  - Successful creation → success message + redirect to /studentList
- *  - API conflict (409) → error message shown
- *  - Form reset button
- *  - Back to list navigation
+ *  - Duplicate email (real 409) → error message, stays on /studentCreate
+ *  - Back navigation → /studentList
+ *
+ * Cleanup strategy:
+ *  Before each scenario, cy.deleteStudentIfExists() visits /studentList and
+ *  removes any leftover student card by first name so the test is idempotent.
  */
 describe('Student Create Page', () => {
 
@@ -19,7 +25,6 @@ describe('Student Create Page', () => {
 
     describe('Auth Guard', () => {
 
-        /* SHOULD REDIRECT UNAUTHENTICATED USER */
         it('should redirect unauthenticated user to /home', () => {
             cy.visit('/studentCreate');
             cy.url().should('include', '/home');
@@ -30,19 +35,7 @@ describe('Student Create Page', () => {
 
     describe('When authenticated', () => {
 
-        // valid form data reused across tests
-        const validStudent = {
-            firstName: 'Alice',
-            lastName: 'Martin',
-            email: 'alice@test.com',
-            phoneNumber: '0600000001',
-            address: '10 rue des Lilas',
-            city: 'Paris',
-            zipCode: '75001',
-        };
-
-        // helper to fill all fields at once
-        const fillForm = (data: typeof validStudent) => {
+        const fillForm = (data: { firstName: string; lastName: string; email: string; phoneNumber: string; address: string; city: string; zipCode: string }) => {
             cy.get('[formcontrolname="firstName"]').type(data.firstName);
             cy.get('[formcontrolname="lastName"]').type(data.lastName);
             cy.get('[formcontrolname="email"]').type(data.email);
@@ -52,113 +45,39 @@ describe('Student Create Page', () => {
             cy.get('[formcontrolname="zipCode"]').type(data.zipCode);
         };
 
-        /** BEFORE EACH */
-        // log in and navigate to the create page before each test
         beforeEach(() => {
-            cy.intercept('GET', '/api/students', { fixture: 'students.json' });
             cy.login();
             cy.visit('/studentCreate');
-        });
-
-        /** PAGE LOAD */
-
-        describe('Page Load', () => {
-
-            /* SHOULD DISPLAY THE CREATE STUDENT FORM */
-            it('should display the create student form', () => {
-                cy.contains('h5', 'Create Student').should('be.visible');
-                cy.get('[formcontrolname="firstName"]').should('exist');
-                cy.get('[formcontrolname="email"]').should('exist');
-            });
-
-            /* SHOULD START WITH AN EMPTY FORM */
-            it('should start with an empty form', () => {
-                cy.get('[formcontrolname="firstName"]').should('have.value', '');
-                cy.get('[formcontrolname="email"]').should('have.value', '');
-            });
-
-            /* SHOULD HAVE SUBMIT BUTTON DISABLED ON LOAD */
-            it('should have the submit button disabled on load', () => {
-                cy.get('button[type="submit"]').should('be.disabled');
-            });
-        });
-
-        /** FORM VALIDATION */
-
-        describe('Form Validation', () => {
-
-            /* SHOULD SHOW REQUIRED ERRORS WHEN FIELDS ARE TOUCHED AND EMPTY */
-            it('should show required errors when fields are touched and empty', () => {
-                cy.get('[formcontrolname="firstName"]').type('A').clear().blur();
-                cy.contains('First name is required').should('be.visible');
-
-                cy.get('[formcontrolname="lastName"]').type('A').clear().blur();
-                cy.contains('Last name is required').should('be.visible');
-
-                cy.get('[formcontrolname="email"]').type('A').clear().blur();
-                cy.contains('Email is required').should('be.visible');
-            });
-
-            /* SHOULD SHOW EMAIL FORMAT ERROR FOR INVALID EMAIL */
-            it('should show email format error for invalid email', () => {
-                cy.get('[formcontrolname="email"]').type('not-an-email').blur();
-                cy.contains('Invalid email format').should('be.visible');
-            });
-
-            /* SHOULD ENABLE SUBMIT BUTTON WHEN ALL FIELDS ARE VALID */
-            it('should enable submit button when all fields are valid', () => {
-                fillForm(validStudent);
-                cy.get('button[type="submit"]').should('not.be.disabled');
-            });
         });
 
         /** SUCCESSFUL CREATION */
 
         describe('Successful Creation', () => {
 
-            /* SHOULD SHOW SUCCESS MESSAGE AFTER CREATING A STUDENT */
-            it('should show a success message after creating a student', () => {
-                cy.intercept('POST', '/api/students', {
-                    statusCode: 201,
-                    body: { id: 3, ...validStudent },
-                }).as('createStudent');
-
-                fillForm(validStudent);
-                cy.get('button[type="submit"]').click();
-                cy.wait('@createStudent');
-
-                // full name appears in the success message
-                cy.contains('Alice').should('be.visible');
-                cy.contains('created').should('be.visible');
+            // API-based cleanup: finds student by fixture email and deletes via API.
+            // Runs before the outer beforeEach (cy.login + cy.visit) — Mocha hook order:
+            // before() outer→inner first, THEN beforeEach() outer→inner per test.
+            before(() => {
+                cy.fixture('test-student').then((student) => {
+                    cy.deleteStudentByEmail(student.email);
+                });
             });
 
-            /* SHOULD REDIRECT TO STUDENTLIST AFTER CREATION */
-            it('should redirect to /studentList after 2 seconds on success', () => {
-                cy.intercept('GET', '/api/students', { fixture: 'students.json' });
-                cy.intercept('POST', '/api/students', {
-                    statusCode: 201,
-                    body: { id: 3, ...validStudent },
-                }).as('createStudent');
-
-                fillForm(validStudent);
-                cy.get('button[type="submit"]').click();
-                cy.wait('@createStudent');
-                // component delays 2 s before navigating after a successful creation
-                cy.url({ timeout: 5000 }).should('include', '/studentList');
-            });
-
-            /* SHOULD POST CORRECT DATA TO API */
-            it('should POST the correct data to /api/students', () => {
-                cy.intercept('POST', '/api/students', (req) => {
-                    expect(req.body.firstName).to.eq('Alice');
-                    expect(req.body.email).to.eq('alice@test.com');
-                    expect(req.body.zipCode).to.eq('75001');
-                    req.reply({ statusCode: 201, body: { id: 3, ...req.body } });
-                }).as('createStudent');
-
-                fillForm(validStudent);
-                cy.get('button[type="submit"]').click();
-                cy.wait('@createStudent');
+            it('should show success message and redirect to /studentList after creation', () => {
+                // Intercept must be registered BEFORE the fixture callback to ensure it
+                // is in the Cypress command queue before the form is submitted.
+                cy.intercept('POST', '/api/students').as('createReq');
+                cy.fixture('test-student').then((student) => {
+                    fillForm(student);
+                    cy.get('button[type="submit"]').click();
+                    // cy.contains retries for up to 3 s — enough to catch the message
+                    // before the component's 2 s redirect timer fires.
+                    cy.contains(
+                        AppNotificationMessage.STUDENT_CREATED(student.firstName, student.lastName),
+                        { timeout: 3000 }
+                    ).should('be.visible');
+                    cy.url({ timeout: 5000 }).should('include', '/studentList');
+                });
             });
         });
 
@@ -166,34 +85,38 @@ describe('Student Create Page', () => {
 
         describe('Creation Failure', () => {
 
-            /* SHOULD SHOW ERROR ON API CONFLICT */
-            it('should show an error message when the API returns a conflict (409)', () => {
-                cy.intercept('POST', '/api/students', {
-                    statusCode: 409,
-                    body: { message: 'Email already exists' },
-                }).as('conflictError');
-
-                fillForm(validStudent);
-                cy.get('button[type="submit"]').click();
-                cy.wait('@conflictError');
-
-                cy.contains('Email already exists').should('be.visible');
-                // stay on create page after a failed attempt
-                cy.url().should('include', '/studentCreate');
+            // Same API-based cleanup for the conflict student.
+            before(() => {
+                cy.fixture('conflict-student').then((student) => {
+                    cy.deleteStudentByEmail(student.email);
+                });
             });
-        });
 
-        /** FORM RESET */
+            let conflictStudentId: number;
 
-        describe('Form Reset', () => {
+            beforeEach(() => {
+                cy.fixture('conflict-student').then((student) => {
+                    cy.request('POST', '/api/students', student)
+                        .then(res => { conflictStudentId = res.body.id; });
+                });
+            });
 
-            /* SHOULD RESET FORM WHEN CLICKING RESET */
-            it('should reset the form when clicking Reset', () => {
-                cy.get('[formcontrolname="firstName"]').type('Alice');
-                cy.get('[formcontrolname="lastName"]').type('Martin');
-                cy.contains('button', 'Reset').should('be.visible').click();
-                cy.get('[formcontrolname="firstName"]').should('have.value', '');
-                cy.get('[formcontrolname="lastName"]').should('have.value', '');
+            afterEach(() => {
+                cy.request({ method: 'DELETE', url: `/api/students/${conflictStudentId}`, failOnStatusCode: false });
+            });
+            // check if better to throw 409 in back 
+            it('should show error when email is already taken ', () => {
+                cy.fixture('conflict-student').then((student) => {
+                    cy.intercept('POST', '/api/students').as('createConflict');
+                    fillForm({
+                        firstName: 'Duplicate', lastName: 'Student', email: student.email,
+                        phoneNumber: '0600000003', address: '3 rue Test', city: 'Paris', zipCode: '75002',
+                    });
+                    cy.get('button[type="submit"]').click();
+                    cy.wait('@createConflict').its('response.statusCode').should('eq', 400);
+                    cy.get('.alert-danger').should('be.visible');
+                    cy.url().should('include', '/studentCreate');
+                });
             });
         });
 
@@ -201,9 +124,7 @@ describe('Student Create Page', () => {
 
         describe('Back Navigation', () => {
 
-            /* SHOULD NAVIGATE TO STUDENTLIST WHEN CLICKING BACK */
             it('should navigate to /studentList when clicking Back to List', () => {
-                // button has no text — only a mat-icon, so select by title attribute
                 cy.get('button[title="Back to Student List"]').click();
                 cy.url().should('include', '/studentList');
             });

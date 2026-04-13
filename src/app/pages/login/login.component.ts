@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
           setTimeout(() => {
             const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/studentList';
             this.router.navigateByUrl(returnUrl);
-          }, 2000);
+          }, 5000);
         },
         error: (err: HttpErrorResponse) => this.errorService.handleError(err, this.infoMessage)
       });

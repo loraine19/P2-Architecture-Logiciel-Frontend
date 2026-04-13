@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { ReactiveFormsModule } from '@angular/forms';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { StudentCreateComponent } from './studentCreate.component';
 import { StudentService } from '../../core/service/student.service';
@@ -146,6 +148,15 @@ describe('StudentCreateComponent', () => {
       tick(2000);
       expect(navigateSpy).toHaveBeenCalledWith(['/studentList']);
     }));
+
+    // CORRECTION : branche erreur non testée — createStudent échoue → errorService.handleError appelé
+    it('should call errorService.handleError when createStudent fails', () => {
+      const errorService = TestBed.inject(ErrorService) as jest.Mocked<ErrorService>;
+      component.studentForm.setValue(validForm);
+      studentService.createStudent.mockReturnValue(throwError(() => ({ status: 500 })));
+      component.onSubmit();
+      expect(errorService.handleError).toHaveBeenCalled();
+    });
   });
 
   /* ON RESET */
@@ -160,6 +171,13 @@ describe('StudentCreateComponent', () => {
       component.studentForm.setValue(validForm);
       component.onReset();
       expect(component.studentForm.pristine).toBe(true);
+    });
+
+    // CORRECTION : branche erreur non testée — onReset remet infoMessage à vide
+    it('should reset infoMessage to empty', () => {
+      component.infoMessage = { message: 'Création échouée', error: true };
+      component.onReset();
+      expect(component.infoMessage).toEqual({ message: '', error: false });
     });
   });
 

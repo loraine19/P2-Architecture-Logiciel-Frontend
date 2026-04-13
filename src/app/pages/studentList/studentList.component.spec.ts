@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { StudentListComponent } from './studentList.component';
 import { StudentService } from '../../core/service/student.service';
@@ -102,6 +104,16 @@ describe('StudentListComponent', () => {
       component.confirmDelete();
       expect(studentService.deleteStudent).not.toHaveBeenCalled();
     });
+
+    // CORRECTION : branche erreur non testée — deleteStudent échoue → errorService.handleError appelé, pendingDeleteId remis à null
+    it('should call errorService.handleError and reset pendingDeleteId when delete fails', () => {
+      const errorService = TestBed.inject(ErrorService) as jest.Mocked<ErrorService>;
+      studentService.deleteStudent.mockReturnValue(throwError(() => ({ status: 500 })));
+      component.deleteStudent(1);
+      component.confirmDelete();
+      expect(errorService.handleError).toHaveBeenCalled();
+      expect(component.pendingDeleteId).toBeNull();
+    });
   });
 
   /* CANCEL DELETE */
@@ -110,6 +122,13 @@ describe('StudentListComponent', () => {
       component.pendingDeleteId = 1;
       component.cancelDelete();
       expect(component.pendingDeleteId).toBeNull();
+    });
+
+    // CORRECTION : branche erreur non testée — cancelDelete remet aussi infoMessage à vide
+    it('should reset infoMessage when cancelling delete', () => {
+      component.infoMessage = { message: 'Suppression annulée', error: true };
+      component.cancelDelete();
+      expect(component.infoMessage).toEqual({ message: '', error: false });
     });
   });
 

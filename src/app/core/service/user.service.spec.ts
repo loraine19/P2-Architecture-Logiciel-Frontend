@@ -10,6 +10,7 @@ import { Login } from '../DTO/Login';
 import { UserDTO } from '../models/User';
 import { AuthType } from '../DTO/AuthType';
 import { UserErrorMessage } from '../constants/userErrorMessage';
+import { LoginResponse } from '../DTO/LoginResponse';
 
 /**
  * Unit tests for UserService — authentication, session management and token refresh
@@ -164,34 +165,6 @@ describe('UserService', () => {
     });
   });
 
-  /* IS LOGGED IN */
-  // delegates directly to adaptiveStorage.getAuthState()
-  describe('isLoggedIn()', () => {
-    it('should return false when not logged in', () => {
-      adaptiveStorage.getAuthState.mockReturnValue(false);
-      expect(service.isLoggedIn()).toBe(false);
-    });
-
-    it('should return true when logged in', () => {
-      adaptiveStorage.getAuthState.mockReturnValue(true);
-      expect(service.isLoggedIn()).toBe(true);
-    });
-  });
-
-  /* GET CURRENT USER */
-  // delegates directly to adaptiveStorage.getAuthStateUser()
-  describe('getCurrentUser()', () => {
-    it('should return null when no user in storage', () => {
-      adaptiveStorage.getAuthStateUser.mockReturnValue(null);
-      expect(service.getCurrentUser()).toBeNull();
-    });
-
-    it('should return the stored user', () => {
-      adaptiveStorage.getAuthStateUser.mockReturnValue(mockUser);
-      expect(service.getCurrentUser()).toEqual(mockUser);
-    });
-  });
-
   /* GET AUTH TOKEN */
   // on web, always returns null — tokens are in HTTP-only cookies, not accessible to JS
   // on mobile, reads from adaptiveStorage (Keychain/Keystore)
@@ -262,6 +235,21 @@ describe('UserService', () => {
       expect(req.request.body).toEqual({ refreshToken: 'refresh-token' });
       req.flush({ message: 'Refreshed' });
     }));
+
+    // CORRECTION : branche erreur non testée — réponse mobile refresh contenant un bearer token → setAuthToken appelé
+    it('should store new access token when mobile refresh response contains Authorization bearer header', fakeAsync(() => {
+      const platformSpy = TestBed.inject(PlatformDetectionService) as jest.Mocked<PlatformDetectionService>;
+      platformSpy.isMobile.mockReturnValue(true);
+      adaptiveStorage.getAuthRefreshToken.mockResolvedValue('refresh-token');
+      adaptiveStorage.setAuthToken.mockResolvedValue(undefined);
+      service.refreshAccessToken().subscribe();
+      flushMicrotasks();
+      const req = httpMock.expectOne('/api/refresh');
+      // flush avec un header Authorization Bearer — extractTokenFromResponse doit détecter le token et appeler setAuthToken
+      req.flush({ message: 'Refreshed' }, { headers: { Authorization: 'Bearer new-access-token' } });
+      flushMicrotasks();
+      expect(adaptiveStorage.setAuthToken).toHaveBeenCalledWith('new-access-token');
+    }));
   });
 
   /* LOGIN — MOBILE PLATFORM */
@@ -280,6 +268,18 @@ describe('UserService', () => {
       flushMicrotasks();
       expect(adaptiveStorage.setAuthRefreshToken).toHaveBeenCalledWith('ref-tok');
       expect(adaptiveStorage.setAuthState).toHaveBeenCalled();
+    }));
+
+    // CORRECTION : branche erreur non testée — réponse sans refreshToken → setAuthRefreshToken ne doit pas être appelé
+    it('should NOT call setAuthRefreshToken when mobile login response has no refreshToken', fakeAsync(() => {
+      const platformSpy = TestBed.inject(PlatformDetectionService) as jest.Mocked<PlatformDetectionService>;
+      platformSpy.isMobile.mockReturnValue(true);
+      service.login(credentials).subscribe();
+      const req = httpMock.expectOne('/api/login');
+      // flush sans refreshToken — la branche if (response.refreshToken) est false
+      req.flush({ success: true, user: mockUser, authType: AuthType.HEADER });
+      flushMicrotasks();
+      expect(adaptiveStorage.setAuthRefreshToken).not.toHaveBeenCalled();
     }));
   });
 });

@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { StudentDetailsComponent } from './studentDetails.component';
 import { StudentService } from '../../core/service/student.service';
@@ -84,6 +86,16 @@ describe('StudentDetailsComponent', () => {
       expect(studentService.getStudentById).not.toHaveBeenCalled();
       expect(component.isLoading).toBe(false);
     });
+
+    // CORRECTION : branche erreur non testée — getStudentById échoue → errorService.handleError appelé, isLoading=false
+    it('should call errorService.handleError and set isLoading to false when getStudentById fails', () => {
+      const errorService = TestBed.inject(ErrorService) as jest.Mocked<ErrorService>;
+      // on remplace le mock par une erreur puis on rappelle loadStudent directement
+      studentService.getStudentById.mockReturnValue(throwError(() => ({ status: 404 })));
+      (component as any).loadStudent();
+      expect(errorService.handleError).toHaveBeenCalled();
+      expect(component.isLoading).toBe(false);
+    });
   });
 
   /* VIEW MODE */
@@ -130,6 +142,23 @@ describe('StudentDetailsComponent', () => {
       component.onSubmit();
       expect(component.isEditMode).toBe(false);
     });
+
+    // CORRECTION : branche erreur non testée — updateStudent échoue → errorService.handleError appelé
+    it('should call errorService.handleError when updateStudent fails', () => {
+      const errorService = TestBed.inject(ErrorService) as jest.Mocked<ErrorService>;
+      component.toggleEditMode();
+      studentService.updateStudent.mockReturnValue(throwError(() => ({ status: 500 })));
+      component.onSubmit();
+      expect(errorService.handleError).toHaveBeenCalled();
+    });
+
+    // CORRECTION : branche erreur non testée — studentId null → retour anticipé, updateStudent non appelé
+    it('should not call updateStudent when studentId is null', () => {
+      component.toggleEditMode(); // isEditMode = true
+      component.studentId = null;
+      component.onSubmit();
+      expect(studentService.updateStudent).not.toHaveBeenCalled();
+    });
   });
 
   /* ON CANCEL */
@@ -160,4 +189,3 @@ describe('StudentDetailsComponent', () => {
     });
   });
 });
-

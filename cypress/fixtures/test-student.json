@@ -1,0 +1,9 @@
+{
+    "firstName": "CypressCreate",
+    "lastName": "Student",
+    "email": "cypress-create-student@test.com",
+    "phoneNumber": "0600000001",
+    "address": "10 rue des Tests",
+    "city": "TestCity",
+    "zipCode": "75001"
+}
