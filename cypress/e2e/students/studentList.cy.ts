@@ -34,6 +34,27 @@ describe('Student List Page', () => {
 
         describe('Navigation', () => {
 
+            it('should close the menu when clicking a nav link', () => {
+                cy.get('.menu-toggle-btn').click();
+                cy.get('.side-menu').should('have.class', 'open');
+                cy.contains('a', 'Home').click();
+                cy.get('.side-menu').should('not.have.class', 'open');
+            });
+
+            it('should close the menu when clicking the overlay', () => {
+                cy.get('.menu-toggle-btn').click();
+                cy.get('.side-menu').should('have.class', 'open');
+                cy.get('.side-menu-overlay').click({ force: true });
+                cy.get('.side-menu').should('not.have.class', 'open');
+            });
+
+            it('should close the menu using the close button inside', () => {
+                cy.get('.menu-toggle-btn').click();
+                cy.get('.side-menu').should('have.class', 'open');
+                cy.get('.close-btn').click();
+                cy.get('.side-menu').should('not.have.class', 'open');
+            });
+
             // assumes at least one student exists in the DB
             it('should navigate to student details when clicking View', () => {
                 cy.get('button[title="View Details"]').first().click();
@@ -89,6 +110,23 @@ describe('Student List Page', () => {
                 cy.contains('button', 'Cancel').click();
                 cy.contains('ToDelete').should('exist');
             });
+        });
+    });
+
+    /** AUTH INTERCEPTOR */
+
+    describe('Auth Interceptor', () => {
+
+        // intercept returns 401, refresh also returns 401 → handle401Error fires, session cleared, user redirected
+        it('should redirect when session expires and refresh token is also rejected', () => {
+            cy.login();
+            cy.intercept('GET', '/api/students', { statusCode: 401 }).as('expiredSession');
+            cy.intercept('POST', '/api/refresh', { statusCode: 401 }).as('expiredRefresh');
+            cy.intercept('POST', '/api/logout', { statusCode: 200, body: {} }).as('logout');
+            cy.visit('/studentList');
+            cy.wait('@expiredSession');
+            cy.wait('@expiredRefresh');
+            cy.url({ timeout: 5000 }).should('not.include', '/studentList');
         });
     });
 });

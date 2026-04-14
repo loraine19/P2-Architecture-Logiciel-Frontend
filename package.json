@@ -10,7 +10,11 @@
     "test:watch": "jest --watch",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:run:headed": "cypress run --headed"
+    "cy:run:headed": "cypress run --headed",
+    "cy:coverage": "ng build --configuration=coverage && start-server-and-test 'vite preview --config vite.preview.config.ts --outDir dist/etudiant-frontend/browser' http://localhost:4200 'cypress run'",
+    "cy:coverage:open": "ng build --configuration=coverage && start-server-and-test 'vite preview --config vite.preview.config.ts --outDir dist/etudiant-frontend/browser' http://localhost:4200 'cypress open'",
+    "cy:coverage:build": "ng build --configuration=coverage && start-server-and-test 'vite preview --config vite.preview.config.ts --outDir dist/etudiant-frontend/browser' http://localhost:4200 'cypress run'",
+    "cy:coverage:report": "nyc report"
   },
   "private": true,
   "dependencies": {
@@ -28,14 +32,19 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "@angular-builders/custom-esbuild": "^21.0.3",
     "@angular/build": "^21.2.5",
     "@angular/cli": "^21.2.5",
     "@angular/compiler-cli": "^21.2.6",
+    "@cypress/code-coverage": "^4.0.3",
     "@types/jest": "^30.0.0",
     "cypress": "^15.13.0",
+    "esbuild-plugin-istanbul": "^0.3.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
     "jest-preset-angular": "^16.1.1",
+    "nyc": "^18.0.0",
+    "start-server-and-test": "^2.1.5",
     "typescript": "~5.9.3",
     "vite": "^8.0.5"
   }

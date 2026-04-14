@@ -12,6 +12,7 @@ module.exports = {
   },
 
   collectCoverage: true,
+  coverageDirectory: 'coverage/jest',
   coverageReporters: ['html', 'lcov'],
   testEnvironment: 'jest-environment-jsdom',
 };

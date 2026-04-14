@@ -11,7 +11,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
+          "builder": "@angular-builders/custom-esbuild:application",
           "options": {
             "outputPath": "dist/etudiant-frontend",
             "index": "src/index.html",
@@ -57,18 +57,30 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "coverage": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "plugins": [
+                "./coverage-plugin.mjs"
+              ]
             }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@angular-builders/custom-esbuild:dev-server",
           "configurations": {
             "production": {
               "buildTarget": "etudiant-frontend:build:production"
             },
             "development": {
               "buildTarget": "etudiant-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
+            },
+            "coverage": {
+              "buildTarget": "etudiant-frontend:build:coverage",
               "proxyConfig": "proxy.conf.json"
             }
           },

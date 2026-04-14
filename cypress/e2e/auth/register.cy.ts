@@ -60,6 +60,35 @@ describe('Register Page', () => {
         });
     });
 
+    /** FORM VALIDATION */
+
+    describe('Form Validation', () => {
+
+        it('should show required errors when fields are touched and empty', () => {
+            ['firstName', 'lastName', 'login', 'password'].forEach(field => {
+                cy.get(`[formcontrolname="${field}"]`).focus().blur();
+            });
+            cy.get('mat-error').should('have.length.greaterThan', 0);
+        });
+
+        it('should show minlength error for short first name', () => {
+            cy.get('[formcontrolname="firstName"]').type('A').blur();
+            cy.get('mat-error').should('be.visible');
+        });
+
+        it('should show email format error for invalid login', () => {
+            cy.get('[formcontrolname="login"]').type('not-valid').blur();
+            cy.get('mat-error').should('be.visible');
+        });
+
+        it('should toggle password visibility', () => {
+            cy.get('mat-icon[matsuffix]').click();
+            cy.get('[formcontrolname="password"]').should('have.attr', 'type', 'text');
+            cy.get('mat-icon[matsuffix]').click();
+            cy.get('[formcontrolname="password"]').should('have.attr', 'type', 'password');
+        });
+    });
+
     /** SUCCESSFUL REGISTRATION */
 
     describe('Successful Registration', () => {

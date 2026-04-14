@@ -1,0 +1,23 @@
+{
+    "report-dir": "coverage/cypress",
+    "reporter": [
+        "text",
+        "html",
+        "lcov"
+    ],
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "**/*.spec.ts",
+        "**/*.e2e.ts",
+        "src/main.ts",
+        "**/*.d.ts",
+        "src/app/core/DTO/**",
+        "src/app/core/models/**",
+        "src/app/core/service/servicesImpl/**",
+        "src/app/core/constants/InfoMessage.ts"
+    ],
+    "all": true,
+    "cwd": "/home/loraine/Projects/Archi P2 - Angular Java/Front-end---Testez-et-am-liorez-une-application-existante"
+}

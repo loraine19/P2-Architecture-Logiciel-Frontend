@@ -67,6 +67,39 @@ describe('Student Details / Edit Page', () => {
                 cy.get('[formcontrolname="firstName"]').should('have.value', 'Alice');
                 cy.get('[formcontrolname="firstName"]').should('be.disabled');
             });
+
+            it('should show required errors when submitting an empty form', () => {
+                cy.get('[title="Edit Student"]').click();
+                // clear all fields to trigger required validators
+                ['firstName', 'lastName', 'email', 'phoneNumber', 'address', 'city', 'zipCode'].forEach(field => {
+                    cy.get(`[formcontrolname="${field}"]`).clear();
+                });
+                // The submit button has [disabled]="studentForm.invalid", so normal click is blocked.
+                // cy.trigger('submit') is jQuery-based and doesn't reach Angular's addEventListener.
+                // Use Angular's dev-mode ng.applyChanges() to set submitted=true and trigger CD.
+                cy.window().then(win => {
+                    const el = win.document.querySelector('app-student-details');
+                    const comp = (win as any).ng.getComponent(el);
+                    comp.submitted = true;
+                    (win as any).ng.applyChanges(comp);
+                });
+                cy.get('mat-error').should('have.length.greaterThan', 0);
+            });
+
+            it('should show format errors for minlength, invalid email and invalid phone', () => {
+                cy.get('[title="Edit Student"]').click();
+                cy.get('[formcontrolname="firstName"]').clear().type('A');        // minlength < 2
+                cy.get('[formcontrolname="lastName"]').clear().type('B');         // minlength < 2
+                cy.get('[formcontrolname="email"]').clear().type('not-an-email'); // invalid email
+                cy.get('[formcontrolname="phoneNumber"]').clear().type('abc');    // invalid pattern
+                cy.window().then(win => {
+                    const el = win.document.querySelector('app-student-details');
+                    const comp = (win as any).ng.getComponent(el);
+                    comp.submitted = true;
+                    (win as any).ng.applyChanges(comp);
+                });
+                cy.get('mat-error').should('have.length.greaterThan', 0);
+            });
         });
 
         /** SUCCESSFUL UPDATE */
