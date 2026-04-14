@@ -16,18 +16,18 @@ import { UserDTO } from '../../core/models/User';
 const mockIntUser: UserDTO = { firstName: 'John', lastName: 'Doe', login: 'test@example.com', password: '' };
 
 /**
- * Tests d'intégration pour LoginComponent — utilise le vrai UserService + AdaptiveStorageService
- * On vérifie l'état du localStorage après le flux complet, et non de simples appels de mock.
- * PlatformDetectionService est fourni en vrai (platform web par défaut) — Router resté mocké.
+ * Integration tests for LoginComponent — uses the real UserService + AdaptiveStorageService
+ * Checks the localStorage state after the full flow, not just mock calls.
+ * PlatformDetectionService is provided as real (web platform by default) — Router stays mocked.
  */
-describe('LoginComponent — intégration (UserService réel)', () => {
+describe('LoginComponent — integration (real UserService)', () => {
     let intComponent: LoginComponent;
     let intFixture: ComponentFixture<LoginComponent>;
     let httpMock: HttpTestingController;
 
     /** TEST SETUP */
     /* beforeEach */
-    // UserService réel + AdaptiveStorageService réel — seul le Router et ErrorService sont mockés
+    // Real UserService + real AdaptiveStorageService — only Router and ErrorService are mocked
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [LoginComponent, ReactiveFormsModule, MaterialModule],
@@ -55,16 +55,16 @@ describe('LoginComponent — intégration (UserService réel)', () => {
     });
 
     /** INTEGRATION TESTS */
-    /* FLUX CONNEXION SUCCÈS */
-    // vérifie l'état réel du localStorage — le vrai AdaptiveStorageService écrit la session
+    /* LOGIN SUCCESS FLOW */
+    // checks real localStorage state — real AdaptiveStorageService writes the session
     describe('Login Flow', () => {
         it('should store auth state in localStorage after a successful login', fakeAsync(() => {
             intComponent.loginForm.setValue({ login: 'test@example.com', password: 'Password1!', rememberMe: true });
             intComponent.onSubmit();
-            // le vrai UserService fait un POST; on intercepte et flushe la réponse
+            // real UserService makes a POST; we intercept and flush the response
             httpMock.expectOne('/api/login').flush({ success: true, user: mockIntUser });
             flushMicrotasks();
-            // le vrai AdaptiveStorageService a écrit dans localStorage — on lit directement
+            // real AdaptiveStorageService has written to localStorage — we read it directly
             const stored = JSON.parse(localStorage.getItem('authState')!);
             expect(stored.isLoggedIn).toBe(true);
             expect(stored.user).toEqual(mockIntUser);
@@ -74,7 +74,7 @@ describe('LoginComponent — intégration (UserService réel)', () => {
         it('should NOT store auth state when login response has success=false', fakeAsync(() => {
             intComponent.loginForm.setValue({ login: 'test@example.com', password: 'Password1!', rememberMe: true });
             intComponent.onSubmit();
-            // le serveur refuse la connexion — AdaptiveStorageService ne doit pas écrire en localStorage
+            // server rejects the login — AdaptiveStorageService must not write to localStorage
             httpMock.expectOne('/api/login').flush({ success: false, message: 'Bad credentials', user: null });
             flushMicrotasks();
             expect(localStorage.getItem('authState')).toBeNull();

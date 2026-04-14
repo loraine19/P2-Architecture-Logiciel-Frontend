@@ -12,17 +12,17 @@ import { Student } from '../../core/models/Student';
 const mockStudent = new Student(1, 'John', 'Doe', 'john@test.com', '0600000000', '1 rue Test', 'Paris', '75001');
 
 /**
- * Tests d'intégration pour StudentDetailsComponent — utilise le vrai StudentService
- * ngOnInit charge le vrai étudiant via HTTP — on vérifie le formulaire peuplé et le PUT après modification.
+ * Integration tests for StudentDetailsComponent — uses the real StudentService
+ * ngOnInit loads the real student via HTTP — checks the populated form and PUT after update.
  */
-describe('StudentDetailsComponent — intégration (StudentService réel)', () => {
+describe('StudentDetailsComponent — integration (real StudentService)', () => {
     let intComponent: StudentDetailsComponent;
     let intFixture: ComponentFixture<StudentDetailsComponent>;
     let httpMock: HttpTestingController;
 
     /** TEST SETUP */
     /* beforeEach */
-    // StudentService réel + ActivatedRoute fixé sur id=1 — ErrorService resté mocké
+    // Real StudentService + ActivatedRoute fixed on id=1 — ErrorService stays mocked
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [StudentDetailsComponent, ReactiveFormsModule, MaterialModule],
@@ -39,44 +39,44 @@ describe('StudentDetailsComponent — intégration (StudentService réel)', () =
         intFixture = TestBed.createComponent(StudentDetailsComponent);
         intComponent = intFixture.componentInstance;
         httpMock = TestBed.inject(HttpTestingController);
-        // detectChanges() déclenche ngOnInit → loadStudent() → GET /api/students/1
+        // detectChanges() triggers ngOnInit → loadStudent() → GET /api/students/1
         intFixture.detectChanges();
     });
 
     afterEach(() => httpMock.verify());
 
     /** INTEGRATION TESTS */
-    /* CHARGEMENT */
-    // le vrai StudentService fait le GET — on vérifie que le formulaire est peuplé avec les bonnes données
+    /* LOAD STUDENT */
+    // real StudentService makes the GET — checks that the form is populated with correct data
     describe('Load Student', () => {
         it('should populate form fields from real HTTP GET response', () => {
-            // vrai StudentService intercepté — on retourne mockStudent
+            // real StudentService intercepted — we return mockStudent
             httpMock.expectOne('/api/students/1').flush(mockStudent);
             expect(intComponent.studentForm.get('firstName')?.value).toBe('John');
             expect(intComponent.studentForm.get('email')?.value).toBe('john@test.com');
             expect(intComponent.isLoading).toBe(false);
-            // formulaire verrouillé en lecture seule après chargement
+            // form locked as read-only after load
             expect(intComponent.studentForm.disabled).toBe(true);
         });
     });
 
-    /* MODIFICATION */
-    // passage en mode édition, modification, soumission — verify le PUT et l'état post-mise à jour
+    /* UPDATE FLOW */
+    // switch to edit mode, edit, submit — verify the PUT and post-update state
     describe('Update Flow', () => {
         it('should PUT updated data and refresh component.student', () => {
             httpMock.expectOne('/api/students/1').flush(mockStudent);
-            // basculer en mode édition déverrouille le formulaire
+            // switching to edit mode unlocks the form
             intComponent.toggleEditMode();
             expect(intComponent.studentForm.disabled).toBe(false);
-            // modifier un champ puis soumettre
+            // modify a field and submit
             intComponent.studentForm.get('firstName')?.setValue('Jonathan');
             intComponent.onSubmit();
-            // vrai StudentService envoie PUT /api/students/1 avec les données modifiées
+            // real StudentService sends PUT /api/students/1 with updated data
             const req = httpMock.expectOne('/api/students/1');
             expect(req.request.method).toBe('PUT');
             expect(req.request.body.firstName).toBe('Jonathan');
             req.flush({ ...mockStudent, firstName: 'Jonathan' });
-            // le composant met à jour student et quitte le mode édition
+            // component updates student and exits edit mode
             expect(intComponent.student?.firstName).toBe('Jonathan');
             expect(intComponent.isEditMode).toBe(false);
         });

@@ -61,14 +61,14 @@ describe('AdaptiveStorageService', () => {
             expect(await service.getAuthToken()).toBe('my-jwt-token');
         });
 
-        // CORRECTION : branche erreur non testée — SecureStorage.set() lève une exception → relancer SECURE_STORAGE_FAILED
+        // missing branch — SecureStorage.set() throws → rethrow SECURE_STORAGE_FAILED
         it('should throw SECURE_STORAGE_FAILED when SecureStorage.set() throws', async () => {
             (window as any).SecureStorage = { set: jest.fn().mockRejectedValue(new Error('native fail')) };
             await expect(service.setAuthToken('jwt')).rejects.toThrow(UserErrorMessage.SECURE_STORAGE_FAILED);
             delete (window as any).SecureStorage;
         });
 
-        // CORRECTION : branche erreur non testée — SecureStorage.get() lève une exception → retourner null silencieusement
+        // missing branch — SecureStorage.get() throws → return null silently
         it('should return null when SecureStorage.get() throws', async () => {
             (window as any).SecureStorage = { get: jest.fn().mockRejectedValue(new Error('native fail')) };
             expect(await service.getAuthToken()).toBeNull();
@@ -87,14 +87,14 @@ describe('AdaptiveStorageService', () => {
             expect(await service.getAuthRefreshToken()).toBe('my-refresh-token');
         });
 
-        // CORRECTION : branche erreur non testée — SecureStorage.set() lève une exception → relancer SECURE_STORAGE_FAILED
+        // missing branch — SecureStorage.set() throws → rethrow SECURE_STORAGE_FAILED
         it('should throw SECURE_STORAGE_FAILED when SecureStorage.set() throws for refresh token', async () => {
             (window as any).SecureStorage = { set: jest.fn().mockRejectedValue(new Error('native fail')) };
             await expect(service.setAuthRefreshToken('refresh')).rejects.toThrow(UserErrorMessage.SECURE_STORAGE_FAILED);
             delete (window as any).SecureStorage;
         });
 
-        // CORRECTION : branche erreur non testée — SecureStorage.get() lève une exception → retourner null silencieusement
+        // missing branch — SecureStorage.get() throws → return null silently
         it('should return null when SecureStorage.get() throws for refresh token', async () => {
             (window as any).SecureStorage = { get: jest.fn().mockRejectedValue(new Error('native fail')) };
             expect(await service.getAuthRefreshToken()).toBeNull();

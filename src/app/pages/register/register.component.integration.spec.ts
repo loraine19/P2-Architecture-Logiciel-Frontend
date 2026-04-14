@@ -12,11 +12,11 @@ import { MaterialModule } from '../../shared/material.module';
 import { RegisterComponent } from './register.component';
 
 /**
- * Tests d'intégration pour RegisterComponent — utilise le vrai UserService
- * On vérifie que les bonnes données sont envoyées à l'API et que la navigation post-succès est correcte.
- * AdaptiveStorageService est fourni en vrai — l'inscription ne stocke rien localement (pas de login auto).
+ * Integration tests for RegisterComponent — uses the real UserService
+ * Checks that the correct data is sent to the API and that post-success navigation is correct.
+ * AdaptiveStorageService is provided as real — registration stores nothing locally (no auto-login).
  */
-describe('RegisterComponent — intégration (UserService réel)', () => {
+describe('RegisterComponent — integration (real UserService)', () => {
     let intComponent: RegisterComponent;
     let intFixture: ComponentFixture<RegisterComponent>;
     let httpMock: HttpTestingController;
@@ -24,7 +24,7 @@ describe('RegisterComponent — intégration (UserService réel)', () => {
 
     /** TEST SETUP */
     /* beforeEach */
-    // UserService réel + AdaptiveStorageService réel — Router et ErrorService restent mockés
+    // Real UserService + real AdaptiveStorageService — Router and ErrorService stay mocked
     beforeEach(async () => {
         const routerSpy = { navigate: jest.fn() };
 
@@ -52,14 +52,14 @@ describe('RegisterComponent — intégration (UserService réel)', () => {
     afterEach(() => httpMock.verify());
 
     /** INTEGRATION TESTS */
-    /* FLUX INSCRIPTION */
-    // on vérifie le corps de la requête HTTP réelle et la navigation post-succès
+    /* REGISTER FLOW */
+    // checks the real HTTP request body and post-success navigation
     describe('Register Flow', () => {
         it('should send correct registration data to POST /api/register', fakeAsync(() => {
             const credentials = { firstName: 'John', lastName: 'Doe', login: 'test@example.com', password: 'Password123!' };
             intComponent.registerForm.setValue(credentials);
             intComponent.onSubmit();
-            // vrai UserService envoie la requête — on vérifie la data transmise à l'API
+            // real UserService sends the request — we check the data sent to the API
             const req = httpMock.expectOne('/api/register');
             expect(req.request.method).toBe('POST');
             expect(req.request.body).toEqual(credentials);
@@ -71,7 +71,7 @@ describe('RegisterComponent — intégration (UserService réel)', () => {
             intComponent.registerForm.setValue({ firstName: 'John', lastName: 'Doe', login: 'test@example.com', password: 'Password123!' });
             intComponent.onSubmit();
             httpMock.expectOne('/api/register').flush({ message: 'Registered' });
-            // tick(2000) avance le fake timer — la navigation est dans un setTimeout dans onSubmit()
+            // tick(2000) advances the fake timer — navigation is inside a setTimeout in onSubmit()
             tick(2000);
             expect(intRouter.navigate).toHaveBeenCalledWith(
                 ['/login'],

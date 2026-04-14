@@ -14,17 +14,17 @@ const mockStudents: Student[] = [
 ];
 
 /**
- * Tests d'intégration pour StudentListComponent — utilise le vrai StudentService
- * On vérifie l'état du composant (students, isLoading) après les réponses HTTP réelles interceptées.
+ * Integration tests for StudentListComponent — uses the real StudentService
+ * Checks component state (students, isLoading) after real intercepted HTTP responses.
  */
-describe('StudentListComponent — intégration (StudentService réel)', () => {
+describe('StudentListComponent — integration (real StudentService)', () => {
     let intComponent: StudentListComponent;
     let intFixture: ComponentFixture<StudentListComponent>;
     let httpMock: HttpTestingController;
 
     /** TEST SETUP */
     /* beforeEach */
-    // StudentService réel — ErrorService resté mocké (logique déjà testée dans error.service.spec)
+    // Real StudentService — ErrorService stays mocked (logic already tested in error.service.spec)
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [StudentListComponent, MaterialModule],
@@ -40,15 +40,15 @@ describe('StudentListComponent — intégration (StudentService réel)', () => {
         intFixture = TestBed.createComponent(StudentListComponent);
         intComponent = intFixture.componentInstance;
         httpMock = TestBed.inject(HttpTestingController);
-        // detectChanges() déclenche ngOnInit → getAllStudents() → requête HTTP en attente
+        // detectChanges() triggers ngOnInit → getAllStudents() → pending HTTP request
         intFixture.detectChanges();
     });
 
     afterEach(() => httpMock.verify());
 
     /** INTEGRATION TESTS */
-    /* CHARGEMENT */
-    // le vrai StudentService fait le GET — on vérifie que le composant reçoit et affiche les données
+    /* LOAD STUDENTS */
+    // real StudentService makes the GET — checks that the component receives and displays the data
     describe('Load Students', () => {
         it('should populate students array from real HTTP GET response', () => {
             httpMock.expectOne('/api/students').flush(mockStudents);
@@ -58,19 +58,19 @@ describe('StudentListComponent — intégration (StudentService réel)', () => {
         });
     });
 
-    /* SUPPRESSION */
-    // suppression réelle : DELETE HTTP + filtre local sur students[]
+    /* DELETE FLOW */
+    // real delete: HTTP DELETE + local filter on students[]
     describe('Delete Flow', () => {
         it('should update students array after real HTTP DELETE', () => {
-            // chargement initial
+            // initial load
             httpMock.expectOne('/api/students').flush(mockStudents);
             expect(intComponent.students.length).toBe(2);
-            // déclenchement de la suppression en deux étapes
+            // trigger the two-step delete
             intComponent.deleteStudent(1);
             intComponent.confirmDelete();
-            // vrai StudentService envoie DELETE /api/students/1
+            // real StudentService sends DELETE /api/students/1
             httpMock.expectOne('/api/students/1').flush(null, { status: 204, statusText: 'No Content' });
-            // le composant retire l'étudiant sans refaire de GET
+            // component removes the student without a new GET
             expect(intComponent.students.find(s => s.id === 1)).toBeUndefined();
             expect(intComponent.students.length).toBe(1);
         });

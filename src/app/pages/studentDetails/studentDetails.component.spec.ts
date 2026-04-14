@@ -87,10 +87,10 @@ describe('StudentDetailsComponent', () => {
       expect(component.isLoading).toBe(false);
     });
 
-    // CORRECTION : branche erreur non testée — getStudentById échoue → errorService.handleError appelé, isLoading=false
+    // missing branch — getStudentById fails → errorService.handleError called, isLoading=false
     it('should call errorService.handleError and set isLoading to false when getStudentById fails', () => {
       const errorService = TestBed.inject(ErrorService) as jest.Mocked<ErrorService>;
-      // on remplace le mock par une erreur puis on rappelle loadStudent directement
+      // replace the mock with an error then call loadStudent directly
       studentService.getStudentById.mockReturnValue(throwError(() => ({ status: 404 })));
       (component as any).loadStudent();
       expect(errorService.handleError).toHaveBeenCalled();
@@ -143,7 +143,7 @@ describe('StudentDetailsComponent', () => {
       expect(component.isEditMode).toBe(false);
     });
 
-    // CORRECTION : branche erreur non testée — updateStudent échoue → errorService.handleError appelé
+    // missing branch — updateStudent fails → errorService.handleError called
     it('should call errorService.handleError when updateStudent fails', () => {
       const errorService = TestBed.inject(ErrorService) as jest.Mocked<ErrorService>;
       component.toggleEditMode();
@@ -152,7 +152,7 @@ describe('StudentDetailsComponent', () => {
       expect(errorService.handleError).toHaveBeenCalled();
     });
 
-    // CORRECTION : branche erreur non testée — studentId null → retour anticipé, updateStudent non appelé
+    // missing branch — studentId null → early return, updateStudent not called
     it('should not call updateStudent when studentId is null', () => {
       component.toggleEditMode(); // isEditMode = true
       component.studentId = null;

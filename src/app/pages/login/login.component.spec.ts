@@ -114,12 +114,12 @@ describe('LoginComponent', () => {
       expect(router.navigateByUrl).toHaveBeenCalledWith('/studentList');
     }));
 
-    // CORRECTION : branche erreur non testée — succès login → infoMessage affiché avant la redirection
+    // missing branch — login success → infoMessage shown before redirect
     it('should show welcome message with login email after successful login', fakeAsync(() => {
       component.loginForm.setValue({ login: 'test@example.com', password: 'Password123!', rememberMe: true });
       userService.login.mockReturnValue(of({ message: '', success: true, user: {} } as LoginResponse));
       component.onSubmit();
-      // le message doit être visible immédiatement avant que le setTimeout redirige
+      // message must be visible immediately before setTimeout redirects
       expect(component.infoMessage.message).toContain('test@example.com');
       expect(component.infoMessage.error).toBe(false);
       tick(2000);
@@ -151,9 +151,9 @@ describe('LoginComponent', () => {
       expect(component.loginForm.pristine).toBe(true);
     });
 
-    // CORRECTION : branche erreur non testée — formulaire invalide → submitted=true mais login() non appelé
+    // missing branch — invalid form → submitted=true but login() not called
     it('should set submitted to true and not call login when form is invalid', () => {
-      // le formulaire est vide (invalide) par défaut à l'initialisation
+      // form is empty (invalid) by default on init
       component.onSubmit();
       expect(component.submitted).toBe(true);
       expect(userService.login).not.toHaveBeenCalled();
@@ -161,13 +161,13 @@ describe('LoginComponent', () => {
   });
 
   /* QUERY PARAMS */
-  // checkQueryParams() lit les params msg et error passés par register ou une session expirée
+  // checkQueryParams() reads the msg and error params passed by register or an expired session
   describe('Query Params', () => {
     let params$: Subject<any>;
     let comp: LoginComponent;
     let fix: ComponentFixture<LoginComponent>;
 
-    // setup dédié avec un Subject contrôlable pour queryParams
+    // dedicated setup with a controllable Subject for queryParams
     beforeEach(async () => {
       TestBed.resetTestingModule();
       params$ = new Subject();
@@ -187,18 +187,18 @@ describe('LoginComponent', () => {
 
       fix = TestBed.createComponent(LoginComponent);
       comp = fix.componentInstance;
-      // ngOnInit s'exécute ici — la subscription à queryParams est enregistrée
+      // ngOnInit runs here — queryParams subscription is registered
       fix.detectChanges();
     });
 
-    // CORRECTION : branche erreur non testée — query param msg présent avec error='false' → infoMessage affiché
+    // missing branch — query param msg with error='false' → infoMessage shown
     it('should set infoMessage from query params with error=false', () => {
       params$.next({ msg: 'Registration successful!', error: 'false' });
       expect(comp.infoMessage.message).toBe('Registration successful!');
       expect(comp.infoMessage.error).toBe(false);
     });
 
-    // CORRECTION : branche erreur non testée — query param error='true' → infoMessage.error=true
+    // missing branch — query param error='true' → infoMessage.error=true
     it('should set infoMessage.error to true when error query param is true', () => {
       params$.next({ msg: 'Session expired', error: 'true' });
       expect(comp.infoMessage.message).toBe('Session expired');

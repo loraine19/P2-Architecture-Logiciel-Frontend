@@ -105,7 +105,7 @@ describe('StudentListComponent', () => {
       expect(studentService.deleteStudent).not.toHaveBeenCalled();
     });
 
-    // CORRECTION : branche erreur non testée — deleteStudent échoue → errorService.handleError appelé, pendingDeleteId remis à null
+    // missing branch — deleteStudent fails → errorService.handleError called, pendingDeleteId reset to null
     it('should call errorService.handleError and reset pendingDeleteId when delete fails', () => {
       const errorService = TestBed.inject(ErrorService) as jest.Mocked<ErrorService>;
       studentService.deleteStudent.mockReturnValue(throwError(() => ({ status: 500 })));
@@ -124,9 +124,9 @@ describe('StudentListComponent', () => {
       expect(component.pendingDeleteId).toBeNull();
     });
 
-    // CORRECTION : branche erreur non testée — cancelDelete remet aussi infoMessage à vide
+    // missing branch — cancelDelete also resets infoMessage to empty
     it('should reset infoMessage when cancelling delete', () => {
-      component.infoMessage = { message: 'Suppression annulée', error: true };
+      component.infoMessage = { message: 'Deletion cancelled', error: true };
       component.cancelDelete();
       expect(component.infoMessage).toEqual({ message: '', error: false });
     });

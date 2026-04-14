@@ -236,7 +236,7 @@ describe('UserService', () => {
       req.flush({ message: 'Refreshed' });
     }));
 
-    // CORRECTION : branche erreur non testée — réponse mobile refresh contenant un bearer token → setAuthToken appelé
+    // missing branch — mobile refresh response containing a bearer token → setAuthToken called
     it('should store new access token when mobile refresh response contains Authorization bearer header', fakeAsync(() => {
       const platformSpy = TestBed.inject(PlatformDetectionService) as jest.Mocked<PlatformDetectionService>;
       platformSpy.isMobile.mockReturnValue(true);
@@ -245,7 +245,7 @@ describe('UserService', () => {
       service.refreshAccessToken().subscribe();
       flushMicrotasks();
       const req = httpMock.expectOne('/api/refresh');
-      // flush avec un header Authorization Bearer — extractTokenFromResponse doit détecter le token et appeler setAuthToken
+      // flush with Authorization Bearer header — extractTokenFromResponse must detect the token and call setAuthToken
       req.flush({ message: 'Refreshed' }, { headers: { Authorization: 'Bearer new-access-token' } });
       flushMicrotasks();
       expect(adaptiveStorage.setAuthToken).toHaveBeenCalledWith('new-access-token');
@@ -270,13 +270,13 @@ describe('UserService', () => {
       expect(adaptiveStorage.setAuthState).toHaveBeenCalled();
     }));
 
-    // CORRECTION : branche erreur non testée — réponse sans refreshToken → setAuthRefreshToken ne doit pas être appelé
+    // missing branch — response without refreshToken → setAuthRefreshToken must not be called
     it('should NOT call setAuthRefreshToken when mobile login response has no refreshToken', fakeAsync(() => {
       const platformSpy = TestBed.inject(PlatformDetectionService) as jest.Mocked<PlatformDetectionService>;
       platformSpy.isMobile.mockReturnValue(true);
       service.login(credentials).subscribe();
       const req = httpMock.expectOne('/api/login');
-      // flush sans refreshToken — la branche if (response.refreshToken) est false
+      // flush without refreshToken — the if (response.refreshToken) branch is false
       req.flush({ success: true, user: mockUser, authType: AuthType.HEADER });
       flushMicrotasks();
       expect(adaptiveStorage.setAuthRefreshToken).not.toHaveBeenCalled();

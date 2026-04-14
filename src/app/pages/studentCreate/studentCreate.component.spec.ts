@@ -149,7 +149,7 @@ describe('StudentCreateComponent', () => {
       expect(navigateSpy).toHaveBeenCalledWith(['/studentList']);
     }));
 
-    // CORRECTION : branche erreur non testée — createStudent échoue → errorService.handleError appelé
+    // missing branch — createStudent fails → errorService.handleError called
     it('should call errorService.handleError when createStudent fails', () => {
       const errorService = TestBed.inject(ErrorService) as jest.Mocked<ErrorService>;
       component.studentForm.setValue(validForm);
@@ -173,9 +173,9 @@ describe('StudentCreateComponent', () => {
       expect(component.studentForm.pristine).toBe(true);
     });
 
-    // CORRECTION : branche erreur non testée — onReset remet infoMessage à vide
+    // missing branch — onReset also resets infoMessage to empty
     it('should reset infoMessage to empty', () => {
-      component.infoMessage = { message: 'Création échouée', error: true };
+      component.infoMessage = { message: 'Creation failed', error: true };
       component.onReset();
       expect(component.infoMessage).toEqual({ message: '', error: false });
     });

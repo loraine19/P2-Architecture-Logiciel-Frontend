@@ -9,17 +9,17 @@ import { ErrorService } from '../../core/service/error.service';
 import { MaterialModule } from '../../shared/material.module';
 
 /**
- * Tests d'intégration pour StudentCreateComponent — utilise le vrai StudentService
- * On vérifie le corps de la requête HTTP et l'état du composant après la réponse.
+ * Integration tests for StudentCreateComponent — uses the real StudentService
+ * Checks the HTTP request body and component state after the response.
  */
-describe('StudentCreateComponent — intégration (StudentService réel)', () => {
+describe('StudentCreateComponent — integration (real StudentService)', () => {
     let intComponent: StudentCreateComponent;
     let intFixture: ComponentFixture<StudentCreateComponent>;
     let httpMock: HttpTestingController;
 
     /** TEST SETUP */
     /* beforeEach */
-    // StudentService réel — ErrorService resté mocké
+    // Real StudentService — ErrorService stays mocked
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [StudentCreateComponent, ReactiveFormsModule, MaterialModule],
@@ -36,16 +36,16 @@ describe('StudentCreateComponent — intégration (StudentService réel)', () =>
         intComponent = intFixture.componentInstance;
         httpMock = TestBed.inject(HttpTestingController);
         intFixture.detectChanges();
-        // bloquer la navigation réelle — provideRouter([]) ne connaît pas '/studentList'
-        // l'objectif ici est de tester le POST HTTP, pas la navigation (déjà testée dans les unit tests)
+        // block real navigation — provideRouter([]) does not know '/studentList'
+        // the goal here is to test the HTTP POST, not navigation (already tested in unit tests)
         jest.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     });
 
     afterEach(() => httpMock.verify());
 
     /** INTEGRATION TESTS */
-    /* CRÉATION */
-    // on vérifie que le vrai StudentService envoie les bonnes données et que le composant réagit
+    /* CREATE FLOW */
+    // checks that the real StudentService sends correct data and the component reacts
     describe('Create Flow', () => {
         const intValidForm = {
             firstName: 'John', lastName: 'Doe', email: 'john@test.com',
@@ -55,12 +55,12 @@ describe('StudentCreateComponent — intégration (StudentService réel)', () =>
         it('should POST student data to /api/students via real StudentService', fakeAsync(() => {
             intComponent.studentForm.setValue(intValidForm);
             intComponent.onSubmit();
-            // vrai StudentService construit le POST — on intercepte et vérifie le body
+            // real StudentService builds the POST — we intercept and check the body
             const req = httpMock.expectOne('/api/students');
             expect(req.request.method).toBe('POST');
             expect(req.request.body).toEqual(intValidForm);
             req.flush({ id: 1, ...intValidForm });
-            // le composant affiche le message de succès avant la redirection
+            // component shows the success message before redirect
             expect(intComponent.infoMessage.error).toBe(false);
             expect(intComponent.infoMessage.message).toContain('John Doe');
             tick(2000);
