@@ -16,8 +16,8 @@ import { AppNotificationMessage } from '../../../src/app/core/constants/appNotif
  *  - Back navigation → /studentList
  *
  * Cleanup strategy:
- *  Before each scenario, cy.deleteStudentIfExists() visits /studentList and
- *  removes any leftover student card by first name so the test is idempotent.
+ *  Before each scenario, cy.deleteStudentByEmail() queries GET /api/students, finds the
+ *  student by email, and deletes by ID — idempotent, no UI navigation required.
  */
 describe('Student Create Page', () => {
 

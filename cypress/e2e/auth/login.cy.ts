@@ -12,10 +12,6 @@
  *  - Invalid credentials (real 401) → error message
  *  - Logout → /home
  *
- * Timing note:
- *  The login component redirects inside a setTimeout(5000 ms).
- *  cy.intercept is used to synchronise on the API response before asserting
- *  the URL so the assertion window starts only after the server has replied.
  */
 describe('Login Page', () => {
 
@@ -56,8 +52,7 @@ describe('Login Page', () => {
             cy.get('[formcontrolname="login"]').type('nonexistent@nowhere.invalid');
             cy.get('[formcontrolname="password"]').type('WrongPass1!');
             cy.get('button[type="submit"]').click();
-            // Wait for the real response — don't assert the status code (backend may return
-            // 400 or 401 depending on implementation). Just verify the error banner appears.
+            // Wait for the real API response to verify the error banner appears.
             cy.wait('@failedLogin');
             cy.get('.alert-danger').should('be.visible');
             cy.url().should('include', '/login');

@@ -58,19 +58,14 @@ Cypress.Commands.add('logout', () => {
 });
 
 /* DELETE STUDENT IF EXISTS */
-// Visits /studentList, waits for the list to load, then deletes the matching card if found.
+// Finds the student by firstName via real API and deletes by ID — no UI navigation needed.
+// Requires the caller to be already authenticated (browser session from cy.login()).
 Cypress.Commands.add('deleteStudentIfExists', (firstName: string) => {
-    cy.intercept('GET', '/api/students*').as('_studentsLoad');
-    cy.visit('/studentList');
-    cy.wait('@_studentsLoad');
-    cy.get('body').then(($body) => {
-        const hasCard = $body.find('.student-card').toArray()
-            .some(card => card.textContent?.includes(firstName));
-        if (hasCard) {
-            cy.contains('.student-card', firstName)
-                .find('button[title="Delete Student"]').click();
-            cy.contains('button', 'Confirm').click();
-            cy.contains('.student-card', firstName).should('not.exist');
+    cy.request('GET', '/api/students').then((res) => {
+        const student = (res.body as { firstName: string; id: number }[])
+            .find(s => s.firstName === firstName);
+        if (student) {
+            cy.request({ method: 'DELETE', url: `/api/students/${student.id}`, failOnStatusCode: false });
         }
     });
 });

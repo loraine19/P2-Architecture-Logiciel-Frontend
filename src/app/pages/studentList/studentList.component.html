@@ -90,7 +90,7 @@
 
         <div class="students-list">
           @for (student of students; track student.id) {
-            <div class="student-card">
+            <div class="student-card" [attr.data-student-id]="student.id">
               <div class="d-block d-md-none">
                 <div class="student-card-header">
                   <div class="student-name gap-3">

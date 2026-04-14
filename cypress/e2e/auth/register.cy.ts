@@ -25,7 +25,6 @@ describe('Register Page', () => {
      * Cleanup helper — authenticates via the API (session cookie), then calls
      * POST /api/delete-test-user with the fixture login as a plain-text body.
      * Clears cookies afterwards so the browser session stays clean.
-     * The endpoint requires auth and expects: @RequestBody String login.
      */
     const deleteFixtureUser = () => {
         cy.fixture('test-user').then((user) => {
